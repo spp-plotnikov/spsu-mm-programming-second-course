@@ -24,7 +24,7 @@ public class Consumer implements Runnable {
 
     @Override
     public void run() {
-        while (MainAppThread.CHECK.get()) {
+        while (MainAppThread.check.get()) {
             try {
                 semaphore.acquire();
                 if (commonList.size() > 0) {

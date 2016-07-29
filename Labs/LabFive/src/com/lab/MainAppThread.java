@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MainAppThread {
 
-    public static AtomicBoolean CHECK = new AtomicBoolean(true);
+    public static AtomicBoolean check = new AtomicBoolean(true);
     private final static List<Request> commonList = new ArrayList<>();
 
     private static final int COUNTOFCONSUMER = 5;
@@ -51,7 +51,7 @@ public class MainAppThread {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         reader.readLine();
-        CHECK.set(false);
+        check.set(false);
 
         for (int i = 0; i < COUNTOFCONSUMER; i++) {
             listOfConsumer.get(0).join();

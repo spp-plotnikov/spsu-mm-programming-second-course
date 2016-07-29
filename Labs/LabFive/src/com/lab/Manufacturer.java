@@ -25,7 +25,7 @@ public class Manufacturer implements Runnable {
     @Override
     public void run() {
         int countOfRequest = 1;
-        while (MainAppThread.CHECK.get()) {
+        while (MainAppThread.check.get()) {
             try {
                 semaphore.acquire();
                 String number = getName() + "." + countOfRequest;
