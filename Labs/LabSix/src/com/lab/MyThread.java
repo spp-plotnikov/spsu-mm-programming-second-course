@@ -63,15 +63,15 @@ public class MyThread extends Thread {
     }
 
     private void makeTask() {
-        numberOfTask = task.doTask(name);
-        System.out.println("Thread " + name + " completed task number " + numberOfTask);
-        synchronized (getTaskQueue()) {
-            if (!getTaskQueue().isEmpty()) {
+        while(true){
+            numberOfTask = task.doTask(name);
+            System.out.println("Thread " + name + " completed task number " + numberOfTask);
+            synchronized (getTaskQueue()) {
+                if (getTaskQueue().isEmpty()) {
+                    return;
+                }
                 setTask(getTaskQueue().pop());
-            } else {
-                return;
             }
         }
-        makeTask();
     }
 }
