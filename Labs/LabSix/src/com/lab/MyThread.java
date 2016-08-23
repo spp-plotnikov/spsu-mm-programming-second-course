@@ -50,8 +50,7 @@ public class MyThread extends Thread {
     public void run() {
         while (isCheck()) {
             setSleep(false);
-            numberOfTask = task.doTask(name);
-            takeNewTask();
+            makeTask();
             setSleep(true);
             try {
                 synchronized (this) {
@@ -63,13 +62,16 @@ public class MyThread extends Thread {
         }
     }
 
-    private void takeNewTask() {
+    private void makeTask() {
+        numberOfTask = task.doTask(name);
         System.out.println("Thread " + name + " completed task number " + numberOfTask);
-        if (!getTaskQueue().isEmpty()) {
-            synchronized (getTaskQueue()) {
+        synchronized (getTaskQueue()) {
+            if (!getTaskQueue().isEmpty()) {
                 setTask(getTaskQueue().pop());
-                takeNewTask();
+            } else {
+                return;
             }
         }
+        makeTask();
     }
 }

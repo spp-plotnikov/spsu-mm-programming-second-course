@@ -22,32 +22,32 @@ public class ThreadPool implements AutoCloseable {
         this.countOfThreads = 0;
     }
 
-    public void addNewTask(int numberOfTask, int timer) {
+    public void enqueue(Task task) {
         for (int i = 0; i < countOfThreads; i++) {
-            if (threads[i].isSleep()) {
-                synchronized (threads[i]) {
-                    threads[i].setTask(new Task(numberOfTask, timer));
+            synchronized (threads[i]) {
+                if (threads[i].isSleep()) {
+                    threads[i].setTask(task);
                     threads[i].notify();
+                    return;
                 }
-                return;
             }
         }
-        if (countOfThreads != SIZE) {
-            synchronized (specialVarForSynch) {
+        synchronized (specialVarForSynch) {
+            if (countOfThreads != SIZE) {
                 threads[countOfThreads] = new MyThread(Integer.toString(countOfThreads), taskQueue);
-                threads[countOfThreads].setTask(new Task(numberOfTask, timer));
+                threads[countOfThreads].setTask(task);
                 threads[countOfThreads].start();
                 countOfThreads++;
-            }
-        } else {
-            synchronized (taskQueue) {
-                taskQueue.addLast(new Task(numberOfTask, timer));
+            } else {
+                synchronized (taskQueue) {
+                    taskQueue.addLast(task);
+                }
             }
         }
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() throws IOException, InterruptedException {
         for (int i = 0; i < countOfThreads; i++) {
             threads[i].setCheck(false);
             while (!threads[i].isSleep()) {

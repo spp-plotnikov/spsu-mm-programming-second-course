@@ -19,7 +19,7 @@ public class TheMainAppThread {
             System.out.println("Write '-' if you want to stop..");
 
             while (!(reader.readLine()).equals("-")) {
-                threadPool.addNewTask(numberOfTask, random.nextInt(10));
+                threadPool.enqueue(new Task(numberOfTask, random.nextInt(10)));
                 numberOfTask++;
             }
         }
