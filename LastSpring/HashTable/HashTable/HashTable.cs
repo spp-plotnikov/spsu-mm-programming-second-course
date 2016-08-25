@@ -8,15 +8,14 @@ namespace HashTable
 {
     class HashTable<T>
     {
-        public enum ObjIsFound { No, Yes };
         static int TableSize = 3;
-        StartHashTable<T>[] first = new StartHashTable<T>[TableSize];
+        ElemHashTable<T>[] first = new ElemHashTable<T>[TableSize];
 
         public HashTable()
         {
             for (int i = 0; i < TableSize; i++)
             {
-                first[i] = new StartHashTable<T>(default(T));
+                first[i] = new ElemHashTable<T>(default(T));
             }
         }
 
@@ -29,27 +28,27 @@ namespace HashTable
                 next = next.Next;
             }
 
-            next.Next = new StartHashTable<T>(obj);
+            next.Next = new ElemHashTable<T>(obj);
         }
 
-        public ObjIsFound Search(T obj)
+        public bool Search(T obj)
         {
             int hash = obj.GetHashCode() % TableSize;
-            var next = first[hash].Next;
-            while (next != null)
+            var next = first[hash];
+            while (next.Next != null)
             {
-                if (next.Value.Equals(obj))
+                if (next.Next.Value.Equals(obj))
                 {
-                    return ObjIsFound.Yes;
+                    return true;
                 }
-                next = next.Next;
+                next.Next = next.Next.Next;
             }
-            return ObjIsFound.No;
+            return false;
         }
 
         public void Delete(T obj)
         {
-            if (Search(obj) == ObjIsFound.Yes)
+            if (Search(obj) == true)
             {
                 int hash = obj.GetHashCode() % TableSize;
                 var next = first[hash];

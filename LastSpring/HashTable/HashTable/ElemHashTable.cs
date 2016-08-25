@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace HashTable
 {
-    class StartHashTable<T>
+    class ElemHashTable<T>
     {
-        public StartHashTable<T> Next;
+        public ElemHashTable<T> Next;
         public T Value;
 
-        public StartHashTable(T obj)
+        public ElemHashTable(T obj)
         {
             this.Next = null;
             this.Value = obj;
