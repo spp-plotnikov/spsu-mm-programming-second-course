@@ -13,15 +13,18 @@ namespace Baccarat
             Console.WriteLine();
 
             Console.Write("Enter Strategy (1 - all rates for lose player,\n 2 - all rates for win player, 3 - all rates for drow): ");
-            while (1 == 1)
+            while (true)
             {
                 try {
                     int str = Convert.ToInt32(Console.ReadLine());
                     GameLogic gm = new GameLogic(str);
-                    gm.Game();
+                    Console.WriteLine();
+                    gm.Play();
                     Console.WriteLine("Result game: {0} ye", gm.resultGame);
                     Console.WriteLine();
-                    Console.Write("For continue enter Strategy:");
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.Write("For continue enter Strategy: ");
                 }
                 catch (System.FormatException)
                 {

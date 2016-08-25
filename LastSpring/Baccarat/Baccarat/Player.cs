@@ -8,14 +8,13 @@ namespace Baccarat
 {
     sealed class Player: Man
     {
-        internal int Score()
+        override internal int Score(ref int counter)
         {
             int s;
-            s = (TakeCard() + TakeCard()) % 10; // Счёт после взятия двух карт
-            if (s < 6)  //Добор ещё одной при определённом условии
-            {
-                s = (s + TakeCard()) % 10;
-            }
+            s = (ChargePointsAfterDraw(ref counter) + ChargePointsAfterDraw(ref counter)) % 10;
+            if (s < 6)
+                s = (s + ChargePointsAfterDraw(ref  counter)) % 10;
+            
             return s;
         }
     }

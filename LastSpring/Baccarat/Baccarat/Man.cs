@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Baccarat
 {
-    class Man
+    abstract class Man
     {
-        protected int TakeCard()  // В игре будет взято максимум 6 карт, при наличии 6 колод взятые карты могут быть
-        {               // одинаковыми, поэтому метод TakeCard универсален для любого взятия карты
-            Random rand = new Random();
-            int i = rand.Next(1, 52);
+        protected int ChargePointsAfterDraw(ref int counter) {
+            Random rand = new Random((int)System.DateTime.Now.Millisecond);
+            byte[] b = new byte[20];
+            rand.NextBytes(b);
             int score = 0;
-            switch (i % 13)
+            switch (b[counter] % 13)
             {
                 case 0: score = 1; break;//туз
                 case 1: score = 2; break;//двойка
@@ -30,8 +30,10 @@ namespace Baccarat
                 case 11: break;
                 case 12: break;
             }
-            Thread.Sleep(15);
+            counter++;
+            counter = counter % 20;
             return score;
         }
+        abstract internal int Score(ref int counter);
     }
 }
