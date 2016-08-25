@@ -26,7 +26,7 @@ public class MyThread extends Thread {
         return taskQueue;
     }
 
-    public void setTask(Task task) {
+    private void setTask(Task task) {
         this.task = task;
     }
 
@@ -48,6 +48,7 @@ public class MyThread extends Thread {
 
     @Override
     public void run() {
+        setSleep(false);
         while (isCheck()) {
             setSleep(false);
             makeTask();
@@ -64,14 +65,14 @@ public class MyThread extends Thread {
 
     private void makeTask() {
         while(true){
-            numberOfTask = task.doTask(name);
-            System.out.println("Thread " + name + " completed task number " + numberOfTask);
             synchronized (getTaskQueue()) {
                 if (getTaskQueue().isEmpty()) {
                     return;
                 }
                 setTask(getTaskQueue().pop());
             }
+            numberOfTask = task.doTask(name);
+            System.out.println("Thread " + name + " completed task number " + numberOfTask);
         }
     }
 }

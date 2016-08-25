@@ -26,7 +26,7 @@ public class ThreadPool implements AutoCloseable {
         for (int i = 0; i < countOfThreads; i++) {
             synchronized (threads[i]) {
                 if (threads[i].isSleep()) {
-                    threads[i].setTask(task);
+                    taskQueue.addLast(task);
                     threads[i].notify();
                     return;
                 }
@@ -35,7 +35,7 @@ public class ThreadPool implements AutoCloseable {
         synchronized (specialVarForSynch) {
             if (countOfThreads != SIZE) {
                 threads[countOfThreads] = new MyThread(Integer.toString(countOfThreads), taskQueue);
-                threads[countOfThreads].setTask(task);
+                taskQueue.addLast(task);
                 threads[countOfThreads].start();
                 countOfThreads++;
             } else {
