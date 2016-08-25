@@ -8,7 +8,7 @@ namespace HashTable
 {
     class HashTable<T>
     {
-        static int TableSize = 3;
+        const int TableSize = 3;
         ElemHashTable<T>[] first = new ElemHashTable<T>[TableSize];
 
         public HashTable()
@@ -48,11 +48,11 @@ namespace HashTable
 
         public void Delete(T obj)
         {
-            if (Search(obj) == true)
+            if (Search(obj))
             {
                 int hash = obj.GetHashCode() % TableSize;
                 var next = first[hash];
-                while (next.Next.Value.Equals(obj) == false)
+                while (!next.Next.Value.Equals(obj))
                 {
                     next = next.Next;
                 }
