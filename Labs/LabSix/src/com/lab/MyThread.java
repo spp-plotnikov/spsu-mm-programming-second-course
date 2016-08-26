@@ -12,17 +12,17 @@ public class MyThread extends Thread {
     private AtomicBoolean check;
     private boolean isSleep;
     private Task task;
-    private Deque<Task> taskQueue;
+    private MyQueue<Task> taskQueue;
     private int numberOfTask;
 
-    public MyThread(String name, Deque<Task> taskQueue) {
+    public MyThread(String name, MyQueue<Task> taskQueue) {
         this.name = name;
         this.check = new AtomicBoolean(true);
         this.isSleep = true;
         this.taskQueue = taskQueue;
     }
 
-    public Deque<Task> getTaskQueue() {
+    public MyQueue<Task> getTaskQueue() {
         return taskQueue;
     }
 

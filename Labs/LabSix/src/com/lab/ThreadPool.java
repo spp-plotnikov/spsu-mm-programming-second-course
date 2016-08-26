@@ -10,14 +10,14 @@ import java.util.Deque;
 public class ThreadPool implements AutoCloseable {
 
     private static final int SIZE = 11;
-    private final Deque<Task> taskQueue;
+    private final MyQueue<Task> taskQueue;
     private MyThread[] threads;
     private int countOfThreads;
 
     private final Object specialVarForSynch = new Object();
 
     public ThreadPool() {
-        this.taskQueue = new ArrayDeque<>();
+        this.taskQueue = new MyQueue<>();
         this.threads = new MyThread[SIZE];
         this.countOfThreads = 0;
     }
