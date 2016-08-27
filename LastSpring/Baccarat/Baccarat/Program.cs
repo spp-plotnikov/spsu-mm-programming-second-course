@@ -17,6 +17,11 @@ namespace Baccarat
             {
                 try {
                     int str = Convert.ToInt32(Console.ReadLine());
+                    if (str > 3 || str < 1)
+                    {
+                        Console.WriteLine("Error, try again");
+                        continue;
+                    }
                     GameLogic gm = new GameLogic(str);
                     Console.WriteLine();
                     gm.Play();
@@ -26,9 +31,9 @@ namespace Baccarat
                     Console.WriteLine();
                     Console.Write("For continue enter Strategy: ");
                 }
-                catch (System.FormatException)
+                catch (Exception)
                 {
-                            Console.WriteLine("Error, try again");
+                    Console.WriteLine("Error, try again");
                 }
             }
         }

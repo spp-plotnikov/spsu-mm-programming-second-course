@@ -8,12 +8,12 @@ namespace Baccarat
 {
     sealed class Bank: Man
     {
-        override internal int Score(ref int counter)
+        override internal int Score()
         {
             int s;
-            s = (ChargePointsAfterDraw(ref counter) + ChargePointsAfterDraw(ref counter)) % 10;
+            s = (ChargePointsAfterDraw() + ChargePointsAfterDraw()) % 10;
             if (s < 5)
-                s = (s + ChargePointsAfterDraw(ref  counter)) % 10;
+                s = (s + ChargePointsAfterDraw()) % 10;
             return s;
         }
     }

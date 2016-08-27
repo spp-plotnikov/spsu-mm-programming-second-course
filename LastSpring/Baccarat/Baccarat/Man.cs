@@ -9,12 +9,11 @@ namespace Baccarat
 {
     abstract class Man
     {
-        protected int ChargePointsAfterDraw(ref int counter) {
-            Random rand = new Random((int)System.DateTime.Now.Millisecond);
-            byte[] b = new byte[20];
-            rand.NextBytes(b);
+        static Random rand = new Random((int)System.DateTime.Now.Millisecond);
+        protected int ChargePointsAfterDraw() {
             int score = 0;
-            switch (b[counter] % 13)
+            int i=rand.Next(1,52);
+            switch (i % 13)
             {
                 case 0: score = 1; break;//туз
                 case 1: score = 2; break;//двойка
@@ -30,10 +29,8 @@ namespace Baccarat
                 case 11: break;
                 case 12: break;
             }
-            counter++;
-            counter = counter % 20;
             return score;
         }
-        abstract internal int Score(ref int counter);
+        abstract internal int Score();
     }
 }

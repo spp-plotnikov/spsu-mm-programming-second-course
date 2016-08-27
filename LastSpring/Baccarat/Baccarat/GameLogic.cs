@@ -9,48 +9,45 @@ namespace Baccarat
 {
     class GameLogic
     {
-        int str;
-        public int resultGame;
+        private int _str;
+        internal int resultGame;
         public enum Strategy { AllOnPlayer = 1, AllOnBank= 2, AllOnDraw=3}
         public GameLogic(int str)
         {
-            this.str = str;
+            _str = str;
         }
+        private int _losePlayer = 0, _draw = 0, _winPlayer = 0;
         
         public void Play()
         {
-            int[] result = new int[3];  // 0    Lose Player
-                                        // 1     Draw
-                                        // 2     Win Player
             int rate = 50;
             int startMoney = 1000;
-            int counter = 0;
             Player player = new Player();
             var bank = new Bank();
             for (int i = 1; i <= 40; i++)
             {
-                int p = player.Score(ref counter);
-                int b = bank.Score(ref counter);
+                int p = player.Score();
+                int b = bank.Score();
                 if (p > b)
-                    result[0]++;
+                    _winPlayer++;
                 if (p < b)
-                    result[2]++;
+                    _losePlayer++;
                 if (p == b)
-                    result[1]++;
-                if((result[1]+result[2]-result[0]>=20 && str == (int)Strategy.AllOnPlayer)
-                    ||(result[0] + result[2] - 9*result[1] >= 20 && str == (int)Strategy.AllOnDraw)
-                    || (result[1] + result[0] - result[2] >= 20 && str == (int)Strategy.AllOnBank))
+                    _draw++;
+                if((_draw + _losePlayer - _winPlayer >= 20 && _str == (int)Strategy.AllOnPlayer)
+                    ||(_winPlayer + _losePlayer - 9* _draw >= 20 && _str == (int)Strategy.AllOnDraw)
+                    || (_draw + _winPlayer - _losePlayer >= 20 && _str == (int)Strategy.AllOnBank))
                 {
-                    Console.WriteLine("GAME OVER on {0} game", result[1]+result[2]+result[0]);
+                    Console.WriteLine("GAME OVER on {0} game", _draw + _losePlayer + _winPlayer);
                     break;
                 }
             }
-            if (str == (int)Strategy.AllOnPlayer)    // Все ставки на победу игрока.
-                resultGame = startMoney + rate * (-result[2] - result[1] + result[0]);
-            if (str == (int)Strategy.AllOnBank)    //lose
-                resultGame = startMoney + rate * (result[2] - result[1] - result[0]);
-            if (str == (int)Strategy.AllOnDraw)    //draw
-                resultGame = startMoney + rate * (-result[2] + 9 * result[1] - result[0]);
+            if (_str == (int)Strategy.AllOnPlayer)    // Все ставки на победу игрока.
+                resultGame = startMoney + rate * (-_losePlayer - _draw + _winPlayer);
+            if (_str == (int)Strategy.AllOnBank)    //lose
+                resultGame = startMoney + rate * (_losePlayer - _draw - _winPlayer);
+            if (_str == (int)Strategy.AllOnDraw)    //draw
+                resultGame = startMoney + rate * (-_losePlayer + 9 * _draw - _winPlayer);
         }  
     }
 }
