@@ -12,7 +12,7 @@ namespace Baccarat
         static Random rand = new Random((int)System.DateTime.Now.Millisecond);
         protected int ChargePointsAfterDraw() {
             int score = 0;
-            int i=rand.Next(1,52);
+            int i = rand.Next(1,52);
             switch (i % 13)
             {
                 case 0: score = 1; break;//туз

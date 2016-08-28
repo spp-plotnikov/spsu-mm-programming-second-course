@@ -24,8 +24,7 @@ namespace Baccarat
                     }
                     GameLogic gm = new GameLogic(str);
                     Console.WriteLine();
-                    gm.Play();
-                    Console.WriteLine("Result game: {0} ye", gm.resultGame);
+                    Console.WriteLine("Result game: {0} ye", gm.Play());
                     Console.WriteLine();
                     Console.WriteLine();
                     Console.WriteLine();

@@ -10,7 +10,6 @@ namespace Baccarat
     class GameLogic
     {
         private int _str;
-        internal int resultGame;
         public enum Strategy { AllOnPlayer = 1, AllOnBank= 2, AllOnDraw=3}
         public GameLogic(int str)
         {
@@ -18,7 +17,7 @@ namespace Baccarat
         }
         private int _losePlayer = 0, _draw = 0, _winPlayer = 0;
         
-        public void Play()
+        public int Play()
         {
             int rate = 50;
             int startMoney = 1000;
@@ -35,19 +34,20 @@ namespace Baccarat
                 if (p == b)
                     _draw++;
                 if((_draw + _losePlayer - _winPlayer >= 20 && _str == (int)Strategy.AllOnPlayer)
-                    ||(_winPlayer + _losePlayer - 9* _draw >= 20 && _str == (int)Strategy.AllOnDraw)
+                    || (_winPlayer + _losePlayer - 9* _draw >= 20 && _str == (int)Strategy.AllOnDraw)
                     || (_draw + _winPlayer - _losePlayer >= 20 && _str == (int)Strategy.AllOnBank))
                 {
                     Console.WriteLine("GAME OVER on {0} game", _draw + _losePlayer + _winPlayer);
-                    break;
+                    return 0;
                 }
             }
             if (_str == (int)Strategy.AllOnPlayer)    // Все ставки на победу игрока.
-                resultGame = startMoney + rate * (-_losePlayer - _draw + _winPlayer);
+                return startMoney + rate * (-_losePlayer - _draw + _winPlayer);
             if (_str == (int)Strategy.AllOnBank)    //lose
-                resultGame = startMoney + rate * (_losePlayer - _draw - _winPlayer);
-            if (_str == (int)Strategy.AllOnDraw)    //draw
-                resultGame = startMoney + rate * (-_losePlayer + 9 * _draw - _winPlayer);
+                return startMoney + rate * (_losePlayer - _draw - _winPlayer);
+            else
+                return startMoney + rate * (-_losePlayer + 9 * _draw - _winPlayer);
+
         }  
     }
 }
