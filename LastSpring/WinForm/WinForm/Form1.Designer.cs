@@ -50,9 +50,9 @@
             // 
             // GrapBoxPctb
             // 
-            this.GrapBoxPctb.Location = new System.Drawing.Point(12, 39);
+            this.GrapBoxPctb.Location = new System.Drawing.Point(2, 1);
             this.GrapBoxPctb.Name = "GrapBoxPctb";
-            this.GrapBoxPctb.Size = new System.Drawing.Size(508, 241);
+            this.GrapBoxPctb.Size = new System.Drawing.Size(528, 279);
             this.GrapBoxPctb.TabIndex = 1;
             this.GrapBoxPctb.TabStop = false;
             // 
@@ -70,23 +70,22 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.label1.Location = new System.Drawing.Point(341, 9);
+            this.label1.Location = new System.Drawing.Point(9, 260);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(47, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "Scale:";
-            this.ScaleBar.Value = 50;
-            this.ScaleBar.ValueChanged += new System.EventHandler(this.ScaleBar_ValueChanged);
             // 
             // ScaleBar
             // 
-            this.ScaleBar.Location = new System.Drawing.Point(391, 10);
+            this.ScaleBar.Location = new System.Drawing.Point(59, 259);
             this.ScaleBar.Maximum = 200;
             this.ScaleBar.Minimum = 10;
             this.ScaleBar.Name = "ScaleBar";
             this.ScaleBar.Size = new System.Drawing.Size(124, 18);
             this.ScaleBar.TabIndex = 4;
             this.ScaleBar.Value = 100;
+            this.ScaleBar.ValueChanged += new System.EventHandler(this.ScaleBar_ValueChanged);
             // 
             // Form1
             // 
@@ -96,8 +95,8 @@
             this.Controls.Add(this.ScaleBar);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.GoBtn);
-            this.Controls.Add(this.GrapBoxPctb);
             this.Controls.Add(this.GraphListCmb);
+            this.Controls.Add(this.GrapBoxPctb);
             this.Name = "Form1";
             this.Text = "Graphics";
             ((System.ComponentModel.ISupportInitialize)(this.GrapBoxPctb)).EndInit();
