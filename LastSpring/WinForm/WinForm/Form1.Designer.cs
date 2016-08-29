@@ -58,7 +58,7 @@
             // 
             // GoBtn
             // 
-            this.GoBtn.Location = new System.Drawing.Point(139, 10);
+            this.GoBtn.Location = new System.Drawing.Point(445, 12);
             this.GoBtn.Name = "GoBtn";
             this.GoBtn.Size = new System.Drawing.Size(75, 23);
             this.GoBtn.TabIndex = 2;
