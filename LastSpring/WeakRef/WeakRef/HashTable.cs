@@ -9,7 +9,7 @@ namespace WeakRef
 {
     class HashTable<T>
     {
-        internal int StrongRefTime;
+        public int StrongRefTime { get; private set; }
         private int variable;
         const int tableSize = 3;
         List<WeakReference>[] hashTable;
@@ -46,19 +46,16 @@ namespace WeakRef
             }
         }
 
-        public void Find(T obj)
+        public bool Find(T obj)
         {
             int hash = obj.GetHashCode() % tableSize;
             foreach (WeakReference weakRef in hashTable[hash])
             {
                 if (weakRef.IsAlive)
                     if (weakRef.Target.Equals(obj))
-                    {
-                        Console.WriteLine(obj.ToString() + " Found");
-                        return;
-                    }
+                        return true;
             }
-            Console.WriteLine(obj.ToString() + " Not found");
+            return false;
         }
 
         public void Delete(T obj)

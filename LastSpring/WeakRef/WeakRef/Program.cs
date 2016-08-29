@@ -11,19 +11,22 @@ namespace WeakRef
     {
         static void Main(string[] args)
         {
-            int StrongRefTime = 1000;
-            var hashTab = new HashTable<int>(StrongRefTime);
+            int strongRefTime = 1000;
+            var hashTab = new HashTable<int>(strongRefTime);
             for (int i = 1; i < 100; i++)
             {
                 hashTab.Add(i);
             }
 
-            Thread.Sleep(StrongRefTime + 50);
+            Thread.Sleep(strongRefTime + 50);
             GC.Collect();
 
             for (int i = 1; i < 100; i++)
             {
-                hashTab.Find(i);
+                if(hashTab.Find(i))
+                    Console.WriteLine("{0} Found", i);
+                else
+                    Console.WriteLine("{0} Not found", i);
             }
             Console.ReadLine();
         }
