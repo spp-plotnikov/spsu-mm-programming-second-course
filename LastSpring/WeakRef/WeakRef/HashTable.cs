@@ -38,12 +38,10 @@ namespace WeakRef
             hashTable[hash].Add(weakRef);
 
             strongRef.Add(obj);
+            
+            TimerCallback timerCallBack = new TimerCallback(RemoveStrongRef);
+            Timer timer = new Timer(timerCallBack, variable, StrongRefTime, Timeout.Infinite);
 
-            if (hash % 2 == 0)
-            {
-                TimerCallback timerCallBack = new TimerCallback(RemoveStrongRef);
-                Timer timer = new Timer(timerCallBack, variable, StrongRefTime, Timeout.Infinite);
-            }
         }
 
         public bool Find(T obj)
