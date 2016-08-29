@@ -19,7 +19,7 @@ namespace WinForm
 
         }
 
-        private void GoBtn_Click(object sender, EventArgs e)
+        private void PrintBtn_Click(object sender, EventArgs e)
         {
             string graph = (string)GraphListCmb.SelectedItem;
 
@@ -48,7 +48,7 @@ namespace WinForm
         private void ScaleBar_ValueChanged(object sender, EventArgs e)
         {
             GrapBoxPctb.Refresh();
-            GoBtn_Click(null, null);
+            PrintBtn_Click(null, null);
         }
     }
 }

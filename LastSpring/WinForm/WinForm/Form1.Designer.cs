@@ -30,7 +30,7 @@
         {
             this.GraphListCmb = new System.Windows.Forms.ComboBox();
             this.GrapBoxPctb = new System.Windows.Forms.PictureBox();
-            this.GoBtn = new System.Windows.Forms.Button();
+            this.PrintBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.ScaleBar = new System.Windows.Forms.HScrollBar();
             ((System.ComponentModel.ISupportInitialize)(this.GrapBoxPctb)).BeginInit();
@@ -56,15 +56,15 @@
             this.GrapBoxPctb.TabIndex = 1;
             this.GrapBoxPctb.TabStop = false;
             // 
-            // GoBtn
+            // PrintBtn
             // 
-            this.GoBtn.Location = new System.Drawing.Point(445, 12);
-            this.GoBtn.Name = "GoBtn";
-            this.GoBtn.Size = new System.Drawing.Size(75, 23);
-            this.GoBtn.TabIndex = 2;
-            this.GoBtn.Text = "Print";
-            this.GoBtn.UseVisualStyleBackColor = true;
-            this.GoBtn.Click += new System.EventHandler(this.GoBtn_Click);
+            this.PrintBtn.Location = new System.Drawing.Point(445, 12);
+            this.PrintBtn.Name = "PrintBtn";
+            this.PrintBtn.Size = new System.Drawing.Size(75, 23);
+            this.PrintBtn.TabIndex = 2;
+            this.PrintBtn.Text = "Print";
+            this.PrintBtn.UseVisualStyleBackColor = true;
+            this.PrintBtn.Click += new System.EventHandler(this.PrintBtn_Click);
             // 
             // label1
             // 
@@ -94,7 +94,7 @@
             this.ClientSize = new System.Drawing.Size(532, 287);
             this.Controls.Add(this.ScaleBar);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.GoBtn);
+            this.Controls.Add(this.PrintBtn);
             this.Controls.Add(this.GraphListCmb);
             this.Controls.Add(this.GrapBoxPctb);
             this.Name = "Form1";
@@ -109,7 +109,7 @@
 
         private System.Windows.Forms.ComboBox GraphListCmb;
         private System.Windows.Forms.PictureBox GrapBoxPctb;
-        private System.Windows.Forms.Button GoBtn;
+        private System.Windows.Forms.Button PrintBtn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.HScrollBar ScaleBar;
     }
