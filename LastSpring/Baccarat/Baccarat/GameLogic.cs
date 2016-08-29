@@ -34,7 +34,7 @@ namespace Baccarat
                 if (p == b)
                     _draw++;
                 if((_draw + _losePlayer - _winPlayer >= 20 && _str == (int)Strategy.AllOnPlayer)
-                    || (_winPlayer + _losePlayer - 9* _draw >= 20 && _str == (int)Strategy.AllOnDraw)
+                    || (_winPlayer + _losePlayer - 9 * _draw >= 20 && _str == (int)Strategy.AllOnDraw)
                     || (_draw + _winPlayer - _losePlayer >= 20 && _str == (int)Strategy.AllOnBank))
                 {
                     Console.WriteLine("GAME OVER on {0} game", _draw + _losePlayer + _winPlayer);

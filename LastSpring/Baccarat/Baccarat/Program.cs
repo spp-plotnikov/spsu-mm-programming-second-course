@@ -12,11 +12,14 @@ namespace Baccarat
             Console.WriteLine("Time: 40 games");
             Console.WriteLine();
 
-            Console.Write("Enter Strategy (1 - all rates for lose player,\n 2 - all rates for win player, 3 - all rates for drow): ");
+            Console.Write("Enter Strategy (1 - all rates for lose player,\n 2 - all rates for win player, 3 - all rates for drow), ");
+            Console.Write("or enter 4 to exit: ");
             while (true)
             {
                 try {
                     int str = Convert.ToInt32(Console.ReadLine());
+                    if (str == 4)
+                        break;
                     if (str > 3 || str < 1)
                     {
                         Console.WriteLine("Error, try again");
