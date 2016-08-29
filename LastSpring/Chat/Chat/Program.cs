@@ -12,8 +12,8 @@ namespace Chat
             Console.WriteLine();
             Console.WriteLine("There are 3 commands:");
             Console.WriteLine("\t\t 'send {your message}'");
-            Console.WriteLine("\t\t 'exit'");
             Console.WriteLine("\t\t 'help'");
+            Console.WriteLine("\t\t 'exit'");
 
             const int PORT = 15000;
             var receiver = new Receiver(PORT);
@@ -22,9 +22,9 @@ namespace Chat
 
             while (true)
             {
-                string message = Console.ReadLine() + ' ';
-                string command = message.Remove(4);
-                message = message.Substring(5);
+                string message = Console.ReadLine();
+                string command = message.Split(' ')[0];
+                message = message.Substring(message.IndexOf(' ') + 1);
 
                 switch (command)
                 {
@@ -32,13 +32,13 @@ namespace Chat
                         sender.Send('@' + userName + ": " + message, false);
                         break;
 
-                    case "exit":
-                        receiver.StopListening();
-                        return;
-
                     case "help":
                         helper.HelpPage();
                         break;
+                        
+                    case "exit":
+                        receiver.StopListening();
+                        return;
 
                     default:
                         Console.WriteLine(command + " unknown command.");

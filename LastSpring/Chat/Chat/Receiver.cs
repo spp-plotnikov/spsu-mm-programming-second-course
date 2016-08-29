@@ -71,7 +71,9 @@ namespace Chat
                     }
                     else
                     {
-                        GetSysMsgEvent(message);
+                        try {
+                            GetSysMsgEvent(message);
+                        }catch(Exception){ }
                     }
                 }
             }

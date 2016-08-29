@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Chat
 {
@@ -35,7 +36,7 @@ namespace Chat
             IPHostEntry ipHostEntry = Dns.GetHostEntry("localhost");
             IPAddress ipAddress = ipHostEntry.AddressList[0];
             Socket socket = new Socket(MainSocket.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                    
+
             for (int curPort = port; curPort < port + 10; curPort++)
             {
                 try
@@ -54,7 +55,7 @@ namespace Chat
 
         void SendEndPointInfo(IPAddress iP, int port, bool onlyToFirstValid, int repeat)
         {
-            Send(Encoding.UTF8.GetString(iP.GetAddressBytes()) + ' ' + port.ToString() 
+            Send(Encoding.UTF8.GetString(iP.GetAddressBytes()) + ' ' + port.ToString()
                 + ' ' + repeat.ToString(), onlyToFirstValid);
         }
 
@@ -62,37 +63,19 @@ namespace Chat
         {
             List<int> EndPtsWithoutListen = new List<int>();
             int count = 0;
-
-            foreach (IPEndPoint ipEndPoint in IPEndPointList)
+            try
             {
-                try
-                {
-                    Socket socket = new Socket(MainSocket.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                AdjustSend(message, onlyToFirstValid, EndPtsWithoutListen, count);
+            }
+            catch (InvalidOperationException)
+            {
+                count = 0;
+                EndPtsWithoutListen.Clear();
+                //Console.WriteLine("Something wrong with connect, try again");
+                AdjustSend(message, onlyToFirstValid, EndPtsWithoutListen, count);
 
-                    socket.Connect(ipEndPoint);
-
-                    byte[] data = Encoding.UTF8.GetBytes(message);
-                    socket.Send(data);
-
-                    if (onlyToFirstValid)
-                        break;
-
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
-                }
-                catch (Exception)
-                {
-                    EndPtsWithoutListen.Add(count);
-                }
-                count++;
             }
 
-            count = 0;
-            foreach (int pos in EndPtsWithoutListen)
-            {
-                IPEndPointList.RemoveAt(pos - count);
-                count++;
-            }
         }
 
         public void SysMsgHandler(string message)
@@ -125,5 +108,43 @@ namespace Chat
                 Console.WriteLine("Troubles with SysMsgHandler");
             }
         }
+
+        private void AdjustSend(string message, bool onlyToFirstValid,
+            List<int> EndPtsWithoutListen, int count)
+        {
+            #region
+            foreach (IPEndPoint ipEndPoint in IPEndPointList)
+            {
+                try
+                {
+                    Socket socket = new Socket(MainSocket.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+                    socket.Connect(ipEndPoint);
+
+                    byte[] data = Encoding.UTF8.GetBytes(message);
+                    socket.Send(data);
+
+                    if (onlyToFirstValid)
+                        break;
+
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                }
+                catch (Exception)
+                {
+                    EndPtsWithoutListen.Add(count);
+                }
+                count++;
+            }
+
+            count = 0;
+            foreach (int pos in EndPtsWithoutListen)
+            {
+                IPEndPointList.RemoveAt(pos - count);
+                count++;
+            }
+            #endregion
+        }
+
     }
 }
