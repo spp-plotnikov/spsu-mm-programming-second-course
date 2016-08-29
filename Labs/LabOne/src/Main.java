@@ -5,12 +5,11 @@
 import mpi.MPI;
 
 import java.io.*;
-import java.util.Random;
 
 public class Main {
 
-    private static final int INF = -1;
-    private static final int VERTICESNUMBER = 1000;
+    private static final int INF = 999999;
+    private static int verticesNumber;
     private static int currentProcessRank;
     private static int commSize;
 
@@ -24,17 +23,19 @@ public class Main {
     */
     public static void main(String[] args) throws IOException {
 
-        int[] rowsOfMatrix = new int[VERTICESNUMBER * VERTICESNUMBER];
-        int size = VERTICESNUMBER;
-
+        long st, en;
+        st = System.currentTimeMillis();
         MPI.Init(args);
+        //System.out.println("length "  + args.length);
         currentProcessRank = MPI.COMM_WORLD.Rank();
         commSize = MPI.COMM_WORLD.Size();
 
-        arrayInitialization(rowsOfMatrix);
+        int[] rowsOfMatrix = arrayInitialization(args[8]);
+        verticesNumber = (int) Math.sqrt(rowsOfMatrix.length);
+        int size = verticesNumber;
 
         if (currentProcessRank == 0) {
-            printInFile(rowsOfMatrix, size, "matrix1.txt");
+            printFile(rowsOfMatrix, size, args[9]);
         }
 
         int linesNum = size / commSize;
@@ -46,38 +47,80 @@ public class Main {
         normalisationLines(rowsOfCurrentProcess, size);
 
         MPI.Finalize();
+        en = System.currentTimeMillis();
+        if (currentProcessRank == 0) {
+            System.out.println(en - st);
+        }
 
     }
 
-    private static void arrayInitialization(int[] rowsOfMatrix) {
 
-        int[][] matrix = new int[VERTICESNUMBER][VERTICESNUMBER];
-        Random random = new Random();
+    private static int[] arrayInitialization(String pathToFile) throws IOException {
 
+        FileInputStream fis = new FileInputStream(pathToFile);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+        String lineOfFile;
+        verticesNumber = Integer.parseInt(br.readLine());
+
+        int[] rowsOfMatrix = new int[verticesNumber * verticesNumber];
+        for(int i = 0 ; i<rowsOfMatrix.length;i++){
+            rowsOfMatrix[i]=0;
+        }
         if (currentProcessRank == 0) {
-            for (int i = 0; i < rowsOfMatrix.length; i++) {
-                rowsOfMatrix[i] = random.nextInt(50);
+            int k = 0;
+            int number1;
+            int number2;
+            int number3;
+            System.out.println("size: " + verticesNumber);
+            while ((lineOfFile = br.readLine()) != null) {
+                String[] strs = lineOfFile.split(" ");
+                number1 = Integer.parseInt(strs[0]);
+                number2 = Integer.parseInt(strs[1]);
+                number3 = Integer.parseInt(strs[2]);
+                if (k != 10) {
+                    System.out.println(number1 + " " + number2 + " " + number3);
+                    k++;
+                }
+                rowsOfMatrix[number2 + number1 * verticesNumber] = number3;
+                rowsOfMatrix[number1 + number2 * verticesNumber] = number3;
+            }
+            for (int i = 0; i < verticesNumber * verticesNumber; i++) {
+                if (rowsOfMatrix[i] == 0) {
+                    rowsOfMatrix[i] = INF;
+                }
             }
             for (int i = 1; i < commSize; i++) {
                 MPI.COMM_WORLD.Send(rowsOfMatrix, 0, rowsOfMatrix.length, MPI.INT, i, 0);
             }
+
         } else {
             MPI.COMM_WORLD.Recv(rowsOfMatrix, 0, rowsOfMatrix.length, MPI.INT, 0, 0);
+
         }
 
-        int index = 0;
-        for (int i = 0; i < VERTICESNUMBER; i++) {
-            for (int j = 0; j < VERTICESNUMBER; j++) {
-                matrix[i][j] = rowsOfMatrix[index];
-                if (i == j) {
-                    matrix[i][j] = 0;
+        br.close();
+        fis.close();
+
+        return rowsOfMatrix;
+    }
+
+    private static void printFile(int[] arrayOfRibs, int size, String path) throws IOException {
+        if (currentProcessRank == 0) {
+            File file = new File(path);
+            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            int allSize = size * size;
+            int i = 0;
+            int j;
+            int k;
+            while (i < allSize) {
+                if (arrayOfRibs[i] != INF) {
+                    j = (int) (i / size);
+                    k = i - j * size;
+                    out.println(j + " " + k + " " + arrayOfRibs[i]);
                 }
-                if (matrix[i][j] == 0) {
-                    matrix[i][j] = INF;
-                }
-                rowsOfMatrix[index] = matrix[i][j];
-                index++;
+                i++;
             }
+            out.flush();
         }
     }
 
@@ -85,7 +128,7 @@ public class Main {
         if (currentProcessRank == 0) {
             File file = new File(path);
             PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            int allSize = VERTICESNUMBER * VERTICESNUMBER;
+            int allSize = size * size;
             int i = 0;
             while (i < allSize) {
                 for (int j = 0; j < size; j++) {
@@ -123,21 +166,21 @@ public class Main {
     }
 
     private static void parallelFloyd(int[] rowsOfCurrentProcess, int size) {
-        int rowsCount = VERTICESNUMBER / commSize;
+        int rowsCount = size / commSize;
         int[] lines = new int[size];
         int option1, option2;
         for (int lineNumber = 0; lineNumber < size; lineNumber++) {
             linesDistribution(rowsOfCurrentProcess, size, lineNumber, lines);
             for (int i = 0; i < rowsCount; i++)
-                for (int j = 0; j < size; j++)
-                    if ((rowsOfCurrentProcess[i * size + lineNumber] != INF) && (lines[j] != INF)) {
-                        option1 = rowsOfCurrentProcess[i * size + j];
-                        option2 = rowsOfCurrentProcess[i * size + lineNumber] + lines[j];
-                        rowsOfCurrentProcess[i * size + j] = Math.min(option1, option2);
-                    }
+                for (int j = 0; j < size; j++) {
+                    //if ((rowsOfCurrentProcess[i * size + lineNumber] != INF) && (lines[j] != INF)) {
+                    option1 = rowsOfCurrentProcess[i * size + j];
+                    option2 = rowsOfCurrentProcess[i * size + lineNumber] + lines[j];
+                    rowsOfCurrentProcess[i * size + j] = Math.min(option1, option2);
+                    //}
+                }
         }
     }
-
     static void linesDistribution(int[] rowsOfCurrentProcess, int size, int lineNumber, int[] lines) {
         int processRank;
         int currentLineNumber;
@@ -183,7 +226,7 @@ public class Main {
             sendIndex[i] = sendIndex[i - 1] + sendCount[i - 1];
         }
 
-        int[] resultRowOfMatrix = new int[VERTICESNUMBER * VERTICESNUMBER];
+        int[] resultRowOfMatrix = new int[verticesNumber * verticesNumber];
 
         if (currentProcessRank == 0) {
             System.arraycopy(rows, 0, resultRowOfMatrix, 0, rows.length);
@@ -203,3 +246,5 @@ public class Main {
         }
     }
 }
+
+
