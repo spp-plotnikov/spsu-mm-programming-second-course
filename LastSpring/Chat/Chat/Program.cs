@@ -33,7 +33,7 @@ namespace Chat
                         break;
 
                     case "help":
-                        helper.HelpPage();
+                        helper.Help();
                         break;
                         
                     case "exit":

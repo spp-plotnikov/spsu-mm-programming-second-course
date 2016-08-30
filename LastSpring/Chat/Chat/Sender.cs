@@ -27,7 +27,7 @@ namespace Chat
             GetFirstAdressPool(firstPort, ownPort);
             SendEndPointInfo(ownIP, ownPort, true, 2);
 
-            receiver.GetSysMsgEvent += SysMsgHandler;
+            receiver.GetSysMsgEvent += SysMessage;
         }
 
         void GetFirstAdressPool(int port, int ownPort)
@@ -35,12 +35,13 @@ namespace Chat
             IPEndPoint ipEndPoint = null;
             IPHostEntry ipHostEntry = Dns.GetHostEntry("localhost");
             IPAddress ipAddress = ipHostEntry.AddressList[0];
-            Socket socket = new Socket(MainSocket.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             for (int curPort = port; curPort < port + 10; curPort++)
             {
                 try
                 {
+
+                    Socket socket = new Socket(MainSocket.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     ipEndPoint = new IPEndPoint(ipAddress, curPort);
                     socket.Bind(ipEndPoint);
                     socket.Close();
@@ -78,7 +79,7 @@ namespace Chat
 
         }
 
-        public void SysMsgHandler(string message)
+        public void SysMessage(string message)
         {
             try
             {

@@ -11,8 +11,8 @@ namespace Chat
         public IPEndPoint ReceivingPoint { get; private set; }
         public Socket MainSocket { get; private set; }
 
-        public delegate void DlgForEvent(string message);
-        public event DlgForEvent GetSysMsgEvent;
+        public delegate void DlgForEventHandler(string message);
+        public event DlgForEventHandler GetSysMsgEvent;
 
         Thread listenThread;
 
