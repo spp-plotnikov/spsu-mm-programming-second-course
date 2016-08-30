@@ -30,21 +30,21 @@ public class Main {
         currentProcessRank = MPI.COMM_WORLD.Rank();
         commSize = MPI.COMM_WORLD.Size();
 
-        int[] rowsOfMatrix = arrayInitialization(args[8]);
+        int[] rowsOfMatrix = initializeArray(args[args.length - 2]);
         verticesNumber = (int) Math.sqrt(rowsOfMatrix.length);
         int size = verticesNumber;
 
-        if (currentProcessRank == 0) {
-            printFile(rowsOfMatrix, size, args[9]);
-        }
+        /*if (currentProcessRank == 0) {
+            printFile(rowsOfMatrix, size, args[args.length - 1]);
+        }*/
 
         int linesNum = size / commSize;
 
         int[] rowsOfCurrentProcess = new int[linesNum * size];
 
-        distributionData(rowsOfMatrix, rowsOfCurrentProcess, size);
-        parallelFloyd(rowsOfCurrentProcess, size);
-        normalisationLines(rowsOfCurrentProcess, size);
+        distributeData(rowsOfMatrix, rowsOfCurrentProcess, size);
+        doParallelFloyd(rowsOfCurrentProcess, size);
+        normalizeLine(rowsOfCurrentProcess, size, args[args.length - 1]);
 
         MPI.Finalize();
         en = System.currentTimeMillis();
@@ -55,7 +55,7 @@ public class Main {
     }
 
 
-    private static int[] arrayInitialization(String pathToFile) throws IOException {
+    private static int[] initializeArray(String pathToFile) throws IOException {
 
         FileInputStream fis = new FileInputStream(pathToFile);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
@@ -63,8 +63,8 @@ public class Main {
         verticesNumber = Integer.parseInt(br.readLine());
 
         int[] rowsOfMatrix = new int[verticesNumber * verticesNumber];
-        for(int i = 0 ; i<rowsOfMatrix.length;i++){
-            rowsOfMatrix[i]=0;
+        for (int i = 0; i < rowsOfMatrix.length; i++) {
+            rowsOfMatrix[i] = 0;
         }
         if (currentProcessRank == 0) {
             int k = 0;
@@ -124,7 +124,7 @@ public class Main {
         }
     }
 
-    private static void printInFile(int[] arrayOfRibs, int size, String path) throws IOException {
+    private static void writeToFile(int[] arrayOfRibs, int size, String path) throws IOException {
         if (currentProcessRank == 0) {
             File file = new File(path);
             PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
@@ -146,7 +146,7 @@ public class Main {
     sendIndex - индекс начала отправления данных
     vocationLines - свободные строки
     */
-    static void distributionData(int[] rowsOfMatrix, int[] rowsOfCurrentProcess, int size) {
+    static void distributeData(int[] rowsOfMatrix, int[] rowsOfCurrentProcess, int size) {
         int[] sendCount = new int[commSize];
         int[] sendIndex = new int[commSize];
         int vocationLines = size;
@@ -165,12 +165,12 @@ public class Main {
                 sendCount[currentProcessRank], MPI.INT, 0);
     }
 
-    private static void parallelFloyd(int[] rowsOfCurrentProcess, int size) {
+    private static void doParallelFloyd(int[] rowsOfCurrentProcess, int size) {
         int rowsCount = size / commSize;
         int[] lines = new int[size];
         int option1, option2;
         for (int lineNumber = 0; lineNumber < size; lineNumber++) {
-            linesDistribution(rowsOfCurrentProcess, size, lineNumber, lines);
+            distributeLine(rowsOfCurrentProcess, size, lineNumber, lines);
             for (int i = 0; i < rowsCount; i++)
                 for (int j = 0; j < size; j++) {
                     //if ((rowsOfCurrentProcess[i * size + lineNumber] != INF) && (lines[j] != INF)) {
@@ -181,7 +181,8 @@ public class Main {
                 }
         }
     }
-    static void linesDistribution(int[] rowsOfCurrentProcess, int size, int lineNumber, int[] lines) {
+
+    static void distributeLine(int[] rowsOfCurrentProcess, int size, int lineNumber, int[] lines) {
         int processRank;
         int currentLineNumber;
         int vocationLines = size;
@@ -211,7 +212,7 @@ public class Main {
     sendIndex - индекс начала отправления данных
     vocationLines - свободные строки
     */
-    static void normalisationLines(int[] rows, int size) throws IOException {
+    static void normalizeLine(int[] rows, int size, String pathToOut) throws IOException {
         int[] sendCount = new int[commSize];
         int[] sendIndex = new int[commSize];
         int vocationLines = size;
@@ -242,7 +243,7 @@ public class Main {
         }
 
         if (currentProcessRank == 0) {
-            printInFile(resultRowOfMatrix, size, "matrix2.txt");
+            writeToFile(resultRowOfMatrix, size, pathToOut);
         }
     }
 }
