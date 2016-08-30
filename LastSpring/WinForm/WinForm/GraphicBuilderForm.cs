@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace WinForm
 {
-    public partial class Form1 : Form
+    public partial class GraphicBuilderForm : Form
     {
-        public Form1()
+        public GraphicBuilderForm()
         {
             InitializeComponent();
 
@@ -37,18 +37,13 @@ namespace WinForm
 
                 GrapBoxPctb.CreateGraphics().DrawCurve(new Pen(Color.Black, 1), GraphBuilder.Draw(curveType, info));
             }
-            
-
-
-
         }
-
         
-
         private void ScaleBar_ValueChanged(object sender, EventArgs e)
         {
             GrapBoxPctb.Refresh();
             PrintBtn_Click(null, null);
         }
+        
     }
 }

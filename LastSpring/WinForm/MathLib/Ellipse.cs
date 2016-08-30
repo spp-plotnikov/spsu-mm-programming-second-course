@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MathLib
 {
-    class Ellips
+    class Ellipse
     {
         public static DoublePoint[] GetPoints(double from, double to, int scale)
         {

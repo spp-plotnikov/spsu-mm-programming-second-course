@@ -1,6 +1,6 @@
 ﻿namespace WinForm
 {
-    partial class Form1
+    partial class GraphicBuilderForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -41,7 +41,7 @@
             this.GraphListCmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.GraphListCmb.FormattingEnabled = true;
             this.GraphListCmb.Items.AddRange(new object[] {
-            "Ellips",
+            "Ellipse",
             "Parabola"});
             this.GraphListCmb.Location = new System.Drawing.Point(12, 12);
             this.GraphListCmb.Name = "GraphListCmb";
@@ -50,14 +50,18 @@
             // 
             // GrapBoxPctb
             // 
+            this.GrapBoxPctb.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GrapBoxPctb.Location = new System.Drawing.Point(2, 1);
             this.GrapBoxPctb.Name = "GrapBoxPctb";
-            this.GrapBoxPctb.Size = new System.Drawing.Size(528, 279);
+            this.GrapBoxPctb.Size = new System.Drawing.Size(528, 286);
             this.GrapBoxPctb.TabIndex = 1;
             this.GrapBoxPctb.TabStop = false;
             // 
             // PrintBtn
             // 
+            this.PrintBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.PrintBtn.Location = new System.Drawing.Point(445, 12);
             this.PrintBtn.Name = "PrintBtn";
             this.PrintBtn.Size = new System.Drawing.Size(75, 23);
@@ -68,9 +72,10 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.label1.Location = new System.Drawing.Point(9, 260);
+            this.label1.Location = new System.Drawing.Point(-1, 269);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(47, 17);
             this.label1.TabIndex = 3;
@@ -78,7 +83,8 @@
             // 
             // ScaleBar
             // 
-            this.ScaleBar.Location = new System.Drawing.Point(59, 259);
+            this.ScaleBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ScaleBar.Location = new System.Drawing.Point(59, 269);
             this.ScaleBar.Maximum = 200;
             this.ScaleBar.Minimum = 10;
             this.ScaleBar.Name = "ScaleBar";
@@ -87,7 +93,7 @@
             this.ScaleBar.Value = 100;
             this.ScaleBar.ValueChanged += new System.EventHandler(this.ScaleBar_ValueChanged);
             // 
-            // Form1
+            // GraphicBuilderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -97,7 +103,8 @@
             this.Controls.Add(this.PrintBtn);
             this.Controls.Add(this.GraphListCmb);
             this.Controls.Add(this.GrapBoxPctb);
-            this.Name = "Form1";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.Name = "GraphicBuilderForm";
             this.Text = "Graphics";
             ((System.ComponentModel.ISupportInitialize)(this.GrapBoxPctb)).EndInit();
             this.ResumeLayout(false);

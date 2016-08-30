@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DoublePoint.cs" />
-    <Compile Include="Ellips.cs" />
+    <Compile Include="Ellipse.cs" />
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="Parabola.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
