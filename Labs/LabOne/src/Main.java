@@ -26,30 +26,45 @@ public class Main {
         long st, en;
         st = System.currentTimeMillis();
         MPI.Init(args);
-        //System.out.println("length "  + args.length);
+
         currentProcessRank = MPI.COMM_WORLD.Rank();
         commSize = MPI.COMM_WORLD.Size();
 
-        int[] rowsOfMatrix = initializeArray(args[args.length - 2]);
-        verticesNumber = (int) Math.sqrt(rowsOfMatrix.length);
-        int size = verticesNumber;
+        if (currentProcessRank == 0) {
+            for (int i = 0; i < args.length; i++) {
+                System.out.println(args[i]);
+            }
+        }
+
+        String pathToListOfVerticles = args[args.length - 2];
+        String pathToMatrixGraph = args[args.length - 1];
+        if (new File(pathToListOfVerticles).exists()) {
+
+            int[] rowsOfMatrix = initializeArray(pathToListOfVerticles);
+            verticesNumber = (int) Math.sqrt(rowsOfMatrix.length);
+            int size = verticesNumber;
 
         /*if (currentProcessRank == 0) {
             printFile(rowsOfMatrix, size, args[args.length - 1]);
         }*/
 
-        int linesNum = size / commSize;
+            int linesNum = size / commSize;
 
-        int[] rowsOfCurrentProcess = new int[linesNum * size];
+            int[] rowsOfCurrentProcess = new int[linesNum * size];
 
-        distributeData(rowsOfMatrix, rowsOfCurrentProcess, size);
-        doParallelFloyd(rowsOfCurrentProcess, size);
-        normalizeLine(rowsOfCurrentProcess, size, args[args.length - 1]);
+            distributeData(rowsOfMatrix, rowsOfCurrentProcess, size);
+            doParallelFloyd(rowsOfCurrentProcess, size);
+            normalizeLine(rowsOfCurrentProcess, size, pathToMatrixGraph);
 
-        MPI.Finalize();
-        en = System.currentTimeMillis();
-        if (currentProcessRank == 0) {
-            System.out.println(en - st);
+            MPI.Finalize();
+            en = System.currentTimeMillis();
+            if (currentProcessRank == 0) {
+                System.out.println("Time: " + (en - st));
+            }
+        } else {
+            if (currentProcessRank == 0) {
+                System.err.println("Wrong path to graph");
+            }
         }
 
     }
@@ -71,16 +86,17 @@ public class Main {
             int number1;
             int number2;
             int number3;
-            System.out.println("size: " + verticesNumber);
+            //System.out.println("size: " + verticesNumber);
             while ((lineOfFile = br.readLine()) != null) {
                 String[] strs = lineOfFile.split(" ");
                 number1 = Integer.parseInt(strs[0]);
                 number2 = Integer.parseInt(strs[1]);
                 number3 = Integer.parseInt(strs[2]);
-                if (k != 10) {
+                //проверка правильности считывания
+                /*if (k != 10) {
                     System.out.println(number1 + " " + number2 + " " + number3);
                     k++;
-                }
+                }*/
                 rowsOfMatrix[number2 + number1 * verticesNumber] = number3;
                 rowsOfMatrix[number1 + number2 * verticesNumber] = number3;
             }
