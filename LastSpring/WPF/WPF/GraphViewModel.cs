@@ -27,7 +27,8 @@ namespace WPF
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public DrawingImage ImgSource {
+        public DrawingImage ImgSource
+        {
             get
             {
                 return _source;

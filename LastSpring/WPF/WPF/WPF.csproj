@@ -98,7 +98,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MathLib\MathLib.csproj">
+    <ProjectReference Include="..\..\WinForm\MathLib\MathLib.csproj">
       <Project>{ddb16257-745e-4265-a2f9-831be73419f9}</Project>
       <Name>MathLib</Name>
     </ProjectReference>

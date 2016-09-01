@@ -45,19 +45,4 @@ namespace MathLib
             return result;
         }
     }
-
-    
-    public class Info
-    {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public int Scale { get; private set; }
-
-        public Info(int width, int height, int scale)
-        {
-            Width = width;
-            Height = height;
-            Scale = scale;
-        }
-    }
 }

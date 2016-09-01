@@ -36,6 +36,7 @@ namespace WinForm
                 OxOyBuilder.Build(GrapBoxPctb.CreateGraphics(), initalPoint, ScaleBar.Value);
 
                 GrapBoxPctb.CreateGraphics().DrawCurve(new Pen(Color.Black, 1), GraphBuilder.Draw(curveType, info));
+                
             }
         }
         

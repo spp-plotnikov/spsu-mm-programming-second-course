@@ -8,9 +8,21 @@ namespace BmpLibrary
 {
     public class BmpLib
     {
-        public int biWidth { get; private set; }
-        public int biHeight { get; private set; }
-        public int biBitCount { get; private set; }
+        public int biWidth
+        {
+            get;
+            private set;
+        }
+        public int biHeight
+        {
+            get;
+            private set;
+        }
+        public int biBitCount
+        {
+            get;
+            private set;
+        }
         private byte[] _data;
 
         public Pixel[,] BitMap { get; set; }

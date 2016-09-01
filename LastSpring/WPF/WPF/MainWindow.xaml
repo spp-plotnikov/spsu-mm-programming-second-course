@@ -36,9 +36,6 @@
             OpacityMask="Black" 
             Stretch="None"
             Margin="0,0,0,-52" Width="517" Grid.Row="1" Height="341">
-            <Image.DataContext>
-                <local:GraphViewModel/>
-            </Image.DataContext>
         </Image>
         <ScrollBar
             x:Name="ScaleBar"
@@ -50,10 +47,6 @@
             HorizontalAlignment="Left"
             Margin="10,308,0,-42"
             Height="23" Value="{Binding IsValueChanged, Mode=OneWayToSource}">
-            <ScrollBar.DataContext>
-                <local:GraphViewModel/>
-            </ScrollBar.DataContext>
-
         </ScrollBar>
 
     </Grid>
