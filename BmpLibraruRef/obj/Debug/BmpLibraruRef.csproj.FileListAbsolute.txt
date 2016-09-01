@@ -1,5 +1,0 @@
-D:\spsu-mm-programming-first-course\Spring\BmpLibraruRef\bin\Debug\BmpLibraruRef.dll
-D:\spsu-mm-programming-first-course\Spring\BmpLibraruRef\bin\Debug\BmpLibraruRef.pdb
-D:\spsu-mm-programming-first-course\Spring\BmpLibraruRef\obj\Debug\BmpLibraruRef.csprojResolveAssemblyReference.cache
-D:\spsu-mm-programming-first-course\Spring\BmpLibraruRef\obj\Debug\BmpLibraruRef.dll
-D:\spsu-mm-programming-first-course\Spring\BmpLibraruRef\obj\Debug\BmpLibraruRef.pdb
