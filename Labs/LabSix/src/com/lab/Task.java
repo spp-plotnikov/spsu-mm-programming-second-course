@@ -13,7 +13,7 @@ public class Task {
         this.numberOfTask = numberOfTask;
     }
 
-    public int doTask(String name){
+    public int doTask(String name) {
         System.out.println("Thread " + name + " started task number " + numberOfTask + " with timer: " + timer);
         try {
             Thread.sleep(timer * 1000);

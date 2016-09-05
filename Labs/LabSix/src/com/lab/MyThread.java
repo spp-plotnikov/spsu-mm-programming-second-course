@@ -1,6 +1,5 @@
 package com.lab;
 
-import java.util.Deque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -10,7 +9,6 @@ public class MyThread extends Thread {
 
     private String name;
     private AtomicBoolean check;
-    private boolean isSleep;
     private Task task;
     private MyQueue<Task> taskQueue;
     private int numberOfTask;
@@ -18,11 +16,10 @@ public class MyThread extends Thread {
     public MyThread(String name, MyQueue<Task> taskQueue) {
         this.name = name;
         this.check = new AtomicBoolean(true);
-        this.isSleep = true;
         this.taskQueue = taskQueue;
     }
 
-    public MyQueue<Task> getTaskQueue() {
+    private MyQueue<Task> getTaskQueue() {
         return taskQueue;
     }
 
@@ -30,15 +27,7 @@ public class MyThread extends Thread {
         this.task = task;
     }
 
-    public boolean isSleep() {
-        return isSleep;
-    }
-
-    public void setSleep(boolean sleep) {
-        isSleep = sleep;
-    }
-
-    public boolean isCheck() {
+    private boolean isCheck() {
         return check.get();
     }
 
@@ -48,11 +37,8 @@ public class MyThread extends Thread {
 
     @Override
     public void run() {
-        setSleep(false);
         while (isCheck()) {
-            setSleep(false);
             makeTask();
-            setSleep(true);
             try {
                 synchronized (this) {
                     this.wait();
@@ -64,12 +50,10 @@ public class MyThread extends Thread {
     }
 
     private void makeTask() {
-        while(true){
-            synchronized (getTaskQueue()) {
-                if (getTaskQueue().isEmpty()) {
-                    return;
-                }
-                setTask(getTaskQueue().pop());
+        while (true) {
+            setTask(getTaskQueue().pop());
+            if (task == null) {
+                return;
             }
             numberOfTask = task.doTask(name);
             System.out.println("Thread " + name + " completed task number " + numberOfTask);

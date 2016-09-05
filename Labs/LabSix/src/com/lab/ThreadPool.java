@@ -1,8 +1,6 @@
 package com.lab;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Created by Katrin on 10.06.2016.
@@ -25,8 +23,7 @@ public class ThreadPool implements AutoCloseable {
     public void enqueue(Task task) {
         for (int i = 0; i < countOfThreads; i++) {
             synchronized (threads[i]) {
-                if (threads[i].isSleep()) {
-                    taskQueue.addLast(task);
+                if (!(threads[i].getState() == Thread.State.WAITING)) {
                     threads[i].notify();
                     return;
                 }
@@ -35,14 +32,10 @@ public class ThreadPool implements AutoCloseable {
         synchronized (specialVarForSynch) {
             if (countOfThreads != SIZE) {
                 threads[countOfThreads] = new MyThread(Integer.toString(countOfThreads), taskQueue);
-                taskQueue.addLast(task);
                 threads[countOfThreads].start();
                 countOfThreads++;
-            } else {
-                synchronized (taskQueue) {
-                    taskQueue.addLast(task);
-                }
             }
+            taskQueue.addLast(task);
         }
     }
 
@@ -50,7 +43,7 @@ public class ThreadPool implements AutoCloseable {
     public void close() throws IOException, InterruptedException {
         for (int i = 0; i < countOfThreads; i++) {
             threads[i].setCheck(false);
-            while (!threads[i].isSleep()) {
+            while (threads[i].getState() == Thread.State.WAITING) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {

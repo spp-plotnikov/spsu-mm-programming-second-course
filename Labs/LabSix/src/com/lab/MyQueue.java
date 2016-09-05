@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Created by SA on 26.08.2016.
+ * Created by Katrin on 26.08.2016.
  */
 public class MyQueue<T> {
     private final Deque<T> taskQueue;
@@ -17,11 +17,13 @@ public class MyQueue<T> {
         taskQueue.addLast(task);
     }
 
-    public synchronized T pop(){
-        return taskQueue.pop();
+    public synchronized T pop() {
+        T task;
+        if (taskQueue.isEmpty()) {
+            task = null;
+        } else {
+            task = taskQueue.pop();
+        }
+        return task;
     }
-    public synchronized boolean isEmpty(){
-        return taskQueue.isEmpty();
-    }
-
 }
