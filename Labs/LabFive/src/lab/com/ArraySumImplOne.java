@@ -7,6 +7,13 @@ import java.util.concurrent.*;
  * Created by Katrin on 11.09.2016.
  */
 public class ArraySumImplOne implements ArraySum {
+
+    private ExecutorService executor;
+
+    public ArraySumImplOne(ExecutorService executor) {
+        this.executor = executor;
+    }
+
     @Override
     public int sum(int[] a) {
 
@@ -21,7 +28,6 @@ public class ArraySumImplOne implements ArraySum {
             size--;
         }
         final int finalSize = size / 2;
-        ExecutorService executor = Executors.newCachedThreadPool();
         if (size > 1) {
             for (int i = 0; i < 2; i++) {
                 final int[] newArray = new int[finalSize];
@@ -30,12 +36,11 @@ public class ArraySumImplOne implements ArraySum {
                 results.add(executor.submit(new Callable<Integer>() {
                     @Override
                     public Integer call() throws Exception {
-                        return new ArraySumImplOne().sum(newArray);
+                        return new ArraySumImplOne(executor).sum(newArray);
                     }
                 }));
             }
         }
-        executor.shutdown();
 
         for (Future<Integer> result : results) {
             try {
