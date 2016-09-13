@@ -11,6 +11,7 @@ public class ThreadPool implements AutoCloseable {
     private final MyQueue<Task> taskQueue;
     private MyThread[] threads;
     private int countOfThreads;
+    private final Object specialVarForSync = new Object();
 
     public ThreadPool() {
         this.taskQueue = new MyQueue<>();
@@ -29,11 +30,12 @@ public class ThreadPool implements AutoCloseable {
                 }
             }
         }
-
-        if (countOfThreads != SIZE) {
-            threads[countOfThreads] = new MyThread(Integer.toString(countOfThreads), taskQueue);
-            threads[countOfThreads].start();
-            countOfThreads++;
+        synchronized (specialVarForSync) {
+            if (countOfThreads != SIZE) {
+                threads[countOfThreads] = new MyThread(Integer.toString(countOfThreads), taskQueue);
+                threads[countOfThreads].start();
+                countOfThreads++;
+            }
         }
 
     }
@@ -42,7 +44,7 @@ public class ThreadPool implements AutoCloseable {
     public void close() throws IOException, InterruptedException {
         for (int i = 0; i < countOfThreads; i++) {
             threads[i].setCheck(false);
-            while (threads[i].getState() == Thread.State.WAITING) {
+            while (!(threads[i].getState() == Thread.State.WAITING)) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
