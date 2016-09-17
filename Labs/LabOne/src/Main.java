@@ -44,10 +44,6 @@ public class Main {
             verticesNumber = (int) Math.sqrt(rowsOfMatrix.length);
             int size = verticesNumber;
 
-        /*if (currentProcessRank == 0) {
-            printFile(rowsOfMatrix, size, args[args.length - 1]);
-        }*/
-
             int linesNum = size / commSize;
 
             int[] rowsOfCurrentProcess = new int[linesNum * size];
@@ -120,25 +116,6 @@ public class Main {
         return rowsOfMatrix;
     }
 
-    private static void printFile(int[] arrayOfRibs, int size, String path) throws IOException {
-        if (currentProcessRank == 0) {
-            File file = new File(path);
-            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            int allSize = size * size;
-            int i = 0;
-            int j;
-            int k;
-            while (i < allSize) {
-                if (arrayOfRibs[i] != INF) {
-                    j = (int) (i / size);
-                    k = i - j * size;
-                    out.println(j + " " + k + " " + arrayOfRibs[i]);
-                }
-                i++;
-            }
-            out.flush();
-        }
-    }
 
     private static void writeToFile(int[] arrayOfRibs, int size, String path) throws IOException {
         if (currentProcessRank == 0) {
