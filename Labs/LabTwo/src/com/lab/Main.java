@@ -8,10 +8,14 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         for (int i = 0; i < 5; i++) {
             final Process process = new Process();
-            Fiber fiber = new Fiber(new Action() {
+            Fiber fiber = new Fiber(new Runnable() {
                 @Override
-                public void callback() throws InterruptedException {
-                    process.begin();
+                public void run() {
+                    try {
+                        process.run();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             ProcessManager.fibersId.add(fiber.getId());

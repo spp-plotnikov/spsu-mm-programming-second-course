@@ -1,11 +1,9 @@
 package com.lab;
 
-import java.util.Date;
-
 public class Fiber {
 
     /// The fiber action delegate.
-    private Action delegateAction;
+    private Runnable action;
 
     /// Gets the fiber identifier.
     private int id;
@@ -22,7 +20,7 @@ public class Fiber {
         return primaryId;
     }
 
-    /// Gets the flag identifing the primary fiber (a fiber that can begin other fibers).
+    /// Gets the flag identifing the primary fiber (a fiber that can run other fibers).
     public boolean isPrimary;
 
     public boolean isPrimary() {
@@ -31,7 +29,7 @@ public class Fiber {
 
     /// Initializes a new instance of the <see cref="Fiber"/> class.
     /// <param name='action'>Action.</param>
-    public Fiber(Action action) throws InterruptedException {
+    public Fiber(Runnable action) throws InterruptedException {
         innerCreate(action);
     }
 
@@ -50,14 +48,17 @@ public class Fiber {
     /// Switches the execution context to the next fiber.
     /// <param name='fiberId'>Fiber id.</param>
     public static void fiberSwitch(int fiberId) {
+        // for debug only and to show that indeed it works! Remove this line!!!
+        System.out.println("Fiber [" + fiberId + "] Switch");
+
         UnmanagedFiberAPI.kernel32.SwitchToFiber(fiberId);
     }
 
     /// Creates the fiber.
     /// <remarks>This method is responsible for the *actual* fiber creation.</remarks>
     /// <param name='action'>Fiber action.</param>
-    private void innerCreate(Action action) throws InterruptedException {
-        this.delegateAction = action;
+    private void innerCreate(Runnable action) throws InterruptedException {
+        this.action = action;
 
         if (primaryId == 0) {
             primaryId = UnmanagedFiberAPI.kernel32.ConvertThreadToFiber(0);
@@ -65,25 +66,22 @@ public class Fiber {
         }
         EventCallbackInterface lpFiber = new EventCallbackInterface() {
             @Override
-            public void callback(int param) throws InterruptedException{
-            //There i still can call Date()
-                fiberRunnerProc(param);
+            public int callback(int param) throws InterruptedException {
+                return fiberRunnerProc(param);
             }
         };
-        id = UnmanagedFiberAPI.kernel32.CreateFiber(100500, lpFiber, 0);
+
+        id = UnmanagedFiberAPI.kernel32.CreateFiber(10050, lpFiber, 0);
     }
 
     /// Fiber method that executes the fiber action.
     /// <param name='lpParam'>Lp parameter.</param>
     /// <returns>fiber status code.</returns>
-    private int fiberRunnerProc(int lpParam) throws InterruptedException {
+    private int fiberRunnerProc(int param) throws InterruptedException {
         int status = 0;
-        //But there i can't
 
-        Date date = new Date();
         try {
-
-            delegateAction.callback();
+            action.run();
         } catch (Exception e) {
             status = 1;
             e.printStackTrace();

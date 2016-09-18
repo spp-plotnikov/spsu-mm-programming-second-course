@@ -10,7 +10,7 @@ public class Process {
     private static final int intervalsAmountBoundary = 10;
     private static final int priorityLevelsNumber = 10;
 
-    public final ArrayList<Integer> workIntervals = new ArrayList<>();
+    private final ArrayList<Integer> workIntervals = new ArrayList<>();
     private  final ArrayList<Integer> pauseIntervals = new ArrayList<>();
 
     private int priority;
@@ -51,17 +51,16 @@ public class Process {
         priority = random.nextInt(priorityLevelsNumber);
     }
 
-    public void begin() throws InterruptedException {
+    public void run() throws InterruptedException {
         synchronized (this) {
             for (int i = 0; i < workIntervals.size(); i++) {
                 Thread.sleep(workIntervals.get(i)); // work emulation
 
-                Date date = new Date();
-               /* long pauseBeginTime = now.getTimeInMillis();
+               long pauseBeginTime = System.currentTimeMillis();
                 do {
                     ProcessManager.processManagerSwitch(false);
                 }
-                while ((GregorianCalendar.getInstance().getTimeInMillis() - pauseBeginTime) < pauseIntervals.get(i)); // I/O emulation*/
+                while ((System.currentTimeMillis() - pauseBeginTime) < pauseIntervals.get(i)); // I/O emulation*/
             }
 
             ProcessManager.processManagerSwitch(true);

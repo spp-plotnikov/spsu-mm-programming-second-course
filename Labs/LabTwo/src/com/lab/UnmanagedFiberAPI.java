@@ -3,6 +3,8 @@ package com.lab;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
+import java.util.concurrent.Callable;
+
 public class UnmanagedFiberAPI{
 
     public interface Kernel32 extends Library {
