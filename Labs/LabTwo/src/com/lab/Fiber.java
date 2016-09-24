@@ -36,20 +36,20 @@ public class Fiber {
     /// Deletes the current fiber.
     /// <remarks>This method should only be used in the fiber action that's executing.</remarks>
     public void delete() {
-        UnmanagedFiberAPI.kernel32.DeleteFiber(id);//
+        UnmanagedFiberAPI.kernel32.DeleteFiber(id);
     }
 
     /// Deletes the fiber with the specified fiber id.
     /// <param name='fiberId'>fiber id.</param>
     public static void delete(int fiberId) {
-        UnmanagedFiberAPI.kernel32.DeleteFiber(fiberId);//
+        UnmanagedFiberAPI.kernel32.DeleteFiber(fiberId);
     }
 
     /// Switches the execution context to the next fiber.
     /// <param name='fiberId'>Fiber id.</param>
     public static void fiberSwitch(int fiberId) {
         // for debug only and to show that indeed it works! Remove this line!!!
-        System.out.println("Fiber [" + fiberId + "] Switch");
+        //System.out.println("Fiber [" + fiberId + "] Switch");
 
         UnmanagedFiberAPI.kernel32.SwitchToFiber(fiberId);
     }

@@ -25,15 +25,15 @@ public class ProcessManager {
             idOfCurrentFiber = new Random().nextInt(fibersId.size());
             Fiber.fiberSwitch(fibersId.get(idOfCurrentFiber));
         } else {
-            for (int fiberId : deletesFibersId) {
-                Fiber.delete(fiberId);
-            }
             System.out.println("Complete deleted... ");
             Fiber.fiberSwitch(Fiber.getPrimaryId());
         }
-
     }
+
 }
+
+
+
 
 
 
