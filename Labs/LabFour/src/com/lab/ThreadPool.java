@@ -44,13 +44,6 @@ public class ThreadPool implements AutoCloseable {
     public void close() throws IOException, InterruptedException {
         for (int i = 0; i < countOfThreads; i++) {
             threads[i].setCheck(false);
-            while (!(threads[i].getState() == Thread.State.WAITING)) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             synchronized (threads[i]) {
                 threads[i].notify();
             }

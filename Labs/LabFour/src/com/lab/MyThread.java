@@ -37,8 +37,8 @@ public class MyThread extends Thread {
 
     @Override
     public void run() {
+        makeTask();
         while (isCheck()) {
-            makeTask();
             try {
                 synchronized (this) {
                     this.wait();
@@ -46,6 +46,7 @@ public class MyThread extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            makeTask();
         }
     }
 
