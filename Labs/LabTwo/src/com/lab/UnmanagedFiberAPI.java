@@ -3,14 +3,15 @@ package com.lab;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
-import java.util.concurrent.Callable;
-
-public class UnmanagedFiberAPI{
+public class UnmanagedFiberAPI {
 
     public interface Kernel32 extends Library {
         int ConvertThreadToFiber(int lpParameter);
+
         void SwitchToFiber(int lpFiber);
+
         void DeleteFiber(int lpFiber);
+
         int CreateFiber(int dwStackSize, EventCallbackInterface lpStartAddress, int lpParameter);
     }
 

@@ -1,6 +1,8 @@
 package com.lab;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Katrin on 16.06.2016.
@@ -8,6 +10,8 @@ import java.util.ArrayList;
 public class Main {
 
     private static ArrayList<Fiber> fibers = new ArrayList<>();
+    public static Map<Integer, Integer> fibersInfo = new TreeMap<>();
+    public static Integer idOfCurrentFiber;
 
     public static void main(String[] args) throws InterruptedException {
         for (int i = 0; i < 5; i++) {
@@ -22,13 +26,15 @@ public class Main {
                     }
                 }
             });
+            fibersInfo.put(fiber.getId(), process.getPriority());
             fibers.add(fiber);
             ProcessManager.fibersId.add(fiber.getId());
         }
         ProcessManager.processManagerSwitch(false);
 
-        for(Fiber fiber: fibers){
-            if(!fiber.isPrimary){
+        for (Fiber fiber : fibers) {
+            if (!fiber.isPrimary) {
+                Thread.sleep(42);
                 fiber.delete();
             }
         }

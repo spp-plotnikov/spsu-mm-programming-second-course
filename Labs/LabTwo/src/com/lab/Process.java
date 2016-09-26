@@ -1,6 +1,7 @@
 package com.lab;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Process {
 
@@ -11,7 +12,7 @@ public class Process {
     private static final int priorityLevelsNumber = 10;
 
     private final ArrayList<Integer> workIntervals = new ArrayList<>();
-    private  final ArrayList<Integer> pauseIntervals = new ArrayList<>();
+    private final ArrayList<Integer> pauseIntervals = new ArrayList<>();
 
     private int priority;
     private int totalDuration;
@@ -56,7 +57,7 @@ public class Process {
             for (int i = 0; i < workIntervals.size(); i++) {
                 Thread.sleep(workIntervals.get(i)); // work emulation
 
-               long pauseBeginTime = System.currentTimeMillis();
+                long pauseBeginTime = System.currentTimeMillis();
                 do {
                     ProcessManager.processManagerSwitch(false);
                 }
