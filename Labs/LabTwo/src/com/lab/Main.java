@@ -1,8 +1,8 @@
 package com.lab;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+
+import static com.lab.ProcessManager.fibersInfo;
 
 /**
  * Created by Katrin on 16.06.2016.
@@ -10,7 +10,6 @@ import java.util.TreeMap;
 public class Main {
 
     private static ArrayList<Fiber> fibers = new ArrayList<>();
-    public static Map<Integer, Integer> fibersInfo = new TreeMap<>();
     public static Integer idOfCurrentFiber;
 
     public static void main(String[] args) throws InterruptedException {
