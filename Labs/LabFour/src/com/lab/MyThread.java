@@ -41,7 +41,9 @@ public class MyThread extends Thread {
         while (isCheck()) {
             try {
                 synchronized (this) {
-                    this.wait();
+                    if (isCheck()) {
+                        this.wait();
+                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
