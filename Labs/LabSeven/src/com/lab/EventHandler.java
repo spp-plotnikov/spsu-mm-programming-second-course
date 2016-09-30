@@ -33,14 +33,14 @@ public class EventHandler extends Thread {
         }
 
         try {
-            while (line != null) {
+            while (!line.equals("end")) {
                 params = line.split(" ");
                 if (params[0].equals(CONTAINS)) {
                     serverOut.write("" + examSystem.contains(Long.parseLong(params[1]), Long.parseLong(params[2])));
                     serverOut.write("\n");
                     serverOut.flush();
-                } else if (params[0].equals(ADD)) {
-                    examSystem.add(Long.parseLong(params[1]), Long.parseLong(params[2]), Boolean.parseBoolean(params[3]));
+                } else if (params[0].equals(ADD) && params.length == 4) {
+                    examSystem.add(Long.parseLong(params[1]), Long.parseLong(params[2]), params[3]);
                     serverOut.write("added..");
                     serverOut.write("\n");
                     serverOut.flush();
@@ -56,8 +56,8 @@ public class EventHandler extends Thread {
                 }
                 line = serverIn.readLine();
             }
-
             close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,12 +65,11 @@ public class EventHandler extends Thread {
     }
 
     private void close() throws IOException {
-        serverOut.write("closing.. " + "\n");
+        serverOut.write("end");
         serverOut.flush();
         serverOut.close();
         serverIn.close();
-        socket.close();
-        StarterForSystem.flag  = false;
-        Socket socket = new Socket("localhost", 66666);
+       // socket.close();
+        StarterForSystem.flag = false;
     }
 }

@@ -24,7 +24,7 @@ public class Client {
         String line = br.readLine();
         BufferedWriter clientOut = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
 
-        while (line != null) {
+        while (!line.equals("end")) {
             clientOut.write(line);
             clientOut.write("\n");
             clientOut.flush();

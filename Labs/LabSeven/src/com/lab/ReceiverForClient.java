@@ -22,14 +22,21 @@ public class ReceiverForClient extends  Thread {
     }
 
     public void run(){
-        while(flag){
+        String line = "start";
+        while(!line.equals("end")){
             try {
                 BufferedReader clientIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-                String line = clientIn.readLine();
                 System.out.println("System: " + line);
+                line = clientIn.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
     }
