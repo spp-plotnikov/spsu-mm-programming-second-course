@@ -2,7 +2,7 @@ package com.lab;
 
 import java.util.ArrayList;
 
-import static com.lab.ProcessManager.fibersInfo;
+import static com.lab.ProcessManager.fibersInformation;
 
 /**
  * Created by Katrin on 16.06.2016.
@@ -25,7 +25,7 @@ public class Main {
                     }
                 }
             });
-            fibersInfo.put(fiber.getId(), process.getPriority());
+            fibersInformation.put(fiber.getId(), process);
             fibers.add(fiber);
             ProcessManager.fibersId.add(fiber.getId());
         }

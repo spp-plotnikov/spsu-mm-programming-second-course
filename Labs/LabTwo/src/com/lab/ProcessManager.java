@@ -2,7 +2,10 @@ package com.lab;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Created by Katrin on 21.06.2016.
@@ -10,9 +13,9 @@ import java.util.TreeMap;
 public class ProcessManager {
 
     public static ArrayList<Integer> fibersId = new ArrayList<>();
-    private static final int priorityLevelsNumber = 10;
+    public static Map<Integer, Process> fibersInformation = new TreeMap<>();
     private static int idOfCurrentFiber = 0;
-    public static Map<Integer, Integer> fibersInfo = new TreeMap<>();
+    private static Map<Integer, Integer> points = new TreeMap<>();
 
 
     // Without priority
@@ -33,23 +36,17 @@ public class ProcessManager {
     }*/
 
     // With priority
-    public static void processManagerSwitch(boolean fiberFinished) {
-        int idOfCurrentFiber = findFiberWithMaxPriority();
-        int naturalPriority = fibersInfo.get(Main.idOfCurrentFiber);
-        int maxPriority = fibersInfo.get(idOfCurrentFiber);
-
-        if(naturalPriority != maxPriority){
-            fibersInfo.put(Main.idOfCurrentFiber, maxPriority);
-        }
-
+    public static void processManagerSwitch(boolean fiberFinished) throws InterruptedException {
         if (fiberFinished) {
             idOfCurrentFiber = Main.idOfCurrentFiber;
             System.out.println("Fiber with id: " + idOfCurrentFiber + " finished work");
-            fibersInfo.remove(idOfCurrentFiber);
+            fibersInformation.remove(idOfCurrentFiber);
+            points.remove(idOfCurrentFiber);
         }
-        if (fibersInfo.size() > 0) {
-            fibersInfo.put(Main.idOfCurrentFiber, naturalPriority);
+        if (fibersInformation.size() > 0) {
+            idOfCurrentFiber = chooseNewFiber();
             Main.idOfCurrentFiber = idOfCurrentFiber;
+            sleep(100);
             Fiber.fiberSwitch(idOfCurrentFiber);
         } else {
             System.out.println("Complete deleted... ");
@@ -57,11 +54,21 @@ public class ProcessManager {
         }
     }
 
+    private static int chooseNewFiber() {
+        int sum;
+        for (Map.Entry<Integer, Process> fiber : fibersInformation.entrySet()) {
+            int totalDuration = fiber.getValue().getTotalDuration() % 10;
+            sum = totalDuration + fiber.getValue().getPriority() * (new Random().nextInt(totalDuration + 1));
+            points.put(fiber.getKey(), sum);
+        }
+        return findFiberWithMaxPriority();
+    }
+
     private static int findFiberWithMaxPriority() {
-        int maxPriority = priorityLevelsNumber + 1;
+        int maxPriority = 0;
         int fiberId = 0;
-        for (Map.Entry<Integer, Integer> fiber : fibersInfo.entrySet()) {
-            if( maxPriority > fiber.getValue()){
+        for (Map.Entry<Integer, Integer> fiber : points.entrySet()) {
+            if (maxPriority < fiber.getValue()) {
                 maxPriority = fiber.getValue();
                 fiberId = fiber.getKey();
             }
