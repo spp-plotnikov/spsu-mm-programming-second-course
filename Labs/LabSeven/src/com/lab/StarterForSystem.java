@@ -1,6 +1,6 @@
 package com.lab;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -14,15 +14,16 @@ public class StarterForSystem {
     private static Socket client;
 
     public static void main(String[] args) throws IOException {
-        ExamSystem examSystem = new ExamSystemImpl();
+        ExamSystem examSystem = new ExamSystemImplTwo();
 
-        ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
+        final ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
 
         while (flag) {
             client = serverSocket.accept();
             EventHandler eventHandler = new EventHandler(client, examSystem);
             eventHandler.start();
         }
+
         client.close();
         serverSocket.close();
     }

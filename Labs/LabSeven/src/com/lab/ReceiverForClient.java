@@ -8,7 +8,7 @@ import java.net.Socket;
 /**
  * Created by Katrin on 28.09.2016.
  */
-public class ReceiverForClient extends  Thread {
+public class ReceiverForClient extends Thread {
 
     private Socket socket;
     private boolean flag = true;
@@ -17,13 +17,13 @@ public class ReceiverForClient extends  Thread {
         this.flag = flag;
     }
 
-    public ReceiverForClient(Socket socket){
+    public ReceiverForClient(Socket socket) {
         this.socket = socket;
     }
 
-    public void run(){
+    public void run() {
         String line = "start";
-        while(!line.equals("end")){
+        while (!line.equals("end")) {
             try {
                 BufferedReader clientIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
                 System.out.println("System: " + line);
@@ -31,13 +31,11 @@ public class ReceiverForClient extends  Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
         }
-
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

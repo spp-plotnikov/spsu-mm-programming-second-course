@@ -21,14 +21,14 @@ public class Client {
         System.out.println("<Вид услуги> <идентификатор студента> <курс> " +
                 "(если добавляете, то через пробел ещё и зачёт/незачёт");
 
-        String line = br.readLine();
+        String line = "start";
         BufferedWriter clientOut = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
 
         while (!line.equals("end")) {
+            line = br.readLine();
             clientOut.write(line);
             clientOut.write("\n");
             clientOut.flush();
-            line = br.readLine();
         }
         receiver.setFlag(false);
     }

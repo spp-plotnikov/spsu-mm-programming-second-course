@@ -61,7 +61,6 @@ public class EventHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void close() throws IOException {
@@ -69,7 +68,5 @@ public class EventHandler extends Thread {
         serverOut.flush();
         serverOut.close();
         serverIn.close();
-       // socket.close();
-        StarterForSystem.flag = false;
     }
 }
