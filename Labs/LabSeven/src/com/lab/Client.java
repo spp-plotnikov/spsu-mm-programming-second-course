@@ -8,7 +8,7 @@ import static com.lab.Constants.SERVER_PORT;
 /**
  * Created by Katrin on 28.09.2016.
  */
-public class Client {
+public class Client extends Thread {
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -32,4 +32,5 @@ public class Client {
         }
         receiver.setFlag(false);
     }
+
 }
