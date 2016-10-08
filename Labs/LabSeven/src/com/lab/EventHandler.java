@@ -35,7 +35,7 @@ public class EventHandler extends Thread {
         try {
             while (!line.equals("end")) {
                 params = line.split(" ");
-                if (params[0].equals(CONTAINS)) {
+                if (params[0].equals(CONTAINS) && params.length == 3) {
                     serverOut.write("" + examSystem.contains(Long.parseLong(params[1]), Long.parseLong(params[2])));
                     serverOut.write("\n");
                     serverOut.flush();
@@ -44,7 +44,7 @@ public class EventHandler extends Thread {
                     serverOut.write("added..");
                     serverOut.write("\n");
                     serverOut.flush();
-                } else if (params[0].equals(REMOVE)) {
+                } else if (params[0].equals(REMOVE) && params.length == 3) {
                     examSystem.remove(Long.parseLong(params[1]), Long.parseLong(params[2]));
                     serverOut.write("remove..");
                     serverOut.write("\n");

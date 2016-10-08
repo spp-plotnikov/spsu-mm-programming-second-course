@@ -7,86 +7,81 @@ import com.lab.Triplet;
  */
 public class LinkedList {
 
-    private Node node;
-    private volatile int size = 0;
+    private Node current;
+    private Node headNode = new Node();
 
     public LinkedList() {
-        this.node = new Node();
+        headNode = new Node();
     }
 
-    private Node headNode = null;
-
-    public int size() {
-        return this.size;
-    }
-
-    public boolean add(Triplet o) {
-        Node next = new Node(node, o);
-        synchronized(node){
-            if (headNode == null) {
-                headNode = next;
-                headNode.setIndex(size() + 1);
-                node = headNode;
+    public void add(Triplet triplet) {
+        Node newNode = new Node(triplet);
+        current = headNode;
+        headNode.lock();
+        Node next = current.getNext();
+        try {
+            if (next == null) {
+                current.setNext(newNode);
             } else {
-                synchronized (node.getPrevious()){
-                    node.setNext(next);
-                    node = next;
-                    node.setIndex(size() + 1);
+                try {
+                    next.lock();
+                    while (next.getNext() != null) {
+                        current.unlock();
+                        current = next;
+                        next = next.getNext();
+                        next.lock();
+                    }
+                    next.setNext(newNode);
+                } finally {
+                    next.unlock();
                 }
             }
-            size++;
+        } finally {
+            current.unlock();
         }
-        return true;
-    }
-
-    public boolean contains(Triplet o) {
-        boolean answer = false;
-        Node node = headNode;
-        for (int i = 0; i < size(); i++) {
-            if (node.getElement().equals(o)) {
-                answer = true;
-            }
-            node = node.getNext();
-        }
-        return answer;
     }
 
     public void remove(Triplet triplet) {
-        Node node = headNode;
-        synchronized (node) {
-            for (int i = 1; i < size() + 1; i++) {
-                if (node.getElement().equals(triplet)) {
-                    if (node == headNode) {
-                        int index = node.getIndex();
-                        synchronized (node.getNext()) {
-                            node.getNext().setPrevious(null);
-                            node = node.getNext();
-                            headNode = node;
-                        }
-                        for (int j = index; j < size() - 1; j++) {
-                            node.setIndex(j);
-                            node = node.getNext();
-                        }
-                        node.setIndex(node.getIndex() - 1);
-                    } else {
-                        int index = node.getIndex();
-                        synchronized (node.getPrevious()){
-                            synchronized (node.getNext()){
-                                node.getPrevious().setNext(node.getNext());
-                                node = node.getNext();
-                            }
-                        }
-                        for (int j = index; j < size() - 1; j++) {
-                            node.setIndex(j);
-                            node = node.getNext();
-                        }
-                        node.setIndex(node.getIndex() - 1);
-
-                    }
-                    size--;
-                }
-                node = node.getNext();
-            }
+        Node nodeForRemove = new Node(triplet);
+        current = headNode;
+        if(current.getNext() == null){
+            return;
         }
+        Node next = current.getNext();
+        current.lock();
+        try {
+            if (next.getElement().equals(nodeForRemove.getElement())) {
+                current.setNext(next.getNext());
+            } else {
+                try {
+                    next.lock();
+                    while (!next.getElement().equals(nodeForRemove.getElement()) && next.getElement() != null) {
+                        current.unlock();
+                        current = next;
+                        next = next.getNext();
+                        next.lock();
+                    }
+                    if (next.getElement() != null) {
+                        current.setNext(next.getNext());
+                    }
+                } finally {
+                    next.unlock();
+                }
+            }
+        } finally {
+            current.unlock();
+        }
+    }
+
+    public boolean contains(Triplet triplet) {
+        boolean answer = false;
+        Node node = headNode;
+        while (!node.getElement().equals(triplet) && node.getNext() != null) {
+            node = node.getNext();
+        }
+        if (node.getElement().equals(triplet)) {
+            answer = true;
+        }
+        return answer;
     }
 }

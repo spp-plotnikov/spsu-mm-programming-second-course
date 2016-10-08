@@ -16,17 +16,17 @@ public class Test {
 
 
     public static void main(String[] args) throws IOException {
-        doTest("one", "6666");
-        doTest("two", "9999");
 
-
+        doTest("one");
+        doTest("two");
     }
 
-    public static void doTest(String param, String port) throws IOException {
+    private static void doTest(String param) throws IOException {
 
         long startTime = System.currentTimeMillis();
-        final String[] strs = new String[]{param, port};
-        new Thread(new Runnable() {
+        final String[] strs = new String[]{param};
+
+        Thread systemThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -35,18 +35,20 @@ public class Test {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
+
+        systemThread.start();
 
         for (int i = 0; i < COUNT_OF_ADDS; i++) {
             int idStudent = new Random(99999999).nextInt() + 1;
             int idCourse = new Random(99999999).nextInt() % 6 + 1;
-            Thread thread = new ClientForTest("add " + idStudent + " " + idCourse + " accepted", strs[1]);
+            Thread thread = new ClientForTest("add " + idStudent + " " + idCourse + " accepted");
             arrayList.add(thread);
             thread.start();
         }
 
         for (int i = 0; i < COUNT_OF_CONTAINS / 2; i++) {
-            Thread thread = new ClientForTest("contains " + i + " " + ((i % 6) + 1), strs[1]);
+            Thread thread = new ClientForTest("contains " + i + " " + ((i % 6) + 1));
             arrayList.add(thread);
             thread.start();
         }
@@ -54,14 +56,14 @@ public class Test {
         for (int i = 0; i < COUNT_OF_REMOVES; i++) {
             int idStudent = new Random(99999999).nextInt() + 1;
             int idCourse = new Random(99999999).nextInt() % 6 + 1;
-            Thread thread = new ClientForTest("remove " + idStudent + " " + idCourse, strs[1]);
+            Thread thread = new ClientForTest("remove " + idStudent + " " + idCourse);
             arrayList.add(thread);
             thread.start();
 
         }
 
         for (int i = 0; i < COUNT_OF_CONTAINS / 2; i++) {
-            Thread thread = new ClientForTest("contains " + i + " " + ((i % 6) + 1), strs[1]);
+            Thread thread = new ClientForTest("contains " + i + " " + ((i % 6) + 1));
             arrayList.add(thread);
             thread.start();
         }
@@ -75,6 +77,13 @@ public class Test {
         }
 
         StarterForSystem.close();
+
+        try {
+            systemThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         System.out.println(System.currentTimeMillis() - startTime);
 

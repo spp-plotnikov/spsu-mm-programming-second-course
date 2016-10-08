@@ -3,6 +3,8 @@ package com.lab;
 import java.io.*;
 import java.net.Socket;
 
+import static com.lab.Constants.SERVER_PORT;
+
 /**
  * Created by Katrin on 28.09.2016.
  */
@@ -11,8 +13,8 @@ public class ClientForTest extends Thread {
     private String flag;
     private Socket socket;
 
-    public ClientForTest(String flag, String port) throws IOException {
-        socket = new Socket("127.0.0.1", Integer.parseInt(port));
+    public ClientForTest(String flag) throws IOException {
+        socket = new Socket("localhost", SERVER_PORT);
         this.flag = flag;
     }
 
