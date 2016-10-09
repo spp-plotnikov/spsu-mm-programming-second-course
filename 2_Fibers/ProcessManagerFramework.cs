@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Threading;
 using Fibers;
 
-//Process Manager doesn't work clearly on the first try
 namespace ProcessManager
 {
     public static class ProcessManager
@@ -53,6 +52,7 @@ namespace ProcessManager
                 uint iter;
                 if ((fibers_iter.TryGetValue(iteration, out iter) == true) && (fibers_list.Contains(iter)))
                 {
+                    current_fiber = fibers_list.IndexOf(iter);
                     Fiber.Switch(iter);
                 }
                 else
@@ -65,7 +65,7 @@ namespace ProcessManager
 
         public static void Main()
         {
-            int fibers_num = 2;
+            int fibers_num = 7;
             for (int i = 0; i < fibers_num; i++)
             {
                 Process process = new Process();
