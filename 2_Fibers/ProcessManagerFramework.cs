@@ -5,17 +5,18 @@ using System.Diagnostics;
 using System.Threading;
 using Fibers;
 
+//the whole program doesn't finished correctly and Process Manager doesn't work clearly on the first try
 namespace ProcessManager
 {
     public static class ProcessManager
     {
         private static Dictionary<uint, int> fibers = new Dictionary<uint, int>(); //fiberId: fiberpriority
-        private static Dictionary<int, uint> fibers_iter = new Dictionary<int, uint>(); //number of iter: fiberId
-        private static List<uint> fibers_list = new List<uint>();
-        private static int current_fiber = 0;
+        private static Dictionary<int, uint> fibersIter = new Dictionary<int, uint>(); //number of iter: fiberId
+        private static List<uint> fibersList = new List<uint>();
+        private static int currentFiber = 0;
         private static int iteration = 0;
 
-        public static void Delete_All()
+        public static void DeleteAll()
         {
             foreach (uint fiber in fibers.Keys)
             {
@@ -23,22 +24,50 @@ namespace ProcessManager
             }
         }
 
+        //  there are no priorities
+
+        //public static void Switch(bool fiberFinished)
+        //{
+        //    if (currentFiber == -1) //Fiber.PrimaryId is working now
+        //    {
+        //        DeleteAll();
+        //    }
+        //    else if (fiberFinished)
+        //    {
+        //        Console.WriteLine(string.Format("Fiber{0} has finished", fibersList[currentFiber]));
+        //        if (currentFiber != 0)
+        //        {
+        //            currentFiber -= 1;
+        //            Fiber.Switch(fibersList[currentFiber]);
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine("The end");
+        //            currentFiber = -1;
+        //            Fiber.Switch(Fiber.PrimaryId);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Fiber.Switch(fibersList[currentFiber]);
+        //    }
+        //}
         public static void Switch(bool fiberFinished)
         {
             Thread.Sleep(3);
             iteration = (iteration + 1) % (fibers.Count * 3);
-            if (!(fibers_list.Count > 0)) //Fiber.PrimaryId is working now
+            if (!(fibersList.Count > 0)) //Fiber.PrimaryId is working now
             {
-                Delete_All();
+                DeleteAll();
             }
             else if (fiberFinished)
             {
-                Console.WriteLine(string.Format("Fiber{0} has finished", fibers_list[current_fiber]));
-                fibers_list.RemoveAt((int)current_fiber);
-                if (fibers_list.Count() > 0)
+                Console.WriteLine(string.Format("Fiber{0} has finished", fibersList[currentFiber]));
+                fibersList.RemoveAt((int)currentFiber);
+                if (fibersList.Count() > 0)
                 {
-                    current_fiber = fibers_list.Count - 1;
-                    Fiber.Switch(fibers_list[current_fiber]);
+                    currentFiber = fibersList.Count - 1;
+                    Fiber.Switch(fibersList[currentFiber]);
                 }
                 else
                 {
@@ -48,17 +77,17 @@ namespace ProcessManager
             }
             else
             {
-                // to allow one process (maybe with lower priority) to get CPU time to work
+                //to allow one process (maybe with lower priority) to get CPU time to work
                 uint iter;
-                if ((fibers_iter.TryGetValue(iteration, out iter) == true) && (fibers_list.Contains(iter)))
+                if ((fibersIter.TryGetValue(iteration, out iter)) && (fibersList.Contains(iter)))
                 {
-                    current_fiber = fibers_list.IndexOf(iter);
+                    currentFiber = fibersList.IndexOf(iter);
                     Fiber.Switch(iter);
                 }
                 else
                 {
-                    current_fiber = ((current_fiber - 1) + fibers_list.Count) % fibers_list.Count;
-                    Fiber.Switch(fibers_list[current_fiber]);
+                    currentFiber = fibersList.Count() - 1;
+                    Fiber.Switch(fibersList[currentFiber]);
                 }
             }
         }
@@ -71,12 +100,12 @@ namespace ProcessManager
                 Process process = new Process();
                 Fiber fiber = new Fiber(new Action(process.Run));
                 fibers.Add(fiber.Id, process.Priority);
-                fibers_iter.Add((i + 1) * 2, fiber.Id);
+                fibersIter.Add((i + 1) * 2, fiber.Id);
                 Console.WriteLine("{0}-{1}", fiber.Id, process.Priority);
             }
             fibers = fibers.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-            current_fiber = fibers.Count - 1;
-            fibers_list = fibers.Keys.ToList();
+            currentFiber = fibers.Count() - 1;
+            fibersList = fibers.Keys.ToList();
             Switch(false);
             Console.ReadLine();
         }
