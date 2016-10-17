@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace icecreamprog
+namespace IceCreamProg
 {
 
     class Program
     {
         static void Main(string[] args)
         {
-            icecream.IceCream.greentea ice1 = new icecream.IceCream.greentea();
-            icecream.IceCream.pistachio ice2 = new icecream.IceCream.pistachio();
+            IceCream.GreenTea ice1 = new IceCream.GreenTea();
+            IceCream.IceCream.Pistachio ice2 = new IceCream.IceCream.Pistachio();
 
-            ice1.recipe();
-            ice2.recipe(); 
+            ice1.Recipe();
+            ice2.Recipe(); 
         }
     }
 }

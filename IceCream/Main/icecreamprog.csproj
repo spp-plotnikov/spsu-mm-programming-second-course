@@ -7,7 +7,7 @@
     <ProjectGuid>{29BED095-15D4-453B-9EFA-94B14CA23C06}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>icecream</RootNamespace>
+    <RootNamespace>IceCream</RootNamespace>
     <AssemblyName>icecream</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,7 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GreenTea.cs" />
     <Compile Include="IceCream.cs" />
+    <Compile Include="Pistachio.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
