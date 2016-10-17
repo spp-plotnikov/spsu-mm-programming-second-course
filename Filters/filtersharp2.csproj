@@ -7,7 +7,7 @@
     <ProjectGuid>{2DA6B340-88DC-4BF1-BB28-75406DB19E6E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>filtersharp2</RootNamespace>
+    <RootNamespace>FilterSharp</RootNamespace>
     <AssemblyName>filtersharp2</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

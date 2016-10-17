@@ -6,12 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace filtersharp2
+namespace FilterSharp
 {
     class Program
     {
-
-        public static void DoMedian(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] bitecolor, Color[,] bitecolorcopy)
+        public static void DoMedian(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] byteСolor, Color[,] byteСolorСopy)
         {
             byte[] R = new byte[9];
             byte[] G = new byte[9];
@@ -24,21 +23,21 @@ namespace filtersharp2
                     for (int i = -1; i < 2; i++)
                         for (int j = -1; j < 2; j++)
                         {
-                            R[k] = bitecolor[i + a, j + b].rgbtRed;
-                            G[k] = bitecolor[i + a, j + b].rgbtGreen;
-                            B[k] = bitecolor[i + a, j + b].rgbtBlue;
+                            R[k] = byteСolor[i + a, j + b].rgbtRed;
+                            G[k] = byteСolor[i + a, j + b].rgbtGreen;
+                            B[k] = byteСolor[i + a, j + b].rgbtBlue;
                             k++;
                         }
                     Array.Sort(R);
                     Array.Sort(G);
                     Array.Sort(B);
-                    bitecolorcopy[a, b].rgbtBlue = B[4];
-                    bitecolorcopy[a, b].rgbtRed = R[4];
-                    bitecolorcopy[a, b].rgbtGreen = G[4];
+                    byteСolorСopy[a, b].rgbtBlue = B[4];
+                    byteСolorСopy[a, b].rgbtRed = R[4];
+                    byteСolorСopy[a, b].rgbtGreen = G[4];
                 }
         }
 
-        public static void DoGauss(int r, byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] bitecolor, Color[,] bitecolorcopy)
+        public static void DoGauss(int r, byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] byteСolor, Color[,] byteСolorСopy)
         {
 
             double[,] gaussArray = new double[5, 5];
@@ -62,9 +61,9 @@ namespace filtersharp2
                             pixelPosX = x + j - 2;
                             pixelPosY = y + i - 2;
 
-                            byte red = bitecolorcopy[pixelPosY, pixelPosX].rgbtRed;
-                            byte green = bitecolorcopy[pixelPosY, pixelPosX].rgbtGreen;
-                            byte blue = bitecolorcopy[pixelPosY, pixelPosX].rgbtBlue;
+                            byte red = byteСolorСopy[pixelPosY, pixelPosX].rgbtRed;
+                            byte green = byteСolorСopy[pixelPosY, pixelPosX].rgbtGreen;
+                            byte blue = byteСolorСopy[pixelPosY, pixelPosX].rgbtBlue;
 
                             rSum += red * gaussArray[i, j];
                             gSum += green * gaussArray[i, j];
@@ -73,30 +72,28 @@ namespace filtersharp2
                             kSum += gaussArray[i, j];
                         }
 
-                    if (kSum <= 0) kSum = 1;
+                    if(kSum <= 0) kSum = 1;
 
                     rSum /= kSum;
-                    if (rSum < 0) rSum = 0;
-                    if (rSum > 255) rSum = 255;
+                    if(rSum < 0) rSum = 0;
+                    if(rSum > 255) rSum = 255;
 
                     gSum /= kSum;
-                    if (gSum < 0) gSum = 0;
-                    if (gSum > 255) gSum = 255;
+                    if(gSum < 0) gSum = 0;
+                    if(gSum > 255) gSum = 255;
 
                     bSum /= kSum;
-                    if (bSum < 0) bSum = 0;
-                    if (bSum > 255) bSum = 255;
+                    if(bSum < 0) bSum = 0;
+                    if(bSum > 255) bSum = 255;
 
-                    bitecolorcopy[y, x].rgbtRed = (byte)rSum;
-                    bitecolorcopy[y, x].rgbtGreen = (byte)gSum;
-                    bitecolorcopy[y, x].rgbtBlue = (byte)bSum;
+                    byteСolorСopy[y, x].rgbtRed = (byte)rSum;
+                    byteСolorСopy[y, x].rgbtGreen = (byte)gSum;
+                    byteСolorСopy[y, x].rgbtBlue = (byte)bSum;
                 }
 
         }
 
-
-
-        public static void DoSobelx(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] bitecolor, Color[,] bitecolorcopy)
+        public static void DoSobelx(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] byteСolor, Color[,] byteСolorСopy)
         {
             int[,] g = new int[,] {  { -1, 0, 1 }, 
                                      { -2, 0, 2 }, 
@@ -109,7 +106,6 @@ namespace filtersharp2
             int newry = 0, newgy = 0, newby = 0;
             int rcy, gcy, bcy;
             int newr = 0, newg = 0, newb = 0;
-            int rc, gc, bc;
 
             for (int i = 1; i <  biHeight - 1; i++)
                 for (int j = 1; j <  biWidth - 1; j++)
@@ -121,9 +117,9 @@ namespace filtersharp2
                     for (int wi = -1; wi < 2; wi++)
                         for (int hw = -1; hw < 2; hw++)
                         {
-                            rcy = bitecolor[i + hw, j + wi].rgbtRed;
-                            bcy = bitecolor[i + hw, j + wi].rgbtBlue;
-                            gcy = bitecolor[i + hw, j + wi].rgbtGreen;
+                            rcy = byteСolor[i + hw, j + wi].rgbtRed;
+                            bcy = byteСolor[i + hw, j + wi].rgbtBlue;
+                            gcy = byteСolor[i + hw, j + wi].rgbtGreen;
 
                             newry += gy[wi + 1, hw + 1] * rcy;
                             newgy += gy[wi + 1, hw + 1] * gcy;
@@ -135,24 +131,23 @@ namespace filtersharp2
 
                     double sum = Math.Sqrt((newb + newg + newr) * (newb + newg + newr) + (newby + newgy + newry) * (newby + newgy + newry));
 
-                    if (sum <= 101)
+                    if(sum <= 101)
                     {
-                        bitecolorcopy[i, j].rgbtBlue = 0;
-                        bitecolorcopy[i, j].rgbtGreen = 0;
-                        bitecolorcopy[i, j].rgbtRed = 0;
+                        byteСolorСopy[i, j].rgbtBlue = 0;
+                        byteСolorСopy[i, j].rgbtGreen = 0;
+                        byteСolorСopy[i, j].rgbtRed = 0;
                     }
                     else
                     {
-                        bitecolorcopy[i, j].rgbtBlue = 255;
-                        bitecolorcopy[i, j].rgbtGreen = 255;
-                        bitecolorcopy[i, j].rgbtRed = 255;
+                        byteСolorСopy[i, j].rgbtBlue = 255;
+                        byteСolorСopy[i, j].rgbtGreen = 255;
+                        byteСolorСopy[i, j].rgbtRed = 255;
                     }
                 }
 
         }
 
-
-        public static void DoSobely(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] bitecolor, Color[,] bitecolorcopy)
+        public static void DoSobely(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] byteСolor, Color[,] byteСolorСopy)
         {
             int[,] g = new int[,] {  { -1, 0, 1 }, 
                                      { -2, 0, 2 }, 
@@ -166,7 +161,6 @@ namespace filtersharp2
             int newry = 0, newgy = 0, newby = 0;
             int rcy, gcy, bcy;
             int newr = 0, newg = 0, newb = 0;
-            int rc, gc, bc;
 
             for (int i = 1; i <  biHeight - 1; i++)
                 for (int j = 1; j <  biWidth - 1; j++)
@@ -178,9 +172,9 @@ namespace filtersharp2
                     for (int wi = -1; wi < 2; wi++)
                         for (int hw = -1; hw < 2; hw++)
                         {
-                            rcy = bitecolor[i + hw, j + wi].rgbtRed;
-                            bcy = bitecolor[i + hw, j + wi].rgbtBlue;
-                            gcy = bitecolor[i + hw, j + wi].rgbtGreen;
+                            rcy = byteСolor[i + hw, j + wi].rgbtRed;
+                            bcy = byteСolor[i + hw, j + wi].rgbtBlue;
+                            gcy = byteСolor[i + hw, j + wi].rgbtGreen;
 
                             //	newry += gy[wi + 1,hw + 1] * rcy;
                             //	newgy += gy[wi + 1,hw + 1] * gcy;
@@ -192,55 +186,54 @@ namespace filtersharp2
 
                     double sum = Math.Sqrt((newb + newg + newr) * (newb + newg + newr) + (newby + newgy + newry) * (newby + newgy + newry));
 
-                    if (sum <= 101)
+                    if(sum <= 101)
                     {
-                        bitecolorcopy[i, j].rgbtBlue = 0;
-                        bitecolorcopy[i, j].rgbtGreen = 0;
-                        bitecolorcopy[i, j].rgbtRed = 0;
+                        byteСolorСopy[i, j].rgbtBlue = 0;
+                        byteСolorСopy[i, j].rgbtGreen = 0;
+                        byteСolorСopy[i, j].rgbtRed = 0;
                     }
                     else
                     {
-                        bitecolorcopy[i, j].rgbtBlue = 255;
-                        bitecolorcopy[i, j].rgbtGreen = 255;
-                        bitecolorcopy[i, j].rgbtRed = 255;
+                        byteСolorСopy[i, j].rgbtBlue = 255;
+                        byteСolorСopy[i, j].rgbtGreen = 255;
+                        byteСolorСopy[i, j].rgbtRed = 255;
                     }
                 }
 
         }
-        public static void DoGrey(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] bitecolor, Color[,] bitecolorcopy)
+        public static void DoGrey(byte[] data, int biWidth, int biHeight, int biBitCount, Color[,] byteСolor, Color[,] byteСolorСopy)
         {
             int R, G, B, Y;
 
             for (int i = 0; i <  biHeight; i++)
                 for (int j = 0; j <  biWidth; j++)
                 {
-                    R = bitecolor[i, j].rgbtRed;
-                    G = bitecolor[i, j].rgbtGreen;
-                    B = bitecolor[i, j].rgbtBlue;
+                    R = byteСolor[i, j].rgbtRed;
+                    G = byteСolor[i, j].rgbtGreen;
+                    B = byteСolor[i, j].rgbtBlue;
                     Y = (R + G + B) / 3;
-                    bitecolor[i, j].rgbtRed = (byte)Y;
-                    bitecolor[i, j].rgbtGreen = (byte)Y;
-                    bitecolor[i, j].rgbtBlue = (byte)Y;
+                    byteСolorСopy[i, j].rgbtRed = (byte)Y;
+                    byteСolorСopy[i, j].rgbtGreen = (byte)Y;
+                    byteСolorСopy[i, j].rgbtBlue = (byte)Y;
                 }
-
         }
 
-        public static void CreateBmp(byte[] data, int biWidth, int biHeight, int biBitCount, string[] args, Color[,] bitecolor)
+        public static void CreateBmp(byte[] data, int biWidth, int biHeight, int biBitCount, string[] args, Color[,] byteСolor)
         {
             int k = 54;
             for (int i = 0; i <  biHeight; i++)
             {
                 for (int j = 0; j <  biWidth; j++)
                 {
-                    data[k] = bitecolor[i, j].rgbtRed;
+                    data[k] = byteСolor[i, j].rgbtRed;
                     k++;
-                    data[k] = bitecolor[i, j].rgbtGreen;
+                    data[k] = byteСolor[i, j].rgbtGreen;
                     k++;
-                    data[k] = bitecolor[i, j].rgbtBlue;
+                    data[k] = byteСolor[i, j].rgbtBlue;
                     k++;
                     if ( biBitCount == 32) { k++; }
                 }
-                if ( biBitCount == 24) k +=  biWidth % 4;
+                if(biBitCount == 24) k +=  biWidth % 4;
             }
 
             System.IO.File.WriteAllBytes(args[2], data);
@@ -250,15 +243,14 @@ namespace filtersharp2
         {
 
         //    FileStream file = new FileStream(@args[0], FileMode.Open, FileAccess.Read);
-
             byte[] data = System.IO.File.ReadAllBytes(@args[0]);
 
             int biWidth = BitConverter.ToInt32(data, 18);        // Ширина изображения в пикселях
             int biHeight = BitConverter.ToInt32(data, 22);        // Высота изображения в пикселях
             int biBitCount = BitConverter.ToInt16(data, 28);      // Бит/пиксел: 32 или 24 
 
-            Color[,] bitecolor = new Color[biHeight, biWidth];
-            Color[,] bitecolorcopy = new Color[biHeight, biWidth];
+            Color[,] byteСolor = new Color[biHeight, biWidth];
+            Color[,] byteСolorСopy = new Color[biHeight, biWidth];
       
 
             int k = 54;
@@ -267,33 +259,33 @@ namespace filtersharp2
 
                 for (int j = 0; j < biWidth; j++)
                 {
-                    bitecolor[i, j].rgbtRed = data[k];
-                    bitecolorcopy[i, j].rgbtRed = data[k];
+                    byteСolor[i, j].rgbtRed = data[k];
+                    byteСolorСopy[i, j].rgbtRed = data[k];
                     k++;
-                    bitecolor[i, j].rgbtGreen = data[k];
-                    bitecolorcopy[i, j].rgbtGreen = data[k];
+                    byteСolor[i, j].rgbtGreen = data[k];
+                    byteСolorСopy[i, j].rgbtGreen = data[k];
                     k++;
-                    bitecolor[i, j].rgbtBlue = data[k];
-                    bitecolorcopy[i, j].rgbtBlue = data[k];
+                    byteСolor[i, j].rgbtBlue = data[k];
+                    byteСolorСopy[i, j].rgbtBlue = data[k];
                     k++;
                     if ( biBitCount == 32) { k++; }
                 }
-                if ( biBitCount == 24) k +=  biWidth % 4;
+                if(biBitCount == 24) k +=  biWidth % 4;
             }
 
             string filters = args[1];
 
-            if (filters[0] == '4') DoGrey(data, biWidth, biHeight, biBitCount,  bitecolor, bitecolorcopy);
+            if(filters[0] == '4') DoGrey(data, biWidth, biHeight, biBitCount,  byteСolor, byteСolorСopy);
 
-            if (filters[0] == '0') DoMedian(data, biWidth, biHeight, biBitCount,  bitecolor, bitecolorcopy);
+            if(filters[0] == '0') DoMedian(data, biWidth, biHeight, biBitCount,  byteСolor, byteСolorСopy);
 
-            if (filters[0] == '1') DoGauss(10, data, biWidth, biHeight, biBitCount, bitecolor, bitecolorcopy);
+            if(filters[0] == '1') DoGauss(10, data, biWidth, biHeight, biBitCount, byteСolor, byteСolorСopy);
 
-            if (filters[0] == '2') DoSobelx(data, biWidth, biHeight, biBitCount, bitecolor, bitecolorcopy);
+            if(filters[0] == '2') DoSobelx(data, biWidth, biHeight, biBitCount, byteСolor, byteСolorСopy);
 
-            if (filters[0] == '3') DoSobely(data, biWidth, biHeight, biBitCount, bitecolor, bitecolorcopy);
+            if(filters[0] == '3') DoSobely(data, biWidth, biHeight, biBitCount, byteСolor, byteСolorСopy);
 
-            CreateBmp(data, biWidth, biHeight, biBitCount, args, bitecolorcopy);
+            CreateBmp(data, biWidth, biHeight, biBitCount, args, byteСolorСopy);
             //  createbmp(data, biWidth,  biHeight, biBitCount,, args, bitecolor);
         }
     }
