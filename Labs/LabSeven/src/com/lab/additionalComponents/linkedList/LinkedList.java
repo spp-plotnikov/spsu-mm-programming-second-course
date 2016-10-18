@@ -23,7 +23,7 @@ public class LinkedList {
             } else {
                 try {
                     next.lock();
-                    while (next.getNext() != null) {
+                    while (next.getNext() != null && !next.getNext().getElement().equals(triplet)) {
                         current.unlock();
                         current = next;
                         next = next.getNext();
