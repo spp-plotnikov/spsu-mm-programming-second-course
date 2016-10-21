@@ -21,20 +21,34 @@ namespace Reflection
             }
             Console.WriteLine("Enter path");
             string path = Console.ReadLine();
-            string[] dirs = Directory.GetFiles(@path, "*.bmp");
-            
-           while (dirs.Length == 0){
-                Console.WriteLine("Error path. Again");
-                path = Console.ReadLine();
-                dirs = Directory.GetFiles(@path, "*.bmp");
+
+            string[] dirs;
+            int ok = 0;
+
+            while (ok == 0)
+            {
+                ok = 1;
+                try
+                {
+                    dirs = Directory.GetFiles(@path, "*.bmp");
+
+                }
+                catch
+                {
+                    Console.WriteLine("Error path. Again");
+                    path = Console.ReadLine();
+                    ok = 0;
+                }
             }
-            
+
+            dirs = Directory.GetFiles(@path, "*.bmp");
+
             foreach (string dir in dirs)
             {
                 string nameProgram = String.Copy(dir);
                 for (int i = dir.Length - 1; i > 0; i--)
                 {
-                    if (dir[i] == '/')
+                    if (dir[i] == '\\')
                     {
                         nameProgram = nameProgram.Remove(0, i + 1);
                         break;
