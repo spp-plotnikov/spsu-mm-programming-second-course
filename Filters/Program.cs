@@ -23,17 +23,17 @@ namespace FilterSharp
                     for (int i = -1; i < 2; i++)
                         for (int j = -1; j < 2; j++)
                         {
-                            R[k] = byteСolor[i + a, j + b].rgbtRed;
-                            G[k] = byteСolor[i + a, j + b].rgbtGreen;
-                            B[k] = byteСolor[i + a, j + b].rgbtBlue;
+                            R[k] = byteСolor[i + a, j + b].RgbtRed;
+                            G[k] = byteСolor[i + a, j + b].RgbtGreen;
+                            B[k] = byteСolor[i + a, j + b].RgbtBlue;
                             k++;
                         }
                     Array.Sort(R);
                     Array.Sort(G);
                     Array.Sort(B);
-                    byteСolorСopy[a, b].rgbtBlue = B[4];
-                    byteСolorСopy[a, b].rgbtRed = R[4];
-                    byteСolorСopy[a, b].rgbtGreen = G[4];
+                    byteСolorСopy[a, b].RgbtBlue = B[4];
+                    byteСolorСopy[a, b].RgbtRed = R[4];
+                    byteСolorСopy[a, b].RgbtGreen = G[4];
                 }
         }
 
@@ -61,9 +61,9 @@ namespace FilterSharp
                             pixelPosX = x + j - 2;
                             pixelPosY = y + i - 2;
 
-                            byte red = byteСolorСopy[pixelPosY, pixelPosX].rgbtRed;
-                            byte green = byteСolorСopy[pixelPosY, pixelPosX].rgbtGreen;
-                            byte blue = byteСolorСopy[pixelPosY, pixelPosX].rgbtBlue;
+                            byte red = byteСolorСopy[pixelPosY, pixelPosX].RgbtRed;
+                            byte green = byteСolorСopy[pixelPosY, pixelPosX].RgbtGreen;
+                            byte blue = byteСolorСopy[pixelPosY, pixelPosX].RgbtBlue;
 
                             rSum += red * gaussArray[i, j];
                             gSum += green * gaussArray[i, j];
@@ -86,9 +86,9 @@ namespace FilterSharp
                     if(bSum < 0) bSum = 0;
                     if(bSum > 255) bSum = 255;
 
-                    byteСolorСopy[y, x].rgbtRed = (byte)rSum;
-                    byteСolorСopy[y, x].rgbtGreen = (byte)gSum;
-                    byteСolorСopy[y, x].rgbtBlue = (byte)bSum;
+                    byteСolorСopy[y, x].RgbtRed = (byte)rSum;
+                    byteСolorСopy[y, x].RgbtGreen = (byte)gSum;
+                    byteСolorСopy[y, x].RgbtBlue = (byte)bSum;
                 }
 
         }
@@ -117,9 +117,9 @@ namespace FilterSharp
                     for (int wi = -1; wi < 2; wi++)
                         for (int hw = -1; hw < 2; hw++)
                         {
-                            rcy = byteСolor[i + hw, j + wi].rgbtRed;
-                            bcy = byteСolor[i + hw, j + wi].rgbtBlue;
-                            gcy = byteСolor[i + hw, j + wi].rgbtGreen;
+                            rcy = byteСolor[i + hw, j + wi].RgbtRed;
+                            bcy = byteСolor[i + hw, j + wi].RgbtBlue;
+                            gcy = byteСolor[i + hw, j + wi].RgbtGreen;
 
                             newry += gy[wi + 1, hw + 1] * rcy;
                             newgy += gy[wi + 1, hw + 1] * gcy;
@@ -133,15 +133,15 @@ namespace FilterSharp
 
                     if(sum <= 101)
                     {
-                        byteСolorСopy[i, j].rgbtBlue = 0;
-                        byteСolorСopy[i, j].rgbtGreen = 0;
-                        byteСolorСopy[i, j].rgbtRed = 0;
+                        byteСolorСopy[i, j].RgbtBlue = 0;
+                        byteСolorСopy[i, j].RgbtGreen = 0;
+                        byteСolorСopy[i, j].RgbtRed = 0;
                     }
                     else
                     {
-                        byteСolorСopy[i, j].rgbtBlue = 255;
-                        byteСolorСopy[i, j].rgbtGreen = 255;
-                        byteСolorСopy[i, j].rgbtRed = 255;
+                        byteСolorСopy[i, j].RgbtBlue = 255;
+                        byteСolorСopy[i, j].RgbtGreen = 255;
+                        byteСolorСopy[i, j].RgbtRed = 255;
                     }
                 }
 
@@ -172,9 +172,9 @@ namespace FilterSharp
                     for (int wi = -1; wi < 2; wi++)
                         for (int hw = -1; hw < 2; hw++)
                         {
-                            rcy = byteСolor[i + hw, j + wi].rgbtRed;
-                            bcy = byteСolor[i + hw, j + wi].rgbtBlue;
-                            gcy = byteСolor[i + hw, j + wi].rgbtGreen;
+                            rcy = byteСolor[i + hw, j + wi].RgbtRed;
+                            bcy = byteСolor[i + hw, j + wi].RgbtBlue;
+                            gcy = byteСolor[i + hw, j + wi].RgbtGreen;
 
                             //	newry += gy[wi + 1,hw + 1] * rcy;
                             //	newgy += gy[wi + 1,hw + 1] * gcy;
@@ -188,15 +188,15 @@ namespace FilterSharp
 
                     if(sum <= 101)
                     {
-                        byteСolorСopy[i, j].rgbtBlue = 0;
-                        byteСolorСopy[i, j].rgbtGreen = 0;
-                        byteСolorСopy[i, j].rgbtRed = 0;
+                        byteСolorСopy[i, j].RgbtBlue = 0;
+                        byteСolorСopy[i, j].RgbtGreen = 0;
+                        byteСolorСopy[i, j].RgbtRed = 0;
                     }
                     else
                     {
-                        byteСolorСopy[i, j].rgbtBlue = 255;
-                        byteСolorСopy[i, j].rgbtGreen = 255;
-                        byteСolorСopy[i, j].rgbtRed = 255;
+                        byteСolorСopy[i, j].RgbtBlue = 255;
+                        byteСolorСopy[i, j].RgbtGreen = 255;
+                        byteСolorСopy[i, j].RgbtRed = 255;
                     }
                 }
 
@@ -208,13 +208,13 @@ namespace FilterSharp
             for (int i = 0; i <  biHeight; i++)
                 for (int j = 0; j <  biWidth; j++)
                 {
-                    R = byteСolor[i, j].rgbtRed;
-                    G = byteСolor[i, j].rgbtGreen;
-                    B = byteСolor[i, j].rgbtBlue;
+                    R = byteСolor[i, j].RgbtRed;
+                    G = byteСolor[i, j].RgbtGreen;
+                    B = byteСolor[i, j].RgbtBlue;
                     Y = (R + G + B) / 3;
-                    byteСolorСopy[i, j].rgbtRed = (byte)Y;
-                    byteСolorСopy[i, j].rgbtGreen = (byte)Y;
-                    byteСolorСopy[i, j].rgbtBlue = (byte)Y;
+                    byteСolorСopy[i, j].RgbtRed = (byte)Y;
+                    byteСolorСopy[i, j].RgbtGreen = (byte)Y;
+                    byteСolorСopy[i, j].RgbtBlue = (byte)Y;
                 }
         }
 
@@ -225,11 +225,11 @@ namespace FilterSharp
             {
                 for (int j = 0; j <  biWidth; j++)
                 {
-                    data[k] = byteСolor[i, j].rgbtRed;
+                    data[k] = byteСolor[i, j].RgbtRed;
                     k++;
-                    data[k] = byteСolor[i, j].rgbtGreen;
+                    data[k] = byteСolor[i, j].RgbtGreen;
                     k++;
-                    data[k] = byteСolor[i, j].rgbtBlue;
+                    data[k] = byteСolor[i, j].RgbtBlue;
                     k++;
                     if ( biBitCount == 32) { k++; }
                 }
@@ -259,14 +259,14 @@ namespace FilterSharp
 
                 for (int j = 0; j < biWidth; j++)
                 {
-                    byteСolor[i, j].rgbtRed = data[k];
-                    byteСolorСopy[i, j].rgbtRed = data[k];
+                    byteСolor[i, j].RgbtRed = data[k];
+                    byteСolorСopy[i, j].RgbtRed = data[k];
                     k++;
-                    byteСolor[i, j].rgbtGreen = data[k];
-                    byteСolorСopy[i, j].rgbtGreen = data[k];
+                    byteСolor[i, j].RgbtGreen = data[k];
+                    byteСolorСopy[i, j].RgbtGreen = data[k];
                     k++;
-                    byteСolor[i, j].rgbtBlue = data[k];
-                    byteСolorСopy[i, j].rgbtBlue = data[k];
+                    byteСolor[i, j].RgbtBlue = data[k];
+                    byteСolorСopy[i, j].RgbtBlue = data[k];
                     k++;
                     if ( biBitCount == 32) { k++; }
                 }

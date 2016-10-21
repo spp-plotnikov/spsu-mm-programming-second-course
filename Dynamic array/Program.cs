@@ -35,12 +35,12 @@ namespace ArrayList
             arr.Remove(2);
             Print(arr);
 
-            if (arr.IndexOf(3) != -1)
+            if(arr.IndexOf(3) != -1)
                 Console.WriteLine("Index of element '3' : " + arr.IndexOf(3));
             else
                 Console.WriteLine("Not found");
 
-            if (arr.IndexOf(5) != -1)
+            if(arr.IndexOf(5) != -1)
                 Console.WriteLine("Index of element '5' : " + arr.IndexOf(5));
             else
                 Console.WriteLine("Index of element '5' : Not found");

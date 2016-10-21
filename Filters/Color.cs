@@ -8,8 +8,8 @@ namespace FilterSharp
 {
     public struct Color
     {
-        public byte rgbtRed;
-        public byte rgbtGreen;
-        public byte rgbtBlue;
+        public byte RgbtRed;
+        public byte RgbtGreen;
+        public byte RgbtBlue;
     };
 }
