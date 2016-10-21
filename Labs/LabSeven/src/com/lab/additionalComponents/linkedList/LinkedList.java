@@ -42,7 +42,7 @@ public class LinkedList {
     public void remove(Triplet triplet) {
         Node nodeForRemove = new Node(triplet);
         current = headNode;
-        if(current.getNext() == null){
+        if (current.getNext() == null) {
             return;
         }
         Node next = current.getNext();
@@ -59,7 +59,7 @@ public class LinkedList {
                         next = next.getNext();
                         next.lock();
                     }
-                    if (next.getElement() != null) {
+                    if (next.getElement().equals(nodeForRemove.getElement())) {
                         current.setNext(next.getNext());
                     }
                 } finally {
@@ -73,12 +73,35 @@ public class LinkedList {
 
     public boolean contains(Triplet triplet) {
         boolean answer = false;
-        Node node = headNode;
-        while (!node.getElement().equals(triplet) && node.getNext() != null) {
-            node = node.getNext();
+        Node nodeForContains = new Node(triplet);
+        current = headNode;
+
+        if (current.getNext() == null) {
+            return answer;
         }
-        if (node.getElement().equals(triplet)) {
-            answer = true;
+        Node next = current.getNext();
+        current.lock();
+        try {
+            if (next.getElement().equals(nodeForContains.getElement())) {
+                current.setNext(next.getNext());
+            } else {
+                try {
+                    next.lock();
+                    while (!next.getElement().equals(nodeForContains.getElement()) && next.getNext() != null) {
+                        current.unlock();
+                        current = next;
+                        next = next.getNext();
+                        next.lock();
+                    }
+                    if (next.getElement().equals(nodeForContains.getElement())) {
+                        answer = true;
+                    }
+                } finally {
+                    next.unlock();
+                }
+            }
+        } finally {
+            current.unlock();
         }
         return answer;
     }
