@@ -49,6 +49,12 @@ public class Main {
     public static void main(String args[]) throws Exception {
         MPI.Init(args);
         int me = MPI.COMM_WORLD.Rank();
+        String input_name = null, output_name = null;
+        if (me == root) {
+            // for some reason it uses first 3 arguments for its internal purposes
+            input_name = args[3];
+            output_name = args[4];
+        }
         int nodes = MPI.COMM_WORLD.Size();
         int n = 0;
         double start_time = 0;
@@ -60,8 +66,14 @@ public class Main {
         // Read & sync n
         Scanner sc = null;
         if (me == root) {
-            sc = new Scanner(new File("input.txt"));
-            n = sc.nextInt();
+            sc = new Scanner(new File(input_name));
+            int tmp;
+            while (sc.hasNextInt()) {
+                tmp = sc.nextInt();
+                n++;
+            }
+            sc.close();
+            sc = new Scanner(new File(input_name));
         }
         int[] buf = {n};
         MPI.COMM_WORLD.Bcast(buf, 0, 1, MPI.INT, root);
@@ -75,6 +87,7 @@ public class Main {
                 arr[i] = sc.nextInt();
             for (int i = 0; i < fakes; i++)
                 arr[n + i] = Integer.MAX_VALUE;
+            sc.close();
         }
 
         // Scatter the data to slaves
@@ -84,21 +97,24 @@ public class Main {
         // In each slave first sort the local
         Arrays.sort(local_arr);
 
-        // ... and here it goes
-        for (int i = 1; i <= nodes; i++) {
-            if ((i + me) % 2 == 0) {
+        // ... and here it comes
+        for (int i = 0; i < nodes; i++) {
+            if ((i + me + 1) % 2 == 0) {
                 if (me < nodes - 1) {
                     doPairwiseStuff(per_node, local_arr, me, me + 1);
                 }
-            } else if (me > 0) {
+            } else if (me != root) {
                 doPairwiseStuff(per_node, local_arr, me - 1, me);
             }
         }
 
         MPI.COMM_WORLD.Gather(local_arr, 0, per_node, MPI.INT, arr, 0, per_node, MPI.INT, root);
         if (me == root) {
-            BufferedWriter outputWriter = new BufferedWriter(new FileWriter("output.dat"));
-            outputWriter.write(Arrays.toString(arr));
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(output_name));
+            for (int i = 0; i < n; i++)
+                outputWriter.write(arr[i] + " ");
+            outputWriter.flush();
+            outputWriter.close();
             System.out.println("Elapsed: " + (System.currentTimeMillis() - start_time) / 1000.0 + " seconds");
         }
         MPI.Finalize();
