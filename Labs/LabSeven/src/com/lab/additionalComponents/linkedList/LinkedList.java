@@ -15,21 +15,26 @@ public class LinkedList {
     public void add(Triplet triplet) {
         Node newNode = new Node(triplet);
         current = headNode;
-        current.lock();
         Node next = current.getNext();
+
         try {
+            current.lock();
             if (next == null) {
                 current.setNext(newNode);
             } else {
                 try {
                     next.lock();
-                    while (next.getNext() != null && !next.getNext().getElement().equals(triplet)) {
+                    while (next.getNext() != null && !current.getNext().getElement().equals(triplet)) {
                         current.unlock();
                         current = next;
                         next = next.getNext();
                         next.lock();
                     }
-                    next.setNext(newNode);
+                    if (current.getNext() == null) {
+                        current.setNext(newNode);
+                    } else {
+                        current.getNext().setElement(triplet);
+                    }
                 } finally {
                     next.unlock();
                 }
@@ -46,8 +51,8 @@ public class LinkedList {
             return;
         }
         Node next = current.getNext();
-        current.lock();
         try {
+            current.lock();
             if (next.getElement().equals(nodeForRemove.getElement())) {
                 current.setNext(next.getNext());
             } else {
@@ -73,27 +78,23 @@ public class LinkedList {
 
     public boolean contains(Triplet triplet) {
         boolean answer = false;
-        Node nodeForContains = new Node(triplet);
-        current = headNode;
 
-        if (current.getNext() == null) {
-            return answer;
-        }
+        current = headNode;
         Node next = current.getNext();
-        current.lock();
         try {
-            if (next.getElement().equals(nodeForContains.getElement())) {
-                current.setNext(next.getNext());
+            current.lock();
+            if (next == null) {
+                return answer;
             } else {
                 try {
                     next.lock();
-                    while (!next.getElement().equals(nodeForContains.getElement()) && next.getNext() != null) {
+                    while (next.getNext() != null && !current.getNext().getElement().equals(triplet)) {
                         current.unlock();
                         current = next;
                         next = next.getNext();
                         next.lock();
                     }
-                    if (next.getElement().equals(nodeForContains.getElement())) {
+                    if (current.getNext().getElement().equals(triplet)) {
                         answer = true;
                     }
                 } finally {

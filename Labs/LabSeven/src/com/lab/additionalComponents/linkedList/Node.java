@@ -25,6 +25,10 @@ public class Node extends ReentrantLock {
         return next;
     }
 
+    public void setElement(Triplet element) {
+        this.element = element;
+    }
+
     public void setNext(Node next) {
         this.next = next;
     }
