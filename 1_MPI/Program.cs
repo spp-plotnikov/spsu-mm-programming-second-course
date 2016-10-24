@@ -91,7 +91,7 @@ namespace Floyd
                 {
                     for (int j = 0; j < numV; j++)
                     {
-                        curTape[i * numV + j] = Min(curTape[i * numV + j], curTape[i * numV + k] + kRow[j]);
+                        curTape[i * numV + j] = Min(curTape[i * numV + j], (curTape[i * numV + k] + kRow[j]) % inf);
                     }
 
                 }
