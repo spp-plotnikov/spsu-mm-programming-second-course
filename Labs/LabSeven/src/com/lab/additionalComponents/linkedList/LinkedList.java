@@ -94,8 +94,14 @@ public class LinkedList {
                         next = next.getNext();
                         next.lock();
                     }
-                    if (current.getNext().getElement().equals(triplet)) {
+                    if (current.getElement().equals(triplet)) {
                         answer = true;
+                    }
+                    if(next.getNext() != null){
+                        if(next.getElement().equals(triplet)){
+                            answer = true;
+                        }
+
                     }
                 } finally {
                     next.unlock();

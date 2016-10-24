@@ -21,6 +21,18 @@ public class Test {
 
         doTest("one");
         doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+        doTest("two");
+
     }
 
     private static void doTest(String param) throws IOException {
