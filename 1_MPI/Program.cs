@@ -13,7 +13,7 @@ namespace Floyd
         private static int numV; //number of vertices
         private static int inf = 200000000; //the largest possible value
         private static int[] counts; //numbers of rows for every process
-        private static int[] rowsVsP;//the last row in each process
+        private static int[] rowsVsP;//the last row in every process
 
         private static int Min(int x, int y)
         {
