@@ -8,11 +8,11 @@ using System.Diagnostics;
 using System.Threading;
 using MPI;
 
-namespace parallelQsort
+namespace ParallelQsort
 {
     class Program
     {
-        static void rootProccess(ref int[] arr, int size)
+        static void RootProccess(ref int[] arr, int size)
         {
             Intracommunicator comm = Communicator.world;
             if (comm.Rank == 0)
@@ -110,7 +110,7 @@ namespace parallelQsort
             }
         }
 
-        static void childProcess()
+        static void ChildProcess()
         {
             Intracommunicator comm = Communicator.world;
             if (comm.Rank != 0)
@@ -185,7 +185,7 @@ namespace parallelQsort
                         arr[i] = Int32.Parse(st[i]);
                     }
 
-                    rootProccess(ref arr, size);
+                    RootProccess(ref arr, size);
                     
                     System.IO.StreamWriter fileOut = new System.IO.StreamWriter(@fileNameOut);
                     for (int i = 0; i < size; i++)
@@ -199,7 +199,7 @@ namespace parallelQsort
                 }
                 else
                 {
-                    childProcess();
+                    ChildProcess();
                     return;
                 }
             }
