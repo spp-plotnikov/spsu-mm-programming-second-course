@@ -12,7 +12,7 @@ namespace Floyd
         private static int numP; //number of process
         private static int curRank; //rank of the current process
         private static int numV; //number of vertices
-        private static int inf = 200000000; //the largest possible value
+        private static int inf = 100000000; //the largest possible value
         private static int[] counts; //numbers of rows for every process
         private static int[] rowsVsP;//the last row in every process
 
@@ -92,7 +92,7 @@ namespace Floyd
                 {
                     for (int j = 0; j < numV; j++)
                     {
-                        curTape[i * numV + j] = Min(curTape[i * numV + j], (curTape[i * numV + k] + kRow[j]) % inf);
+                        curTape[i * numV + j] = Min(curTape[i * numV + j], curTape[i * numV + k] + kRow[j]);
                     }
 
                 }
