@@ -53,9 +53,15 @@ public class Test {
 
         systemThread.start();
 
+        Random random = new Random();
+        int idStudent;
+        int idCourse;
+
+
+
         for (int i = 0; i < COUNT_OF_ADDS; i++) {
-            int idStudent = new Random(99999999).nextInt() + 1;
-            int idCourse = new Random(99999999).nextInt() % 6 + 1;
+            idStudent = random.nextInt(99999999) + 1;
+            idCourse = random.nextInt(999999) % 6 + 1;
             Thread thread = new ClientForTest("add " + idStudent + " " + idCourse + " accepted");
             arrayList.add(thread);
             thread.start();
@@ -68,8 +74,8 @@ public class Test {
         }
 
         for (int i = 0; i < COUNT_OF_REMOVES; i++) {
-            int idStudent = new Random(99999999).nextInt() + 1;
-            int idCourse = new Random(99999999).nextInt() % 6 + 1;
+            idStudent = random.nextInt(99999999) + 1;
+            idCourse = random.nextInt(999999) % 6 + 1;
             Thread thread = new ClientForTest("remove " + idStudent + " " + idCourse);
             arrayList.add(thread);
             thread.start();

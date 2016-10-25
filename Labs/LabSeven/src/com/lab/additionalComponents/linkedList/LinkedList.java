@@ -58,7 +58,7 @@ public class LinkedList {
             } else {
                 try {
                     next.lock();
-                    while (!next.getElement().equals(nodeForRemove.getElement()) && next.getElement() != null) {
+                    while (!next.getElement().equals(nodeForRemove.getElement()) && next.getNext() != null) {
                         current.unlock();
                         current = next;
                         next = next.getNext();
