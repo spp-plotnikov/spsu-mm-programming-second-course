@@ -69,16 +69,16 @@ namespace Floyd
                 //get the number of proccess that counts k-row
                 for (int pr = 1; pr < numP; ++pr)
                 {
-                    if (k <= rowsVsP[pr])
+                    if(k <= rowsVsP[pr])
                     {
-                        if (k > rowsVsP[pr - 1])
+                        if(k > rowsVsP[pr - 1])
                         {
                             proc = pr;
                         }
                     }
                 }
 
-                if (proc == curRank)
+                if(proc == curRank)
                 {
                     for (int z = 0; z < numV; z++)
                     {
@@ -101,10 +101,19 @@ namespace Floyd
 
         public static void Main(string[] args)
         {
-            int[] adjMatrix = ParseMatrix("graph1000.txt");
             int[] answMatrix;
+            string fileIn = "";
+            string fileOut = "";
             using (new MPI.Environment(ref args))
             {
+                if(args.Count() != 2)
+                {
+                    Console.WriteLine("Invalid number of input parameters.");
+                    return;
+                }
+                fileIn = args[0];
+                fileOut = args[1];
+                int[] adjMatrix = ParseMatrix(fileIn);
                 numP = MPI.Communicator.world.Size;
                 counts = new int[numP];
                 rowsVsP = new int[numP];
@@ -134,9 +143,9 @@ namespace Floyd
                 FloydTask(curTape);
                 answMatrix = new int[numV * numV];
                 MPI.Intracommunicator.world.GatherFlattened(curTape, sizes, 0, ref answMatrix);
-                if (curRank ==0)
+                if(curRank ==0)
                 {
-                   SaveArrayToFile(answMatrix, "answer.txt");
+                   SaveArrayToFile(answMatrix, fileOut);
                    Console.ReadLine();
                 }
                
