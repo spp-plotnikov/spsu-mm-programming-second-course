@@ -8,11 +8,11 @@ using System.Diagnostics;
 using System.Threading;
 using MPI;
 
-namespace Parallel_Qsort
+namespace parallelQsort
 {
     class Program
     {
-        static void centrProccess(ref int[] arr, int N)
+        static void rootProccess(ref int[] arr, int size)
         {
             Intracommunicator comm = Communicator.world;
             if (comm.Rank == 0)
@@ -24,7 +24,7 @@ namespace Parallel_Qsort
                     isUse[i] = false;
                 }
 
-                Tuple<int, int> indexPair = new Tuple<int, int>(0, N);
+                Tuple<int, int> indexPair = new Tuple<int, int>(0, size);
                 Queue<Tuple <int, int> > sortingQueue = new Queue<Tuple <int, int> >();
                 sortingQueue.Enqueue(indexPair);
                 Queue<Tuple <int, int, int> > catchingQueue = new Queue<Tuple <int, int, int> >();
@@ -110,7 +110,7 @@ namespace Parallel_Qsort
             }
         }
 
-        static void notCentrProcess()
+        static void childProcess()
         {
             Intracommunicator comm = Communicator.world;
             if (comm.Rank != 0)
@@ -128,8 +128,7 @@ namespace Parallel_Qsort
                     
                     int i = 0;
                     int j = size - 1;
-                    int refElem = arr[size / 2];
-                    
+                    int refElem = arr[size / 2];  
 
                     while (i <= j)
                     {
@@ -178,18 +177,18 @@ namespace Parallel_Qsort
                     fileIn.Close();
                     String[] st = line.Split(' ');
                     
-                    int N = st.Count();
-                    int[] arr = new int[N];
+                    int size = st.Count();
+                    int[] arr = new int[size];
 
-                    for (int i = 0; i < N; i++)
+                    for (int i = 0; i < size; i++)
                     {
                         arr[i] = Int32.Parse(st[i]);
                     }
 
-                    centrProccess(ref arr, N);
+                    rootProccess(ref arr, size);
                     
                     System.IO.StreamWriter fileOut = new System.IO.StreamWriter(@fileNameOut);
-                    for (int i = 0; i < N; i++)
+                    for (int i = 0; i < size; i++)
                     {
                         fileOut.Write(arr[i] + " ");
                     }
@@ -200,7 +199,7 @@ namespace Parallel_Qsort
                 }
                 else
                 {
-                    notCentrProcess();
+                    childProcess();
                     return;
                 }
             }
