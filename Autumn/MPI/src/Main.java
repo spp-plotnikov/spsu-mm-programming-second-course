@@ -36,7 +36,7 @@ public class Main {
         Vector<Integer> weight[] = new Vector[n + 1];
         boolean[] used = new boolean[n + 1];
         if (me == root) {
-            for (int i = 1; i <= n; i++) {
+            for (int i = 0; i <= n; i++) {
                 g[i] = new Vector<Integer>();
                 weight[i] = new Vector<Integer>();
             }
@@ -49,7 +49,7 @@ public class Main {
                 weight[a].add(c);
                 weight[b].add(c);
             }
-            for (int i = 1; i <= n; i++) {
+            for (int i = 0; i < n; i++) {
                 for (int j = 1; j < size; j++) {
                     int[] buf1 = new int[]{g[i].size()};
                     MPI.COMM_WORLD.Send(buf1, 0, 1, MPI.INT, j, 4);
