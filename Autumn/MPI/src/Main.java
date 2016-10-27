@@ -16,7 +16,7 @@ public class Main {
         int size = MPI.COMM_WORLD.Size();
         Scanner sc = null;
         PrintWriter pw = null;
-        int n;
+        int n,m = 0;
         if (me == root) {
             inputFile = new File(args[3]);
             outputFile = new File(args[4]);
@@ -129,7 +129,6 @@ public class Main {
             pw.println(n);
             pw.println(sum);
             pw.close();
-            sc.close();
 //            System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
         }
     }
