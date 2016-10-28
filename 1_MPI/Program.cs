@@ -12,7 +12,7 @@ namespace Floyd
         private static int numP; //number of process
         private static int curRank; //rank of the current process
         private static int numV; //number of vertices
-        private static int inf = 100000000; //the largest possible value
+        private static int inf = 100000000;
         private static int[] counts; //numbers of rows for every process
         private static int[] rowsVsP;//the last row in every process
 
@@ -26,7 +26,7 @@ namespace Floyd
             string line;
             int i, j, w;
             System.IO.StreamReader file = new System.IO.StreamReader(@fileName);
-            numV = Int32.Parse(file.ReadLine()); //get the number of vertices
+            numV = Int32.Parse(file.ReadLine());
             int[] adjMatrix = new int[numV * numV];
             for (i = 0; i < adjMatrix.Count(); i++)
             {
