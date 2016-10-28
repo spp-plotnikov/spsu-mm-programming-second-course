@@ -8,7 +8,6 @@ namespace ProducerVsConsumer
 {
     public class Task
     {
-        
         private static int wait = 1000;
         private static bool flag = true;
 
@@ -53,7 +52,6 @@ namespace ProducerVsConsumer
             }
             for (int i = 0; i < numProd; i++)
             {
-
                 ProducersList[0].Join();
                 ProducersList.RemoveAt(0);
             }
