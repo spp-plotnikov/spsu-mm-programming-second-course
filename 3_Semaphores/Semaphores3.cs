@@ -75,7 +75,7 @@ namespace ProducerVsConsumer
             {
                 while(flag)
                 {
-                    if(Empty.WaitOne(0) && Critical.WaitOne())
+                    if(Empty.WaitOne(0) && Critical.WaitOne(0))
                     {
                         try
                         {
