@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,7 +54,7 @@ namespace EvenOddSortEasyLife
             }
         }
 
-        public int[] addMaxInt(int[] inputArray, int numOfParts) // adds MaxInt to the end of array for nice sharing between processes
+        public int[] addMaxInt(int[] inputArray, int numOfParts) // add MaxInt to the end of array for nice sharing between processes
         {
             int arraySize = inputArray.GetLength(0);
             int resLength = numOfParts * (arraySize / numOfParts + ((arraySize % numOfParts == 0) ? 0 : 1));
@@ -68,7 +68,7 @@ namespace EvenOddSortEasyLife
             return res;
         }
 
-        public int[] ReadArray(string[] args) // Reads the source array
+        public int[] ReadArray(string[] args) // Read the source array
         {
             if (args.GetLength(0) != 2)
             {
@@ -89,7 +89,7 @@ namespace EvenOddSortEasyLife
             return a;
         }
 
-        public void WriteAnswer(int[] answer, int arraySrcSize, string[] args) // writes the answer
+        public void WriteAnswer(int[] answer, int arraySrcSize, string[] args)
         {
             string outputFileName = args[1];
             System.IO.StreamWriter outputFile = new System.IO.StreamWriter(outputFileName);
