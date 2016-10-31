@@ -85,7 +85,7 @@ public class Main {
         }
         used[1] = true;
         long sum = 0;
-        for (int k = 0; k < n - 1; k++) {
+        for (int k = 0; k < n - 2; k++) {
             int min_weight = Integer.MAX_VALUE;
             int to = 0;
             for (int i = me; i < g.length; i += size) {
