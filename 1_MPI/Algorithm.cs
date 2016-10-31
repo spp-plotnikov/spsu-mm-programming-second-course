@@ -34,7 +34,7 @@ namespace Floyd
             }
             for (i = 0; i < numV; i++)
             {
-                adjMatrix[i * numV + i] = 0;
+                adjMatrix[i*numV + i] = 0;
             }
             //initialize the adjacency matrix
             while ((line = file.ReadLine()) != null)
@@ -88,8 +88,14 @@ namespace Floyd
                 {
                     for (int z = 0; z < numV; z++)
                     {
-                        kRow[z] = curTape[(numV * (k % counts[proc])) + z];
+                        int numRow = k; //num of row in curTape
+                        if (proc != 0)
+                        {
+                            numRow = k - rowsVsP[proc - 1] - 1;
+                        }
+                        kRow[z] = curTape[(numV * numRow) + z];
                     }
+                    
                 }
 
                 MPI.Communicator.world.Broadcast(ref kRow,proc);
@@ -135,13 +141,12 @@ namespace Floyd
                     tapeH = freeRows / (numP-i-1);
                 }
                 counts[numP-1] = freeRows;
-
                 int[] sizes = new int[numP]; //the number of vertices in every process
                 int count = 0;
                 for (int i = 0; i < numP; i++)
                 {
                     sizes[i] = counts[i] * numV;
-                    rowsVsP[i] = count + counts[i]-1;
+                    rowsVsP[i] = count + counts[i] - 1;
                     count += counts[i];
                 }
                 int[] curTape = new int[sizes[curRank]];
