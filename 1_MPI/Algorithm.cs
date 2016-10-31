@@ -34,7 +34,7 @@ namespace Floyd
             }
             for (i = 0; i < numV; i++)
             {
-                adjMatrix[i*numV + i] = 0;
+                adjMatrix[i * numV + i] = 0;
             }
             //initialize the adjacency matrix
             while ((line = file.ReadLine()) != null)
