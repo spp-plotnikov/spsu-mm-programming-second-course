@@ -32,6 +32,10 @@ namespace Floyd
             {
                 adjMatrix[i] = inf;
             }
+            for (i = 0; i < numV; i++)
+            {
+                adjMatrix[i*numV + i] = 0;
+            }
             //initialize the adjacency matrix
             while ((line = file.ReadLine()) != null)
             {
@@ -40,6 +44,7 @@ namespace Floyd
                 j = Int32.Parse(st[1]);
                 w = Int32.Parse(st[2]);
                 adjMatrix[i * numV + j] = w;
+                adjMatrix[j * numV + i] = w;
             }
             return adjMatrix;
         }
