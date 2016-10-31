@@ -6,21 +6,18 @@ using System.Threading;
 
 namespace ProducerVsConsumer
 {
-    public class Task
+    public class Semaphores
     {
         private static int wait = 1000;
         private static bool flag = true;
 
-        private static int bufSize = 5;
         public static List<int> Buf = new List<int>();
 
         private static int numProd = 6;
         private static int numCons = 3;
         public static List<Thread> ProducersList = new List<Thread>();
         public static List<Thread> ConsumersList = new List<Thread>();
-
-        public static Semaphore Full = new Semaphore(0, bufSize);
-        public static Semaphore Empty = new Semaphore(bufSize, bufSize);
+        
         public static Semaphore Critical = new Semaphore(1, 1);
 
         static void Main(string[] args)
@@ -73,7 +70,7 @@ namespace ProducerVsConsumer
             {
                 while(flag)
                 {
-                    if(Empty.WaitOne(0) && Critical.WaitOne(0))
+                    if(Critical.WaitOne(0))
                     {
                         try
                         {
@@ -85,7 +82,6 @@ namespace ProducerVsConsumer
                         finally
                         {
                             Critical.Release();
-                            Full.Release();
                         }
                     }
                 }
@@ -106,7 +102,7 @@ namespace ProducerVsConsumer
             {
                 while(flag)
                 {
-                    if(Full.WaitOne(0) && Critical.WaitOne(0))
+                    if(Critical.WaitOne(0) && Buf.Count() > 0)
                     {
                         try
                         {
@@ -118,7 +114,6 @@ namespace ProducerVsConsumer
                         finally
                         {
                             Critical.Release();
-                            Empty.Release();
                         }
                     }
                 }
