@@ -222,14 +222,9 @@ namespace Prim
 
                 if (comm.Rank == 0)
                 {
-                    string st = "";
-
-                    foreach (var q in totalQueue)
-                    {
-                        st += q + " ";
-                    }
-
+                    string st = totalQueue.Count.ToString;                                     
                     st += "\r\n";
+
                     File.WriteAllText(@pathOut, st + totalLength, Encoding.Unicode);
                  }
             }
