@@ -88,14 +88,11 @@ public class LinkedList {
             } else {
                 try {
                     next.lock();
-                    while (next.getNext() != null && !current.getNext().getElement().equals(triplet)) {
+                    while (next.getNext() != null && !next.getElement().equals(triplet)) {
                         current.unlock();
                         current = next;
                         next = next.getNext();
                         next.lock();
-                    }
-                    if (current.getElement().equals(triplet)) {
-                        answer = true;
                     }
                     if(next.getNext() != null){
                         if(next.getElement().equals(triplet)){
