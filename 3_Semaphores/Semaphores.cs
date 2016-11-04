@@ -68,22 +68,14 @@ namespace ProducerVsConsumer
 
             public void Run()
             {
-                while(flag)
+                while (flag)
                 {
-                    if(Critical.WaitOne(0))
-                    {
-                        try
-                        {
-                            int item = name;
-                            Buf.Add(item);
-                            Console.WriteLine("Producer №{0} add the item = {1}", name, item);
-                            Thread.Sleep(wait);
-                        }
-                        finally
-                        {
-                            Critical.Release();
-                        }
-                    }
+                    Critical.WaitOne();
+                    int item = name;
+                    Buf.Add(item);
+                    Console.WriteLine("Producer №{0} add the item = {1}", name, item);
+                    Thread.Sleep(wait);
+                    Critical.Release();
                 }
             }
         }
@@ -102,19 +94,14 @@ namespace ProducerVsConsumer
             {
                 while(flag)
                 {
-                    if(Critical.WaitOne(0) && Buf.Count() > 0)
+                    Critical.WaitOne();
+                    if(Buf.Count() > 0)
                     {
-                        try
-                        {
-                            int item = Buf.Last();
-                            Buf.Remove(item);
-                            Console.WriteLine("Consumer №{0} get the item = {1}", name, item);
-                            Thread.Sleep(wait);
-                        }
-                        finally
-                        {
-                            Critical.Release();
-                        }
+                        int item = Buf.Last();
+                        Buf.Remove(item);
+                        Console.WriteLine("Consumer №{0} get the item = {1}", name, item);
+                        Thread.Sleep(wait);
+                        Critical.Release();
                     }
                 }
             }
