@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace SemaphorExample
+namespace SemaphoreExample
 {
     class Program
     {
