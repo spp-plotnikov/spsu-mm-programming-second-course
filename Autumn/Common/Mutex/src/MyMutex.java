@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyMutex implements Lock {
     AtomicInteger level[]; // yeah, we need them atomic, fancy that
     AtomicInteger victim[];
-    int n;
+    public int n;
 
     public MyMutex(int threadCount) {
         n = threadCount;

@@ -6,6 +6,7 @@ public class MyProducer<T> implements Runnable {
     MyMutex mutex;
     T obj;
 
+    // sends obj to q syncing with m
     public MyProducer(Queue<T> q, MyMutex m, T obj) {
         target = q;
         mutex = m;
@@ -13,17 +14,20 @@ public class MyProducer<T> implements Runnable {
     }
 
     public void run() {
-        mutex.lock();
-        try {
-            Thread.sleep(ThreadLocalRandom.current().nextInt(50, 100));
-            target.add(obj);
-            System.out.println("Added object");
-        }
-        catch (InterruptedException e) {
-            // nobody cares
-        }
-        finally {
-            mutex.unlock();
+        while (true) {
+            try {
+                mutex.lock();
+                Thread.sleep(ThreadLocalRandom.current().nextInt(50, 100));
+                target.add(obj);
+                System.out.println("[Producer] Thread " +
+                        ((int) Thread.currentThread().getId() % mutex.n + 1) + " produced object");
+            } catch (InterruptedException e) {
+                System.out.println("[Producer] Thread " +
+                        ((int) Thread.currentThread().getId() % mutex.n + 1) + " has been terminated");
+                return;
+            } finally {
+                mutex.unlock();
+            }
         }
     }
 }
