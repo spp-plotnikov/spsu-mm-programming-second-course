@@ -54,7 +54,7 @@ public class MyThreadPool extends Thread {
             }
         }
     }
-git 
+    
     @Override
     protected void finalize() {
         this.doStop();
