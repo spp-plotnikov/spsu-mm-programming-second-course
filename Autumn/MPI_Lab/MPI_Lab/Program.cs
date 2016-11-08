@@ -30,9 +30,11 @@ namespace MPI_Lab
                 if (world.Rank == 0)
                 {
                     StreamReader tstfile;
+                    Console.WriteLine("Infile:");
+                    string fileName = Console.ReadLine();
                     try
                     {
-                        tstfile = new StreamReader("../../smalltest.txt"); //smalltest.txt или bigtest.txt
+                        tstfile = new StreamReader(fileName);
                     }
                     catch
                     {
@@ -102,9 +104,11 @@ namespace MPI_Lab
                     {
                         res += matrix[edge.First, edge.Second];
                     }
+                    Console.WriteLine("Outfile:");
+                    fileName = Console.ReadLine();
                     try
                     {
-                        StreamWriter outfile = new StreamWriter(new FileStream("out.txt", FileMode.Create));
+                        StreamWriter outfile = new StreamWriter(new FileStream(fileName, FileMode.Create));
                         outfile.WriteLine(n.ToString());
                         outfile.WriteLine(res.ToString());
                         outfile.Close();
@@ -112,13 +116,13 @@ namespace MPI_Lab
                     }
                     catch
                     {
-                        Console.WriteLine("Oh! Out is fail! But res is " + res.ToString());
+                        Console.WriteLine("Oh! Outfile is fail! But res is " + res.ToString());
                     }
                 }
                 else
                 {
-                    bool Fail = !world.Receive<bool>(0, 0);
-                    if (Fail)
+                    bool fail = !world.Receive<bool>(0, 0);
+                    if (fail)
                         return;
                     int n = world.Receive<int>(0, 1);
                     int k = n / (world.Size-1); //количество вершин на процессоре (кроме последнего)
@@ -129,7 +133,7 @@ namespace MPI_Lab
                     else
                         lastVert = k * world.Rank - 1;
                     List<int> vertsOnProc = new List<int>();
-                    for (int i=0; i<=lastVert-firstVert; i++)
+                    for (int i=0; i <= lastVert - firstVert; i++)
                     {
                         vertsOnProc.Add(firstVert + i);
                     }
