@@ -82,7 +82,7 @@ namespace Floyd
                     }
                 }
 
-                if (proc == curRank)
+                if(proc == curRank)
                 {
                     for (int z = 0; z < numV; z++)
                     {
@@ -153,7 +153,7 @@ namespace Floyd
                 answMatrix = new int[numV * numV];
                 Console.WriteLine("before gather");
                 MPI.Intracommunicator.world.GatherFlattened(curTape, sizes, 0, ref answMatrix);
-                if (curRank ==0)
+                if(curRank ==0)
                 {
                     Console.WriteLine("Start saving to file");
                     SaveArrayToFile(answMatrix, fileOut);
