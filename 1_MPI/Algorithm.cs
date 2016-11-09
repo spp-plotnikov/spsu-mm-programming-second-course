@@ -16,11 +16,6 @@ namespace Floyd
         private static int[] counts; //numbers of rows for every process
         private static int[] rowsVsP;//the last row in every process
 
-        private static int Min(int x, int y)
-        {
-            return (x < y) ? x : y;
-        }
-
         private static int[] ParseMatrix(string fileName)
         {
             string line;
@@ -103,7 +98,7 @@ namespace Floyd
                 {
                     for (int j = 0; j < numV; j++)
                     {
-                        curTape[i * numV + j] = Min(curTape[i * numV + j], curTape[i * numV + k] + kRow[j]);
+                        curTape[i * numV + j] = Math.Min(curTape[i * numV + j], curTape[i * numV + k] + kRow[j]);
                     }
 
                 }
