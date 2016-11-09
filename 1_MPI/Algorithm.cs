@@ -1,4 +1,4 @@
-﻿using MPI;
+using MPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +15,10 @@ namespace Floyd
         private static int inf = 100000000;
         private static int[] counts; //numbers of rows for every process
         private static int[] rowsVsP;//the last row in every process
-
+        
         private static int[] ParseMatrix(string fileName)
         {
+            Console.WriteLine("parsing");
             string line;
             int i, j, w;
             System.IO.StreamReader file = new System.IO.StreamReader(@fileName);
@@ -41,6 +42,7 @@ namespace Floyd
                 adjMatrix[i * numV + j] = w;
                 adjMatrix[j * numV + i] = w;
             }
+            Console.WriteLine("parsing - end");
             return adjMatrix;
         }
 
@@ -63,7 +65,8 @@ namespace Floyd
 
         private static void FloydTask(int[] curTape)
         {
-            int[] kRow = new int[numV];          
+            int[] kRow = new int[numV];
+            Console.WriteLine("start - task{0}", curRank);    
             for (int k = 0; k < numV; k++)
             {
                 int proc = 0;
@@ -79,7 +82,7 @@ namespace Floyd
                     }
                 }
 
-                if(proc == curRank)
+                if (proc == curRank)
                 {
                     for (int z = 0; z < numV; z++)
                     {
@@ -92,7 +95,6 @@ namespace Floyd
                     }
                     
                 }
-
                 MPI.Communicator.world.Broadcast(ref kRow,proc);
                 for (int i = 0; i < counts[curRank]; i++)
                 {
@@ -103,6 +105,7 @@ namespace Floyd
 
                 }
             }
+            Console.WriteLine("the end, task {0}", curRank);
         }
        
 
@@ -148,15 +151,16 @@ namespace Floyd
                 MPI.Intracommunicator.world.ScatterFromFlattened(adjMatrix, sizes, 0, ref curTape);
                 FloydTask(curTape);
                 answMatrix = new int[numV * numV];
+                Console.WriteLine("before gather");
                 MPI.Intracommunicator.world.GatherFlattened(curTape, sizes, 0, ref answMatrix);
-                if(curRank ==0)
+                if (curRank ==0)
                 {
-                   SaveArrayToFile(answMatrix, fileOut);
-                   Console.ReadLine();
+                    Console.WriteLine("Start saving to file");
+                    SaveArrayToFile(answMatrix, fileOut);
+                    Console.ReadLine();
                 }
                
             }
         }
     }
 }
-
