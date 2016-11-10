@@ -9,7 +9,7 @@ namespace ProcessManager
 {
     public static class MyProcessManager
     {
-        private static Random Rng = new Random();
+        private static Random _rng = new Random();
         private static int _num;
         private static Queue<int> _fibersInQueue = new Queue<int>();
         private static List<double> _listForRandom = new List<double>();
@@ -64,7 +64,7 @@ namespace ProcessManager
 
         private static int getRandomFiber ()
         {
-            double rand = Rng.NextDouble();
+            double rand = _rng.NextDouble();
             for (int i = 0; i < _listForRandom.Count; i++)
             {
                 if (_listForRandom[i] > rand)
@@ -156,7 +156,7 @@ namespace ProcessManager
 
         private const int PriorityLevelsNumber = 10;
 
-        private static bool _isPriority;
+        private readonly bool _isPriority;
 
         private readonly List<int> _workIntervals = new List<int>();
         private readonly List<int> _pauseIntervals = new List<int>();
