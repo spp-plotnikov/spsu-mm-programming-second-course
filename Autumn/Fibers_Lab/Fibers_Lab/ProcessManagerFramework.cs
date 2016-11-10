@@ -62,7 +62,7 @@ namespace ProcessManager
             _listForRandom[_listForRandom.Count - 1] = 1.0;
         }
 
-        private static int getRandomFiber ()
+        private static int GetRandomFiber ()
         {
             double rand = _rng.NextDouble();
             for (int i = 0; i < _listForRandom.Count; i++)
@@ -90,13 +90,13 @@ namespace ProcessManager
                 else
                 {
                     CreateListForRandom(); //перестраиваем                 
-                    _curFiber = getRandomFiber();
+                    _curFiber = GetRandomFiber();
                     Fiber.Switch(_fibersId[_curFiber]);
                 }
             }
             else
             {
-                _curFiber = getRandomFiber();
+                _curFiber = GetRandomFiber();
                 Fiber.Switch(_fibersId[_curFiber]);
             }
         }
