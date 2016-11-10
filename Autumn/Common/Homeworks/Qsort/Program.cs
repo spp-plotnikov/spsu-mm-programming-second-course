@@ -8,7 +8,8 @@ using System.Diagnostics;
 using System.Threading;
 using MPI;
 
-namespace ConsoleApplication1
+
+namespace MpiTaskQsort
 {
     // The Qsort algorithm 
     // It has a root process as a task manager 
@@ -174,7 +175,7 @@ namespace ConsoleApplication1
                     string rawLine = inputFile.ReadLine();
                     String[] splitInitLine = rawLine.Split(' ');
                     inputFile.Close();
-                    
+
                     // make a comfortable representation 
                     int sizeOfArr = splitInitLine.Count();
                     int[] initArr = new int[sizeOfArr];
