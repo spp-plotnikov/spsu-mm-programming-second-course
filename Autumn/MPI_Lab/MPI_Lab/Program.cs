@@ -30,11 +30,9 @@ namespace MPI_Lab
                 if (world.Rank == 0)
                 {
                     StreamReader tstfile;
-                    Console.WriteLine("Infile:");
-                    string fileName = Console.ReadLine();
                     try
                     {
-                        tstfile = new StreamReader(fileName);
+                        tstfile = new StreamReader(args[0]);
                     }
                     catch
                     {
@@ -104,11 +102,9 @@ namespace MPI_Lab
                     {
                         res += matrix[edge.First, edge.Second];
                     }
-                    Console.WriteLine("Outfile:");
-                    fileName = Console.ReadLine();
                     try
                     {
-                        StreamWriter outfile = new StreamWriter(new FileStream(fileName, FileMode.Create));
+                        StreamWriter outfile = new StreamWriter(new FileStream(args[1], FileMode.Create));
                         outfile.WriteLine(n.ToString());
                         outfile.WriteLine(res.ToString());
                         outfile.Close();
