@@ -4,11 +4,13 @@ using System.Threading;
 
 public class ListWSemaphore<T> : List<T>
 {
-    private static int maxNumOfThreads = 2; // Number of maximum concurrent threads
-    public int curNumOfThreads = 0; // Number of current threads, working with list
+    public bool endOfWork = false;
+    private static int maxNumOfThreads = SemaphoreExample.Constants.maxNumOfThreads;
+    private int curNumOfThreads = 0;
+    static Semaphore semaphore = new Semaphore(maxNumOfThreads, maxNumOfThreads);
     private List<T> list = new List<T>(); // Just list
-
-    public int CurNumOfThreads // Property
+    
+    public int CurNumOfThreads
     {
         get
         {
@@ -18,27 +20,31 @@ public class ListWSemaphore<T> : List<T>
 
     public void Add(T item) // Adding an item
     {
-        while (maxNumOfThreads <= curNumOfThreads) { Console.WriteLine("{0} Waiting, curThreads = {1}", Thread.CurrentThread.Name, curNumOfThreads); Thread.Sleep(100); }
+        if (curNumOfThreads >= maxNumOfThreads) { Console.WriteLine("{0} is waiting", Thread.CurrentThread.Name); }
+        semaphore.WaitOne();
         curNumOfThreads++;
         list.Add(item);
+        semaphore.Release();
         curNumOfThreads--;
     }
 
     public void RemoveAt(int index) // Removing an item by index
     {
-        while (maxNumOfThreads <= curNumOfThreads) { Console.WriteLine("{0} Waiting, curThreads = {1}", Thread.CurrentThread.Name, curNumOfThreads); Thread.Sleep(100); }
+        if (curNumOfThreads >= maxNumOfThreads) { Console.WriteLine("{0} is waiting", Thread.CurrentThread.Name); }
+        semaphore.WaitOne();
         curNumOfThreads++;
         try
         {
             list.RemoveAt(index);
         }
         catch { }
+        semaphore.Release();
         curNumOfThreads--;
     }
 
     public void LockFrvr() // Making object inaccessible to changes
     {
-        curNumOfThreads = -1;
+        endOfWork = true;
     }
 
     public void WriteList() // WriteLine list

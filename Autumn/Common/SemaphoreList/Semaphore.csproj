@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="ListWSemaphore.cs" />
     <Compile Include="ProducerNConsumer.cs" />
     <Compile Include="Program.cs" />
