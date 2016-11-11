@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,7 @@ namespace ProducerVsConsumer
 
         public static List<int> Buf = new List<int>();
 
-        private static int numProd = 2;
+        private static int numProd = 1;
         private static int numCons = 3;
         public static List<Thread> ProducersList = new List<Thread>();
         public static List<Thread> ConsumersList = new List<Thread>();
@@ -94,15 +94,15 @@ namespace ProducerVsConsumer
             {
                 while(flag)
                 {
-                    if(Buf.Count() > 0)
+                    Critical.WaitOne();
+                    if (Buf.Count() > 0)
                     {
-                        Critical.WaitOne();
                         int item = Buf.Last();
                         Buf.Remove(item);
                         Console.WriteLine("Consumer №{0} get the item = {1}", name, item);
-                        Critical.Release();
-                        Thread.Sleep(wait);
                     }
+                    Critical.Release();
+                    Thread.Sleep(wait);
                 }
             }
         }
