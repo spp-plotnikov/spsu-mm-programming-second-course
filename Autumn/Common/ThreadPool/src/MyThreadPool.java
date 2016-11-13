@@ -1,62 +1,50 @@
-import java.util.Iterator;
-import java.util.List;
 import java.util.Queue;
 import java.util.LinkedList;
 
-public class MyThreadPool extends Thread {
+public class MyThreadPool {
     public static int threadMax = 2;
     private Queue<Runnable> pending;
-    private List<Thread> running;
-    public volatile boolean isStoped = true;
+    private Worker[] workers;
 
     public MyThreadPool() {
-        running = new LinkedList<>();
         pending = new LinkedList<>();
+        workers = new Worker[threadMax];
     }
 
     public void enqueue(Runnable obj) {
         synchronized (pending) {
             pending.add(obj);
+            pending.notify();
         }
     }
 
-    public void run() {
-        isStoped = false;
-        // control loop
-        while (!isStoped) {
-            // check if any of running threads is done
-            Iterator<Thread> it = running.iterator();
-            while (it.hasNext()) {
-                Thread cur = it.next();
-                if (!cur.isAlive())
-                    it.remove();
-            }
-
-            // check whether it is possible to start some new threads
-            synchronized (pending) {
-                while (!pending.isEmpty() && running.size() < threadMax) {
-                    running.add(new Thread(pending.poll()));
-                    running.get(running.size() - 1).start();
-                }
-            }
+    public void start() {
+        for (int i = 0; i < threadMax; i++) {
+            Worker cur = new Worker(pending);
+            cur.start();
+            workers[i] = cur;
         }
     }
 
-    public void doStop() {
-        isStoped = true;
-        for (Thread cur : running) {
-            cur.interrupt();
+    public void stop() {
+        System.out.println("terminating...");
+        for (Worker cur : workers) {
+            while (!pending.isEmpty()) pending.poll();
             try {
+                cur.interrupt();
+                synchronized (pending) {
+                    pending.add(null); // empty task means "terminate"
+                    pending.notifyAll();
+                }
                 cur.join();
-            }
-            catch (InterruptedException e) {
-                // who cares?
+            } catch (InterruptedException e) {
+                System.out.println("this should not happen");
             }
         }
     }
-    
+
     @Override
     protected void finalize() {
-        this.doStop();
+        this.stop();
     }
 }

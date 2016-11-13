@@ -9,12 +9,12 @@ public class Main {
             Runnable task = () -> {
                 int me = ((int) Thread.currentThread().getId());// % MyThreadPool.threadMax + 1);
                 try {
-                    System.out.println("[" + (System.currentTimeMillis() - st) + "] Thread " + me + ": started");
+                    System.out.println("[" + (System.currentTimeMillis() - st) + "] Task " + me + ": started");
                     Thread.sleep(ThreadLocalRandom.current().nextInt(100, 5000));
-                    System.out.println("[" + (System.currentTimeMillis() - st) + "] Thread " + me + ": finished");
+                    System.out.println("[" + (System.currentTimeMillis() - st) + "] Task " + me + ": finished");
                 }
                 catch (InterruptedException e) {
-                    System.out.println("[" + (System.currentTimeMillis() - st) + "] Thread " + me + ": terminated");
+                    System.out.println("[" + (System.currentTimeMillis() - st) + "] Task " + me + ": terminated");
                 }
             };
             pool.enqueue(task);
@@ -22,7 +22,7 @@ public class Main {
             Thread.sleep(ThreadLocalRandom.current().nextInt(200, 400));
         }
         Thread.sleep(5000); // give 'em some time
-        pool.doStop();
-        pool.join();
+        pool.stop();
+        System.out.println("Program has finished");
     }
 }
