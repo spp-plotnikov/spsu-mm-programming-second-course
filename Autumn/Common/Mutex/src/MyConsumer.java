@@ -1,17 +1,20 @@
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MyConsumer<T> implements Runnable {
     Queue<T> target;
     MyMutex mutex;
+    private volatile AtomicBoolean exitFlag;
 
-    public MyConsumer(Queue<T> q, MyMutex m) {
+    public MyConsumer(Queue<T> q, MyMutex m, AtomicBoolean exitFlag) {
         target = q;
         mutex = m;
+        this.exitFlag = exitFlag;
     }
 
     public void run() {
-        while (true) {
+        while (!exitFlag.get()) {
             try {
                 mutex.lock();
                 Thread.sleep(ThreadLocalRandom.current().nextInt(50, 100));

@@ -1,20 +1,23 @@
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MyProducer<T> implements Runnable {
     Queue<T> target;
     MyMutex mutex;
     T obj;
+    private volatile AtomicBoolean exitFlag;
 
     // sends obj to q syncing with m
-    public MyProducer(Queue<T> q, MyMutex m, T obj) {
+    public MyProducer(Queue<T> q, MyMutex m, T obj, AtomicBoolean exitFlag) {
+        this.exitFlag = exitFlag;
         target = q;
         mutex = m;
         this.obj = obj;
     }
 
     public void run() {
-        while (true) {
+        while (!exitFlag.get()) {
             try {
                 mutex.lock();
                 Thread.sleep(ThreadLocalRandom.current().nextInt(50, 100));
