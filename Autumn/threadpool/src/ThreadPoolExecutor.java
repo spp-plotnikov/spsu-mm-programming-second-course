@@ -1,13 +1,12 @@
-public class ThreadPoolExecutor implements Runnable {
-
+public class ThreadPoolExecutor {
     private final TaskQueue taskQueue;
-    private final Thread[] workers;
+    private final myThread[] workers;
 
     public ThreadPoolExecutor(int numThreads) {
         taskQueue = new TaskQueue();
-        workers = new Thread[numThreads];
+        workers = new myThread[numThreads];
         for (int i = 0; i < workers.length; i++) {
-            workers[i] = new Thread(this);
+            workers[i] = new myThread(taskQueue);
             workers[i].start();
         }
     }
@@ -18,29 +17,12 @@ public class ThreadPoolExecutor implements Runnable {
             taskQueue.notify();
         }
     }
-
     public void shutdown() {
         for (int i = 0; i < workers.length; i++) {
             if(workers[i].isAlive()) {
-                workers[i].interrupt();
-            }
-        }
-    }
-
-    public void run() {
-        while(true) {
-            Runnable r = taskQueue.pop();
-            if (r == null) {
-                synchronized(taskQueue) {
-                    try {
-                        while(taskQueue.isEmpty()) taskQueue.wait();
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
-                }
-            } else {
-                r.run();
+                workers[i].installFlagOff();
             }
         }
     }
 }
+
