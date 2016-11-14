@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Text;
+using System.Web;
 using System.Threading;
 using MPI;
 
@@ -12,7 +12,13 @@ namespace Qsort
 {
     class Program
     {
-        public enum sendRoot { endOfWork = -1, sizeOfArray = 0, arrayItself = 1 }; // declare send operations for root
+        // declare send operations for root
+        public enum SendRoot 
+        { 
+            endOfWork = -1,
+            sizeOfArray = 0, 
+            arrayItself = 1 
+        }
 
         // sequential qsort
         public static void PlQsort(ref int[] arr, int l, int r)
@@ -25,11 +31,13 @@ namespace Qsort
                 {
                     i++;
                 }
+
                 while (arr[j] > pivot)
                 {
                     j--;
                 }
-                if (i <= j)
+
+                if(i <= j)
                 {
                     // swap
                     int tmp = arr[i];
@@ -39,30 +47,35 @@ namespace Qsort
                     j--;
                 }
             }
-            if (l < j)
+
+            if(l < j)
             {
                 PlQsort(ref arr, l, j);
             }
-            if (i < r)
+
+            if(i < r)
             {
                 PlQsort(ref arr, i, r);
             }
         }
 
+        // the Root process
         static void Root(ref int[] arr, int arrSize)
         {
             Intracommunicator comm = Communicator.world;
-            if (comm.Rank != 0)
+            if(comm.Rank != 0)
             {
                 return; // we don't need this (we are in root)
             }
+
             int numOfProcesses = comm.Size - 1;
 
             // if there are too many parts to divide to
-            if (numOfProcesses > arrSize)
+            if(numOfProcesses > arrSize)
             {
                 numOfProcesses = arrSize;
             }
+
             int numPerOne = arrSize / numOfProcesses;
             
             // we will hold the last processor seperately
@@ -75,8 +88,9 @@ namespace Qsort
                 {
                     toSend[j - tmp] = arr[j];
                 }
-                comm.Send(numPerOne, i + 1, (int)sendRoot.sizeOfArray); // send the size of the array
-                comm.Send(toSend, i + 1, (int)sendRoot.arrayItself); // send subarray
+
+                comm.Send(numPerOne, (i + 1), (int)SendRoot.sizeOfArray); // send the size of the array
+                comm.Send(toSend, (i + 1), (int)SendRoot.arrayItself); // send subarray
             }
 
             // the last processor case
@@ -86,23 +100,25 @@ namespace Qsort
             {
                 lastSend[i - (numOfProcesses - 1) * numPerOne] = arr[i];
             }
-            comm.Send(lastLen, numOfProcesses, (int)sendRoot.sizeOfArray); // send the size of the array
-            comm.Send(lastSend, numOfProcesses, (int)sendRoot.arrayItself); // send subarray
+
+            comm.Send(lastLen, numOfProcesses, (int)SendRoot.sizeOfArray); // send the size of the array
+            comm.Send(lastSend, numOfProcesses, (int)SendRoot.arrayItself); // send subarray
 
             // if there are too many processes abort exceeding
             for (int i = numOfProcesses + 1; i < comm.Size; i++)
             {
-                comm.Send(-1, i, (int)sendRoot.sizeOfArray); // send the size of the array
+                comm.Send(-1, i, (int)SendRoot.sizeOfArray); // send the size of the array
             }
 
             // we will store results in a separate copy
             int[] newCopy = new int[arrSize];
+
             // now receive all the parts 
             for (int i = 0; i < numOfProcesses; i++)
             {
-                int subarrSize = comm.Receive<int>(i + 1, (int)sendRoot.sizeOfArray);
+                int subarrSize = comm.Receive<int>(i + 1, (int)SendRoot.sizeOfArray);
                 int[] newArr = new int[subarrSize];
-                comm.Receive(i + 1, (int)sendRoot.arrayItself, ref newArr);
+                comm.Receive(i + 1, (int)SendRoot.arrayItself, ref newArr);
                 for (int j = 0; j < subarrSize; j++)
                 {
                     newCopy[j + i * numPerOne] = newArr[j];
@@ -112,35 +128,40 @@ namespace Qsort
             // merge sorted parts
             int idx = 0;
             int[] partsPtr = new int[numOfProcesses];
+
             for (int i = 0; i < numOfProcesses; i++)
             {
                 partsPtr[i] = i * numPerOne; // shows the first element of subarray
             }
+
             while (idx < arrSize)
             {
                 int tmpIdx = 0;
                 int minElem = Int32.MaxValue;
+
                 // looking through new min
                 for (int i = 0; i < numOfProcesses; i++)
                 {
-                     if (partsPtr[i] != -1) // denote that we went through the whole subarray
+                     // denote that we went through the whole subarray
+                     if(partsPtr[i] != -1)
                      {
-                         if (newCopy[partsPtr[i]] <  minElem)
+                         if(newCopy[partsPtr[i]] < minElem)
                          {
                              minElem = newCopy[partsPtr[i]];
                              tmpIdx = i;
                          }
                      }
                 }
+
                 arr[idx] = minElem;
                 idx++;
                 
                 // move index in subarray
 
                 // special case last pointer
-                if (tmpIdx == (numOfProcesses - 1))
+                if(tmpIdx == (numOfProcesses - 1))
                 {
-                    if (partsPtr[tmpIdx] == arrSize - 1)
+                    if(partsPtr[tmpIdx] == arrSize - 1)
                     {
                         partsPtr[tmpIdx] = -1; // we have finished with this part
                     }
@@ -151,7 +172,7 @@ namespace Qsort
                 }
                 else
                 {
-                    if (partsPtr[tmpIdx] == ((tmpIdx  + 1) * numPerOne - 1))
+                    if(partsPtr[tmpIdx] == ((tmpIdx  + 1) * numPerOne - 1))
                     {
                         partsPtr[tmpIdx] = -1; // we have finished with this part
                     }
@@ -161,26 +182,30 @@ namespace Qsort
                     }
                 }
             }
+
             return;
         }
 
+        // Executes by all except the root process 
         static void Child()
         {
             Intracommunicator comm = Communicator.world;
-            if (comm.Rank == 0)
+            if(comm.Rank == 0)
             {
                 return; // we don't need this (we are in child)
             }
-            int arrSize = comm.Receive<int>(0, (int)sendRoot.sizeOfArray);
-            if (arrSize == -1)
+
+            int arrSize = comm.Receive<int>(0, (int)SendRoot.sizeOfArray);
+            if(arrSize == -1)
             {
                 return; // we don't need this process
             }
+
             int[] newArr = new int[arrSize];
-            comm.Receive(0, (int)sendRoot.arrayItself, ref newArr);
+            comm.Receive(0, (int)SendRoot.arrayItself, ref newArr);
             PlQsort(ref newArr, 0, arrSize - 1);
-            comm.Send(arrSize, 0, (int)sendRoot.sizeOfArray);
-            comm.Send(newArr, 0, (int)sendRoot.arrayItself);
+            comm.Send(arrSize, 0, (int)SendRoot.sizeOfArray);
+            comm.Send(newArr, 0, (int)SendRoot.arrayItself);
             return;
         }
 
@@ -188,11 +213,12 @@ namespace Qsort
         {
             using (new MPI.Environment(ref args))
             {
-                if (args.Count() != 2)
+                if(args.Count() != 2)
                 {
-                    throw new System.InvalidOperationException("Too few parametrs! Lacks filenames!");
+                    throw new System.InvalidOperationException("Too few parameters! Lacks filenames!");
                 }
-                if (Communicator.world.Rank == 0)
+
+                if(Communicator.world.Rank == 0)
                 {
                     // read the files
                     string inputFileName = args[0], outputFileName = args[1];
@@ -212,13 +238,13 @@ namespace Qsort
                     // sort
                     Root(ref initArr, sizeOfArr);
 
-
                     // write into output file
                     System.IO.StreamWriter outputFile = new System.IO.StreamWriter(@outputFileName);
                     for (int i = 0; i < sizeOfArr; i++)
                     {
                         outputFile.Write(initArr[i] + " ");
                     }
+
                     outputFile.Close();
 
                     return;
