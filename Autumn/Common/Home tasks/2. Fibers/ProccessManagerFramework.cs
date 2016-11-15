@@ -49,7 +49,8 @@ namespace ProcessManager
     }
 
     class ProcessManager
-    { 
+    {
+        private static Random Rnd = new Random();
         // Priority algorithm or not
         private static bool IsModePriority = true; // Now its priority algorithm
         private static bool IsStart = true;
@@ -70,11 +71,19 @@ namespace ProcessManager
 
         private static uint GetNextFiber()
         {
+            uint nextFiber;
+            // 20% chance to switch process to low priority
+            if (Rnd.Next(100) < 20) 
+            {
+                nextFiber = PriorityQueue.First().Item2;
+                return nextFiber;
+            }
+
             if (PriorityQueue.Count() > 1)
             {
                 PriorityQueue.Remove(new Tuple<int, uint>(IdToPrior[CurFiber], CurFiber));
             }
-            uint nextFiber = PriorityQueue.Last().Item2;
+            nextFiber = PriorityQueue.Last().Item2;
             PriorityQueue.Add(new Tuple<int, uint>(IdToPrior[CurFiber], CurFiber));
             return nextFiber;
         }
@@ -132,7 +141,7 @@ namespace ProcessManager
                         FibersList.Remove(CurFiber);
                         CurFiber = FibersList.First();
                     }
-                } 
+                }
                 else if (IsModePriority)
                 {
                     CurFiber = PriorityQueue.Last().Item2;
@@ -144,13 +153,13 @@ namespace ProcessManager
                 IsStart = false;
                 Fiber.Switch(CurFiber);
             }
-            
+
         }
-  
+
         static void Main(string[] args)
         {
             // number of process
-            uint numProc = 3;
+            uint numProc = 5;
 
             for (int i = 0; i < numProc; i++)
             {
@@ -168,6 +177,7 @@ namespace ProcessManager
             Switch();
 
             Console.WriteLine("Done");
+            Console.ReadKey();
         }
     }
 }
