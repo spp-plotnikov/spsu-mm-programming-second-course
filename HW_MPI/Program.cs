@@ -25,31 +25,9 @@ namespace QSort
                 string fileNameOut = args[1];
                 Communicator comm = Communicator.world;
 
-                int p = Communicator.world.Size;
-                if (p == 1)
-                {
-                    System.IO.StreamReader fileIn = new System.IO.StreamReader(@fileNameIn);
-                    string line = fileIn.ReadLine();
-                    fileIn.Close();
-                    String[] st = line.Split(' ');
-                    int size = st.Length;
-                    int[] array = new int[size];
-                    for (int i = 0; i < size; i++)
-                    {
-                        array[i] = Int32.Parse(st[i]);
-                    }
-                    Array.Sort(array);
-                    System.IO.StreamWriter fileOut = new System.IO.StreamWriter(@fileNameOut);
-                    for (int i = 0; i < size; i++)
-                    {
-                        fileOut.Write(array[i] + " ");
-                    }
-                    fileOut.WriteLine();
-                    fileOut.Close();
-                    return;
-                }
-
-                if (comm.Rank == 0)
+            
+      
+                if(comm.Rank == 0)
                 {
 
                     System.IO.StreamReader fileIn = new System.IO.StreamReader(@fileNameIn);
@@ -72,10 +50,35 @@ namespace QSort
                 return;
             }
         }
+
+
         static void ZeroProc(int[] array, string fileNameOut)
         {
             int len = array.Length;
             int numOfProc = Communicator.world.Size;
+
+            //some tricks for efficacy
+
+            if (len < numOfProc || numOfProc == 1)
+            {
+                Array.Sort(array);
+                for (int i = 1; i < numOfProc; i++)
+                {
+                    Communicator.world.Send(-1, i, 42);
+                }
+                System.IO.StreamWriter fileOutLocal = new System.IO.StreamWriter(@fileNameOut);
+                for (int i = 0; i < len; i++)
+                {
+                    fileOutLocal.Write(array[i] + " ");
+                }
+                fileOutLocal.WriteLine();
+                fileOutLocal.Close();
+                return;
+            }
+            for (int i = 1; i < numOfProc; i++)
+            {
+                Communicator.world.Send(1, i, 42);
+            }
             for (int i = 1; i < numOfProc; i++)
             {
                 int mas = len / numOfProc + (len % numOfProc > i ? 1 : 0);
@@ -85,54 +88,59 @@ namespace QSort
             // split array
 
             List<int> partOfArray = new List<int>();
-            for (int i = 0; i < len; i += numOfProc)
+            for (int i = 0; i < numOfProc; i++)
             {
-                for (int j = 0; j + i < len && j < numOfProc; j++)
+                int mas = len / numOfProc + (len % numOfProc > i ? 1 : 0);
+                int[] toSend = new int[mas];
+                for (int j = i; j < len; j += numOfProc)
                 {
-                    if (j != 0)
-                    {
-                        Communicator.world.Send(array[i + j], j, 1);
-                    }
-                    else
-                    {
-                        partOfArray.Add(array[i + j]);
-                    }
+                    toSend[(j - i) / numOfProc] = array[j];
                 }
+
+                if(i != 0)
+                {
+                    Communicator.world.Send(mas, i, 0);
+                    Communicator.world.Send(toSend, i, 1);
+                }
+                else
+                {
+                    for (int j = 0; j < mas; j++)
+                    {
+                        partOfArray.Add(toSend[j]);
+
+                    }
+                }        
             }
 
             //receive part of array
        
             partOfArray.Sort();
-
             List<int> keysElem = new List<int>();
             int numOfKeys = partOfArray.Count / numOfProc;
-            for (int i = 0; i <= numOfKeys; i++)
+            for (int i = 0; i <= numOfKeys && i * numOfProc < partOfArray.Count; i++)
             {
                 keysElem.Add(partOfArray[i * numOfProc]);
             }
             for (int i = 1; i < numOfProc; i++)
             {
-                int curNum;
-                Communicator.world.Receive(i, 2, out curNum);
-                for (int j = 0; j <= curNum; j++)
+                List<int> temp = new List<int>();
+                Communicator.world.Receive(i, 2, out temp);
+                for (int j = 0; j < temp.Count; j++)
                 {
-                    int t;
-                    Communicator.world.Receive(i, 3, out t);
-                    keysElem.Add(t);
+                   
+                    keysElem.Add(temp[j]);
                 }
-               // Console.WriteLine(curNum);
             }
             List<int> idx = new List<int>();
-
             for (int i = 0; i < numOfProc - 1; i++)
             {
                 int temp = keysElem.Count / numOfProc + (keysElem.Count % numOfProc > i ? 1 : 0);
                 idx.Add(keysElem[temp]);
             }
-
             idx.Sort();
 
             //sending boundaries
+
             List<int> boundaries = new List<int>();
             for (int i = 0; i < numOfProc - 1; i++)
             {
@@ -144,6 +152,7 @@ namespace QSort
             }
 
             //split by bound
+
             int k = 0;
             List<List<int>> toMerge = new List<List<int>>();
             List<int> tmp = new List<int>();
@@ -155,11 +164,11 @@ namespace QSort
                     tmp.Add(partOfArray[k]);
                     k++;
                 }
-                if (i != Communicator.world.Rank)
+                if(i != Communicator.world.Rank)
                 {
                     Communicator.world.Send(tmp, i, 4);
                 }
-                else if (tmp.Count != 0)
+                else if(tmp.Count != 0)
                 {
                     toMerge.Add(tmp);
                 }
@@ -169,23 +178,24 @@ namespace QSort
                 tmp.Add(partOfArray[k]);
                 k++;
             }
-            if (Communicator.world.Size - 1 != Communicator.world.Rank)
+            if(Communicator.world.Size - 1 != Communicator.world.Rank)
             {
                 Communicator.world.Send(tmp, Communicator.world.Size - 1, 4);
             }
-            else if (tmp.Count != 0)
+            else if(tmp.Count != 0)
             {
                 toMerge.Add(tmp);
             }
 
             //final part
+
             for (int i = 0; i < numOfProc; i++)
             {
-                if (i != Communicator.world.Rank)
+                if(i != Communicator.world.Rank)
                 {
                     tmp = new List<int>();
                     Communicator.world.Receive(i, 4, out tmp);
-                    if (tmp.Count != 0) { 
+                    if(tmp.Count != 0) { 
                         toMerge.Add(tmp);
                     }
                 }
@@ -211,47 +221,55 @@ namespace QSort
             fileOut.Close();
             return;
         }
+
+
         static void NonZeroProc()
         {
+            int isAlive;
+            Communicator.world.Receive(0, 42, out isAlive);
+            if(isAlive == -1)
+            {
+                return;
+            }
+
             //recevie part of array
+
             int len;
             Communicator.world.Receive(0, 0, out len);
-            List<int> partOfArray = new List<int>();
-            for (int i = 0; i < len; ++i)
-            {
-                int cur;
-                Communicator.world.Receive(0, 1, out cur);
-                partOfArray.Add(cur);
-            }
-
+            int[] partOfArray = new int[len];
+            Communicator.world.Receive(0, 1, ref partOfArray);
+            
             //sort of array
-            partOfArray.Sort();
+
+            Array.Sort(partOfArray);
 
             //send num of key elem
+
             int numOfProc = Communicator.world.Size;
-            int numOfKeys = (partOfArray.Count - 1) / numOfProc;
-            Communicator.world.Send(numOfKeys, 0, 2);
+            int numOfKeys = (partOfArray.Length - 1) / numOfProc;
+            List<int> toSend = new List<int>();
             for (int i = 0; i <= numOfKeys; i++)
             {
-                Communicator.world.Send(partOfArray[i * numOfProc], 0, 3);     
+                toSend.Add(partOfArray[i * numOfProc]);     
             }
+            Communicator.world.Send(toSend, 0, 2);
 
             //recieving boundaries
+
             List<int> boundaries = new List<int>();
             Communicator.world.Receive(0, 2, out boundaries);
-
             int k = 0;
             List<List<int>> toMerge = new List<List<int>>();
             List<int> tmp = new List<int>();
             for (int i = 0; i < boundaries.Count; i++)
             {
                 tmp = new List<int>();
-                while (k < partOfArray.Count && partOfArray[k] <= boundaries[i])
+                while (k < partOfArray.Length && partOfArray[k] <= boundaries[i])
                 {
                     tmp.Add(partOfArray[k]);
                     k++;
                 }
-                if (i != Communicator.world.Rank)
+                if(i != Communicator.world.Rank)
                 {
                     Communicator.world.Send(tmp, i, 4);
                 }
@@ -260,20 +278,22 @@ namespace QSort
                     toMerge.Add(tmp);
                 }
             }
-            while (k < partOfArray.Count)
+            while (k < partOfArray.Length)
             {
                 tmp.Add(partOfArray[k]);
                 k++;
             }
-            if (Communicator.world.Size - 1 != Communicator.world.Rank)
+            if(Communicator.world.Size - 1 != Communicator.world.Rank)
             {
                 Communicator.world.Send(tmp, Communicator.world.Size - 1, 4);
             }
-            else if (tmp.Count != 0) 
+            else if(tmp.Count != 0) 
             {
                 toMerge.Add(tmp);
             }
+
             //final part
+
             for (int i = 0; i < numOfProc; i++)
             {
                 if (i != Communicator.world.Rank)
@@ -286,13 +306,13 @@ namespace QSort
                     }
                 }
             }
-
             List<int> ans = new List<int>();
             Merge(toMerge, ref ans);
-
             Communicator.world.Send(ans, 0, 5);
             return;
         }
+
+
         static void Merge(List<List<int>> toMerge, ref List <int> res)
         {
             List<int> idx = new List<int>();
@@ -308,14 +328,14 @@ namespace QSort
                 int num = -1;
                 for (int i = 0; i < idx.Count; i++)
                 {
-                    if (toMerge[i].Count > idx[i] && toMerge[i][idx[i]] < min)
+                    if(toMerge[i].Count > idx[i] && toMerge[i][idx[i]] < min)
                     {
                         min = toMerge[i][idx[i]];
                         num = i;
                         end = false;
                     }
                 }
-                if (!end)
+                if(!end)
                 {
                     res.Add(toMerge[num][idx[num]]);
                     idx[num]++;
@@ -327,4 +347,3 @@ namespace QSort
 
 }
 
-// cd Documents/Visual Studio 2015/Projects/QSort/QSort/bin/Debug
