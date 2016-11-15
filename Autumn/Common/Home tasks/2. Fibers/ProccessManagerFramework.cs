@@ -62,9 +62,9 @@ namespace ProcessManager
         // Id of fiber to current iteration
         private static Dictionary<uint, int> IterOnId = new Dictionary<uint, int>();
         // Id of fiber to current iteration
-        private static Dictionary<uint, int> IdToPrior = new Dictionary<uint, int>();
+        private static Dictionary<uint, Tuple<int, int>> IdToPrior = new Dictionary<uint, Tuple<int, int>>();
         // List of fibers which sorted by priority
-        private static SortedSet<Tuple<int, uint>> PriorityQueue = new SortedSet<Tuple<int, uint>>();
+        private static SortedSet<Tuple<int, int, uint>> PriorityQueue = new SortedSet<Tuple<int, int, uint>>();
 
         public static uint CurFiber = 0;
         public static bool IsIncrease;
@@ -75,16 +75,21 @@ namespace ProcessManager
             // 20% chance to switch process to low priority
             if (Rnd.Next(100) < 20) 
             {
-                nextFiber = PriorityQueue.First().Item2;
+                nextFiber = PriorityQueue.First().Item3;
                 return nextFiber;
             }
 
             if (PriorityQueue.Count() > 1)
             {
-                PriorityQueue.Remove(new Tuple<int, uint>(IdToPrior[CurFiber], CurFiber));
+                PriorityQueue.Remove(new Tuple<int, int, uint>(IdToPrior[CurFiber].Item1, IdToPrior[CurFiber].Item2, CurFiber));
+                nextFiber = PriorityQueue.Last().Item3;
+                IdToPrior[CurFiber] = new Tuple<int, int>(IdToPrior[CurFiber].Item1, IdToPrior[CurFiber].Item2 - 1); // Decrease second priority at last fiber
+                PriorityQueue.Add(new Tuple<int, int, uint>(IdToPrior[CurFiber].Item1, IdToPrior[CurFiber].Item2, CurFiber));
             }
-            nextFiber = PriorityQueue.Last().Item2;
-            PriorityQueue.Add(new Tuple<int, uint>(IdToPrior[CurFiber], CurFiber));
+            else
+            {
+                nextFiber = PriorityQueue.Last().Item3;
+            }
             return nextFiber;
         }
 
@@ -96,7 +101,7 @@ namespace ProcessManager
                 Console.WriteLine(string.Format("Fiber {0} has finished", CurFiber));
                 if (IsModePriority)
                 {
-                    PriorityQueue.Remove(new Tuple<int, uint>(IdToPrior[CurFiber], CurFiber));
+                    PriorityQueue.Remove(new Tuple<int, int, uint>(IdToPrior[CurFiber].Item1, IdToPrior[CurFiber].Item2, CurFiber));
                 }
                 else
                 {
@@ -113,7 +118,7 @@ namespace ProcessManager
                 }
                 if (IsModePriority)
                 {
-                    CurFiber = PriorityQueue.Last().Item2;
+                    CurFiber = PriorityQueue.Last().Item3;
                 }
                 else
                 {
@@ -144,7 +149,7 @@ namespace ProcessManager
                 }
                 else if (IsModePriority)
                 {
-                    CurFiber = PriorityQueue.Last().Item2;
+                    CurFiber = PriorityQueue.Last().Item3;
                 }
                 else
                 {
@@ -170,8 +175,8 @@ namespace ProcessManager
                 CopyList.Add(id);
                 IdToIter.Add(id, process.NumIter);
                 IterOnId.Add(id, 0);
-                IdToPrior.Add(id, process.Priority);
-                PriorityQueue.Add(new Tuple<int, uint>(process.Priority, id));
+                IdToPrior.Add(id, new Tuple<int, int>(process.Priority, 100));
+                PriorityQueue.Add(new Tuple<int, int, uint>(process.Priority, 100, id));
             }
 
             Switch();
