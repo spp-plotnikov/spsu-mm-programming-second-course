@@ -4,61 +4,12 @@ using System.Threading;
 
 namespace ProducerConsumer
 {
-    class ProdCons
-    {
-        Semaphore _mut, _empty, _full;
-        List<int> items = new List<int>();
-
-        public ProdCons(int num) //емкость буфера
-        {
-            _mut = new Semaphore(1, num);
-            _empty = new Semaphore(num, num); 
-            _full = new Semaphore(0, num);      
-        }
-
-        public void Producer()
-        {
-            Random r = new Random();
-            while (true)
-            {
-                //Console.WriteLine("{0} is waiting in QUEUE...", Thread.CurrentThread.Name);
-                _empty.WaitOne();
-                _mut.WaitOne();
-               // Console.WriteLine("{0} enters the Critical Section!", Thread.CurrentThread.Name);
-                items.Add(r.Next(100));
-                Console.WriteLine(items.Count);
-              //  Console.WriteLine("{0} is leaving the Critical Section", Thread.CurrentThread.Name);
-                _mut.Release();
-                _full.Release();
-                Thread.Sleep(1000);
-            }
-        }
-
-        public void Consumer()
-        {
-            while (true)
-            {
-                //Console.WriteLine("{0} is waiting in QUEUE...", Thread.CurrentThread.Name);
-                _full.WaitOne();
-                _mut.WaitOne();
-                //Console.WriteLine("{0} enters the Critical Section!", Thread.CurrentThread.Name);
-                items.RemoveAt(items.Count - 1);
-                Console.WriteLine(items.Count);
-               // Console.WriteLine("{0} is leaving the Critical Section", Thread.CurrentThread.Name);
-                _mut.Release();
-                _empty.Release();
-                Thread.Sleep(1000);
-            }
-
-        }
-
-    }
-
-
     class Program
     {
+        static List<Producer> pr = new List<Producer>();
+        static List<Consumer> con = new List<Consumer>();
 
-        static void Main(string[] args)
+        static void Start()
         {
             int numbOfProd = 0, numbOfCons = 0;
             Console.WriteLine("Input numb of Producer: ");
@@ -77,42 +28,41 @@ namespace ProducerConsumer
                 Console.WriteLine("Not natural number. Input numb of Consumers again: ");
                 numbOfCons = Convert.ToInt32(Console.ReadLine());
             }
+                      
+            List<int> buff = new List<int>();
+            Semaphore sem = new Semaphore(1, 1);
 
-            int total = 10000;
-            Thread[] thr = new Thread[numbOfCons + numbOfProd];
-            int j = 0;
-
-            for (int i = 0; i < Math.Max(numbOfProd, numbOfCons); i++)
+            for (int i = 0; i < numbOfCons; i++)
             {
-                if (i < numbOfProd)
-                {
-                    Thread thread = new Thread(new ProdCons(total).Producer);
-                    thr[j] = thread;
-                    j++;
-                    thread.Name = "Producer_" + i;
-                    thread.Start();
-                }
-
-                if (i < numbOfCons)
-                {
-                    Thread thread = new Thread(new ProdCons(total).Consumer);
-                    thr[j] = thread;
-                    j++;
-                    thread.Name = "Consumer_" + i;
-                    thread.Start();
-                }
+                con.Add(new Consumer(ref buff, ref sem, i));
+            }
+            for (int i = 0; i < numbOfProd; i++)
+            {
+                pr.Add(new Producer(ref buff, ref sem, i));
             }
 
-           while(!Console.KeyAvailable)
-           {
+            Console.ReadKey();
+            Console.WriteLine("All processes will be finished, please, wait");
 
-           }
-
-           foreach(var t in thr)
+            for (int i = 0; i < numbOfCons; i++)
             {
-                t.Abort();
-                t.Join();
-            }          
+                con[0].Delete();
+                con.RemoveAt(0);
+            }
+            for (int i = 0; i < numbOfProd; i++)
+            {
+                pr[0].Delete();
+                pr.RemoveAt(0);
+            }
+
+            Console.WriteLine("The end");
+            Console.ReadKey();
+        }
+
+        static void Main(string[] args)
+        {
+            Start();
+            return;
         }
     }
 }
