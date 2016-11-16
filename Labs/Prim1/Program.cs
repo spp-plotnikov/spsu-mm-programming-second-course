@@ -9,14 +9,13 @@ namespace Prim
 {
     class Program
     {
-        static int[][] Pars(string namefile) //парсер файла
+        static int[][] Pars(string namefile)
         {
             StreamReader file = new StreamReader(@namefile);
             var line = file.ReadLine();
             if (line == null) return null;
 
-            string[] subStrings = line.Split(' ');
-
+            String[] subStrings = line.Split(' ');
             if (subStrings.Length != 1)
             {
                 Console.WriteLine("Error format");
@@ -27,20 +26,20 @@ namespace Prim
             int[][] arr = new int[arraySize][];
             int i, j;
 
-            for (i = 0; i < arraySize; i ++)
+            for (i = 0; i < arraySize; i++)
             {
                 arr[i] = new int[arraySize + 1];
                 arr[i][arraySize] = i;
                 for (j = 0; j < arraySize; j++)
                 {
                     arr[i][j] = 0;
-                }   
+                }
             }
-            
+
             while ((line = file.ReadLine()) != null)
             {
                 subStrings = line.Split(' ');
-               
+
                 if (subStrings.Length == 1 || subStrings.Length != 3)
                 {
                     Console.WriteLine("Error format");
@@ -50,13 +49,11 @@ namespace Prim
                 {
                     i = Convert.ToInt32(subStrings[0]);
                     j = Convert.ToInt32(subStrings[1]);
-
                     if (i >= j)
                     {
                         Console.WriteLine("Error format");
                         return null;
                     }
-
                     int k = Convert.ToInt32(subStrings[2]);
                     arr[j][i] = k;
                     arr[i][j] = k;
@@ -69,20 +66,16 @@ namespace Prim
         {
             int i = 0;
             int line = array.Last();
-
             while (i < (array.Length - 1) && array[i] == 0) i++;
-
-            if (i + 1 == array.Length) return new[] { int.MaxValue, -1, line};
-
-            int min = array[i];
-            int numb = i;
-
-            i++;
-
+            if (i + 1 == array.Length) return new[] { int.MaxValue, line, -1 };
+            if (que.Contains(i)) i++;
+            int min = int.MaxValue;
+            int numb = -1;
             while (i != array.Length - 1)
             {
                 if (array[i] <= 0 || que.Contains(i))
                 {
+                    array[i] = 0;
                     i++;
                     continue;
                 }
@@ -96,8 +89,8 @@ namespace Prim
                 }
                 i++;
             }
-            return new[] { min, numb, line};
-    }
+            return new[] { min, line, numb};
+        }
 
         static void Main(string[] args)
         {
@@ -109,87 +102,142 @@ namespace Prim
 
                 if (args.Count() != 2)
                 {
-                    Console.WriteLine("Not enough parametrs. Add names input and output files");
+                    Console.WriteLine("Not enough parametrs. Add input and output files");
                     return;
                 }
 
                 string pathIn = "";
                 string pathOut = "";
+                int[][] parsed = null;
+                int[][] tr = new int[comm.Size][];
+                List<int> queue = new List<int> { 0 };
+                List<int> totalQueue = new List<int> { 0 };
+                int[] total = null;
 
-                if (Communicator.world.Rank == 0)
-                {
                     pathIn = args[0];
                     pathOut = args[1];
-                }
+                    if (!File.Exists(pathIn))
+                    {
+                        Console.WriteLine("Nonexistent file. Try again:");
+                        return;
+                    }
 
-                if (!File.Exists(pathIn))
+
+                    parsed = Pars(pathIn);
+
+                    if (parsed == null)
+                    {
+                        Console.WriteLine("NULL");
+                        return;
+                    }
+                if (comm.Rank == 0)
                 {
-                    Console.WriteLine("Nonexistent file. Try again:");
-                    return;
+                    for (int i = 0; i < parsed.Length; i++)
+                    {
+                        for (int j = 0; j < parsed.Length; j++)
+                        {
+                            Console.Write(parsed[i][j] + " ");
+                        }
+                        Console.Write("\n");
+                    }
+                    Console.WriteLine("\n");
                 }
+                
+                
+                total = IndexOfMin(parsed[0], totalQueue);
 
-                int[][] parsed = Pars(pathIn); // матрица
-
-                if (parsed == null)
-                {
-                    Console.WriteLine("NULL");
-                    return;
-                }
-
-                int[][] tr = new int[comm.Size][]; //для потоков
-                List<int> queue = new List<int> { 0 }; //очередь вершин, из которых можно найти минимум
-                List<int> totalQueue = new List<int> { 0 }; //итоговая очередь
-                int[] total = IndexOfMin(parsed[0], totalQueue); //элемент для стартового сравнения
-
-                totalLength += total[0];
-                parsed[0][total[1]] = 0;
-                parsed[total[1]][0] = 0;
-
-                queue.Add(total[1]);
-                totalQueue.Add(total[1]);
+                    totalLength += total[0];
+                    parsed[0][total[2]] = 0;
+                    parsed[total[2]][0] = 0;
+                    queue.Add(total[2]);
+                    totalQueue.Add(total[2]);
+                   
                 int queueLen = queue.Count;
+
+                for (int i = 0; i < parsed.Length; i++)
+                {
+                    for (int j = 0; j < parsed.Length; j++)
+                    {
+                        Console.Write(parsed[i][j] + " ");
+                    }
+                    Console.Write("\n");
+                }
+                Console.WriteLine("\n");
+
 
                 while (totalQueue.Count != parsed.Length)
                 {
-                    int delta = 0; //для работы с потоками
+                    int delta = 0;
                     total[0] = int.MaxValue;
-
                     do
                     {
-                        if (comm.Size > queueLen - delta)
+                        if (comm.Rank == 0)
                         {
-                            for (int i = 0; i < comm.Size; i++)
+                            foreach (var x1 in queue)
                             {
-                                if (i < queueLen - delta) tr[i] = parsed[queue[i + delta]];
-                                else tr[i] = parsed[queue[delta]];
+                                Console.Write(x1 + " ");
+                            }
+                            Console.Write("\n");
+                            if (comm.Size > queueLen - delta)
+                            {
+                                for (int i = 0; i < comm.Size; i++)
+                                {
+                                    if (i < queueLen - delta) tr[i] = parsed[queue[i + delta]];
+                                    else tr[i] = parsed[queue[delta]];
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < comm.Size; i++)
+                                {
+                                    tr[i] = parsed[queue[i + delta]];
+                                }
                             }
                         }
-                        else
-                        {
-                            for (int i = 0; i < comm.Size; i++)
-                            {
-                                tr[i] = parsed[queue[i + delta]];
-                            }
-                        }
-
                         delta += comm.Size;
-                        int[] x = comm.Scatter(tr, 0); //разделение
-                        
+
+                        int[] x = comm.Scatter(tr, 0);
+
+                        //foreach (var x1 in x)
+                        //{
+                        //    Console.Write(x1 + " ");
+                        //}
+                        //Console.WriteLine("\n");
+
+
                         int[] min = IndexOfMin(x, totalQueue);
-                        if (min[1] == -1)
+
+                        if (min[2] == -1)
                         {
-                            queue.Remove(min[2]);
+                            queue.Remove(min[1]);
                             delta--;
                             queueLen--;
                         }
 
-                        int[][] total1 = comm.Gather(min, 0); //слияние
-                        
-                        if (comm.Rank == 0) //обработка подытога 
+                        Console.Write("min on " + comm.Rank + " is ");
+                        foreach (var t in min)
+                        {
+                            Console.Write(t + " ");
+                        }
+                        Console.Write("\n");
+
+                        int[][] total1 = comm.Gather(min, 0);
+
+                        if (comm.Rank == 0)
+                        {
+                            Console.Write("preSplitmin: ");
+                            foreach (var t in total1)
+                            {
+                                Console.Write(t[0] + ", ");
+                            }
+                            Console.Write("\n");
+                        }
+
+
+                        if (comm.Rank == 0)
                         {
                             int localMin = total1[0][0];
                             int[] localNum = { total1[0][1], total1[0][2] };
-
                             foreach (int[] t in total1)
                             {
                                 if (localMin > t[0])
@@ -205,28 +253,55 @@ namespace Prim
                                 total[1] = localNum[0];
                                 total[2] = localNum[1];
                             }
+                            Console.WriteLine("Min: " + total[0] + " " + total[1] + " " + total[2]);
                         }
-
+                        comm.Broadcast(ref total, 0);
+                        
+                        comm.Barrier();
                     } while ((queueLen - delta) > 0);
 
-                    //финальная выборка
-                    totalLength = totalLength + total[0];
-                    parsed[total[1]][total[2]] = 0;
-                    parsed[total[2]][total[1]] = 0;
+                    //if (comm.Rank == 0)
+                    {
+                        totalLength = totalLength + total[0];
+                      //  Console.WriteLine("totlen now: " + totalLength);
+                        parsed[total[1]][total[2]] = 0;
+                        parsed[total[2]][total[1]] = 0;
+                        queue.Add(total[2]);
+                        totalQueue.Add(total[2]);
+                        queueLen = queue.Count;
+                        total[0] = int.MaxValue;
+                    }
+                    if (comm.Rank == 0)
+                    {
+                        for (int i = 0; i < parsed.Length; i++)
+                        {
+                            for (int j = 0; j < parsed.Length; j++)
+                            {
+                                Console.Write(parsed[i][j] + " ");
+                            }
+                            Console.Write("\n");
+                        }
+                        Console.WriteLine("\n");
+                    }
 
-                    queue.Add(total[1]);
-                    totalQueue.Add(total[1]);
-                    queueLen = queue.Count;
-                    total[0] = int.MaxValue;                   
+                    comm.Barrier();
                 }
 
                 if (comm.Rank == 0)
                 {
-                    string st = totalQueue.Count.ToString;                                     
-                    st += "\r\n";
+                        Console.Write("totalqueue: ");
 
-                    File.WriteAllText(@pathOut, st + totalLength, Encoding.Unicode);
-                 }
+                        string st = Convert.ToString(totalQueue.Count) + System.Environment.NewLine;
+
+                        foreach (var q in totalQueue)
+                        {
+                            // Console.Write(q + " ");
+                            st += q + " ";
+                        }
+                        st += System.Environment.NewLine;
+                        File.WriteAllText(@pathOut, st + totalLength, Encoding.Unicode);
+                       // Console.WriteLine(st + totalLength);                    
+                }
             }
         }
     }
