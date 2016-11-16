@@ -48,7 +48,7 @@ namespace Fibers
    
             if(FibersList.Count > 1)
             {
-                for (int i = 0; i < FibersList.Count; i++)
+                for (int i = 0; i < FibersList.Count / 2; i++)
                 {
                     Process tmpProcess = Processes[i];
                     Processes[i] = Processes[Processes.Count - 1 - i];
