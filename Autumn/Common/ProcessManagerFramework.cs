@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Threading;
+using Fibers;
 
 namespace ProcessManager
 {
@@ -11,6 +12,13 @@ namespace ProcessManager
         public static void Switch(bool fiberFinished)
         {
             // a place for fiber magic
+            
+
+        }
+        public static void Main()
+        {
+            Console.WriteLine("work");
+            return;
         }
     }
 
