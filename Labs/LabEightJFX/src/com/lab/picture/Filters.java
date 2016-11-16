@@ -1,7 +1,10 @@
 package com.lab.picture;
 
+<<<<<<< HEAD
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+=======
+>>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -25,14 +28,22 @@ public class Filters {
     private int width;
     private boolean[] flag;
     private final static List<String> list = Arrays.asList("Gray", "SobelX", "SobelY");
+<<<<<<< HEAD
     private DoubleProperty progressProperty;
 
     public Filters(Image img, WritableImage dest, int height, int width, boolean[] flag) {
+=======
+    public static double progress;
+    private ProgressIndicator progressIndicator;
+
+    public Filters(Image img, WritableImage dest, int height, int width, boolean[] flag, ProgressIndicator progressIndicator) {
+>>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
         this.img = img;
         this.dest = dest;
         this.height = height;
         this.width = width;
         this.flag = flag;
+<<<<<<< HEAD
         progressProperty = new SimpleDoubleProperty(0);
     }
 
@@ -42,6 +53,13 @@ public class Filters {
 
     public boolean applyFilter(String nameF) {
         progressProperty.set(0);
+=======
+        this.progressIndicator = progressIndicator;
+    }
+
+    public boolean applyFilter(String nameF) {
+        progress = 0;
+>>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
         boolean answer = false;
         switch (list.indexOf(nameF)) {
             case 0:
@@ -78,8 +96,18 @@ public class Filters {
                     return false;
                 }
             }
+<<<<<<< HEAD
             progressProperty.set((double)x / (width - 1));
         }
+=======
+            progress = (double)x / (width - 1);
+            if(x % 100 == 0){
+                progressIndicator.setProgress(progress);
+            }
+        }
+        progressIndicator.setProgress(1);
+
+>>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
         return true;
     }
 
@@ -131,8 +159,17 @@ public class Filters {
                     return false;
                 }
             }
+<<<<<<< HEAD
             progressProperty.set(((double)x / (width - 1))) ;
         }
+=======
+            progress = ((double)x / (width - 1)) ;
+            if(x % 100 == 0){
+                progressIndicator.setProgress(progress);
+            }
+        }
+        progressIndicator.setProgress(1);
+>>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
         return true;
     }
 
