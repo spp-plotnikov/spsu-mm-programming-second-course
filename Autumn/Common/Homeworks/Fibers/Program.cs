@@ -11,7 +11,7 @@ namespace Fibers
         static void Main(string[] args)
         {
             ProcessManager.CurrentProcess = 0;
-            int numOfFibers = 5;
+            int numOfFibers = 3;
             for (int i = 0; i < numOfFibers; i++)
             {
                 Process proc = new Process();

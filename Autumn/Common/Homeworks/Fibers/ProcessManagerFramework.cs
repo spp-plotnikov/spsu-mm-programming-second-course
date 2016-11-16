@@ -39,7 +39,7 @@ namespace Fibers
         }
 
         // unpriority 
-        /*public static void Switch(bool fiberFinished)
+        public static void Switch(bool fiberFinished)
         {
             if(fiberFinished)
             {
@@ -48,15 +48,15 @@ namespace Fibers
    
             if(FibersList.Count > 1)
             {
-                uint tmpFiber = FibersList[FibersList.Count - 1];
-                Process tmpProcess = Processes[Processes.Count - 1];
-                for (int i = FibersList.Count - 1; i > 0; i--)
+                for (int i = 0; i < FibersList.Count; i++)
                 {
-                    Processes[i] = Processes[i - 1];
-                    FibersList[i] = FibersList[i - 1];
+                    Process tmpProcess = Processes[i];
+                    Processes[i] = Processes[Processes.Count - 1 - i];
+                    Processes[Processes.Count - 1 - i] = tmpProcess;
+                    uint tmpFiber = FibersList[i];
+                    FibersList[i] = FibersList[FibersList.Count - 1 - i];
+                    FibersList[FibersList.Count - 1 - i] = tmpFiber;
                 }
-                FibersList[0] = tmpFiber;
-                Processes[0] = tmpProcess;
                 CurrentFiber = FibersList[FibersList.Count - 1];
                 Console.WriteLine("Fiber has been switched!");
             }
@@ -65,10 +65,11 @@ namespace Fibers
                 Delete();
             }
             Fiber.Switch(CurrentFiber);
-        }*/
+        }
+        
         
         // priority
-        public static void Switch(bool fiberFinished)
+        /*public static void Switch(bool fiberFinished)
         {
             if(fiberFinished)
             {
@@ -97,6 +98,7 @@ namespace Fibers
             }
             Fiber.Switch(CurrentFiber);
         }
+        */
     }
 
     public class Process
