@@ -14,14 +14,7 @@ namespace ProcessManager
         public static Dictionary<uint, int> allFibersWithPriority = new Dictionary<uint, int>();
         public static Dictionary<int, uint> supportDict = new Dictionary<int, uint>();
         private static uint currentFiber;
-        //  public static List <System.Collections.Generic.KeyValuePair<int, uint> > allFibersWithPriority = new List<KeyValuePair<int, uint>>();
 
-        /*  private static Dictionary<int, int> fibers = new Dictionary<int, int>(); //fiberId: fiberpriority
-          private static Dictionary<int, int> fibersIter = new Dictionary<int, int>(); //number of iter: fiberId
-          private static List<int> fibersList = new List<int>();
-          private static Queue<int> fibersQueue = new Queue<int>();
-          private static int iteration = 0;
-          */
 
         public static void DeleteAllFibers()
         {
