@@ -49,11 +49,13 @@ namespace Prim
                 {
                     i = Convert.ToInt32(subStrings[0]);
                     j = Convert.ToInt32(subStrings[1]);
+
                     if (i >= j)
                     {
                         Console.WriteLine("Error format");
                         return null;
                     }
+
                     int k = Convert.ToInt32(subStrings[2]);
                     arr[j][i] = k;
                     arr[i][j] = k;
@@ -66,11 +68,14 @@ namespace Prim
         {
             int i = 0;
             int line = array.Last();
+
             while (i < (array.Length - 1) && array[i] == 0) i++;
             if (i + 1 == array.Length) return new[] { int.MaxValue, line, -1 };
+
             if (que.Contains(i)) i++;
             int min = int.MaxValue;
             int numb = -1;
+
             while (i != array.Length - 1)
             {
                 if (array[i] <= 0 || que.Contains(i))
@@ -89,7 +94,7 @@ namespace Prim
                 }
                 i++;
             }
-            return new[] { min, line, numb};
+            return new[] { min, line, numb };
         }
 
         static void Main(string[] args)
@@ -114,56 +119,31 @@ namespace Prim
                 List<int> totalQueue = new List<int> { 0 };
                 int[] total = null;
 
-                    pathIn = args[0];
-                    pathOut = args[1];
-                    if (!File.Exists(pathIn))
-                    {
-                        Console.WriteLine("Nonexistent file. Try again:");
-                        return;
-                    }
-
-
-                    parsed = Pars(pathIn);
-
-                    if (parsed == null)
-                    {
-                        Console.WriteLine("NULL");
-                        return;
-                    }
-                if (comm.Rank == 0)
+                pathIn = args[0];
+                pathOut = args[1];
+                if (!File.Exists(pathIn))
                 {
-                    for (int i = 0; i < parsed.Length; i++)
-                    {
-                        for (int j = 0; j < parsed.Length; j++)
-                        {
-                            Console.Write(parsed[i][j] + " ");
-                        }
-                        Console.Write("\n");
-                    }
-                    Console.WriteLine("\n");
+                    Console.WriteLine("Nonexistent file. Try again:");
+                    return;
                 }
-                
-                
+
+                parsed = Pars(pathIn);
+
+                if (parsed == null)
+                {
+                    Console.WriteLine("NULL");
+                    return;
+                }
+
                 total = IndexOfMin(parsed[0], totalQueue);
 
-                    totalLength += total[0];
-                    parsed[0][total[2]] = 0;
-                    parsed[total[2]][0] = 0;
-                    queue.Add(total[2]);
-                    totalQueue.Add(total[2]);
-                   
+                totalLength += total[0];
+                parsed[0][total[2]] = 0;
+                parsed[total[2]][0] = 0;
+                queue.Add(total[2]);
+                totalQueue.Add(total[2]);
+
                 int queueLen = queue.Count;
-
-                for (int i = 0; i < parsed.Length; i++)
-                {
-                    for (int j = 0; j < parsed.Length; j++)
-                    {
-                        Console.Write(parsed[i][j] + " ");
-                    }
-                    Console.Write("\n");
-                }
-                Console.WriteLine("\n");
-
 
                 while (totalQueue.Count != parsed.Length)
                 {
@@ -173,11 +153,6 @@ namespace Prim
                     {
                         if (comm.Rank == 0)
                         {
-                            foreach (var x1 in queue)
-                            {
-                                Console.Write(x1 + " ");
-                            }
-                            Console.Write("\n");
                             if (comm.Size > queueLen - delta)
                             {
                                 for (int i = 0; i < comm.Size; i++)
@@ -198,13 +173,6 @@ namespace Prim
 
                         int[] x = comm.Scatter(tr, 0);
 
-                        //foreach (var x1 in x)
-                        //{
-                        //    Console.Write(x1 + " ");
-                        //}
-                        //Console.WriteLine("\n");
-
-
                         int[] min = IndexOfMin(x, totalQueue);
 
                         if (min[2] == -1)
@@ -214,26 +182,8 @@ namespace Prim
                             queueLen--;
                         }
 
-                        Console.Write("min on " + comm.Rank + " is ");
-                        foreach (var t in min)
-                        {
-                            Console.Write(t + " ");
-                        }
-                        Console.Write("\n");
-
                         int[][] total1 = comm.Gather(min, 0);
-
-                        if (comm.Rank == 0)
-                        {
-                            Console.Write("preSplitmin: ");
-                            foreach (var t in total1)
-                            {
-                                Console.Write(t[0] + ", ");
-                            }
-                            Console.Write("\n");
-                        }
-
-
+                        
                         if (comm.Rank == 0)
                         {
                             int localMin = total1[0][0];
@@ -253,54 +203,29 @@ namespace Prim
                                 total[1] = localNum[0];
                                 total[2] = localNum[1];
                             }
-                            Console.WriteLine("Min: " + total[0] + " " + total[1] + " " + total[2]);
                         }
+
                         comm.Broadcast(ref total, 0);
-                        
+
                         comm.Barrier();
                     } while ((queueLen - delta) > 0);
 
-                    //if (comm.Rank == 0)
-                    {
-                        totalLength = totalLength + total[0];
-                      //  Console.WriteLine("totlen now: " + totalLength);
-                        parsed[total[1]][total[2]] = 0;
-                        parsed[total[2]][total[1]] = 0;
-                        queue.Add(total[2]);
-                        totalQueue.Add(total[2]);
-                        queueLen = queue.Count;
-                        total[0] = int.MaxValue;
-                    }
-                    if (comm.Rank == 0)
-                    {
-                        for (int i = 0; i < parsed.Length; i++)
-                        {
-                            for (int j = 0; j < parsed.Length; j++)
-                            {
-                                Console.Write(parsed[i][j] + " ");
-                            }
-                            Console.Write("\n");
-                        }
-                        Console.WriteLine("\n");
-                    }
+                    totalLength = totalLength + total[0];
+                    parsed[total[1]][total[2]] = 0;
+                    parsed[total[2]][total[1]] = 0;
+                    queue.Add(total[2]);
+                    totalQueue.Add(total[2]);
+                    queueLen = queue.Count;
+                    total[0] = int.MaxValue;
 
                     comm.Barrier();
                 }
 
                 if (comm.Rank == 0)
                 {
-                        Console.Write("totalqueue: ");
+                    string st = Convert.ToString(totalQueue.Count) + System.Environment.NewLine;
 
-                        string st = Convert.ToString(totalQueue.Count) + System.Environment.NewLine;
-
-                        foreach (var q in totalQueue)
-                        {
-                            // Console.Write(q + " ");
-                            st += q + " ";
-                        }
-                        st += System.Environment.NewLine;
-                        File.WriteAllText(@pathOut, st + totalLength, Encoding.Unicode);
-                       // Console.WriteLine(st + totalLength);                    
+                    File.WriteAllText(@pathOut, st + totalLength, Encoding.Unicode);
                 }
             }
         }
