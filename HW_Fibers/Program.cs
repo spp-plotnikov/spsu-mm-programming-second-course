@@ -11,6 +11,7 @@ namespace ProcessManager
     {
         public static Queue<uint> queueOfActiveFibers = new Queue<uint>();
         public static List<uint> allFibers = new List<uint>();
+        public static List<int> Priority = new List<int>();
         public static Dictionary<uint, int> allFibersWithPriority = new Dictionary<uint, int>();
         public static Dictionary<int, uint> supportDict = new Dictionary<int, uint>();
         private static uint currentFiber;
@@ -25,7 +26,7 @@ namespace ProcessManager
         }
 
         //whitout priority
-
+    /*
        public static void Switch(bool fiberFinished)
         {
             if(queueOfActiveFibers.Count == 0)
@@ -50,26 +51,63 @@ namespace ProcessManager
             {
                 queueOfActiveFibers.Enqueue(currentFiber);
                 currentFiber = queueOfActiveFibers.Peek();
-               Fiber.Switch(currentFiber);
+                Fiber.Switch(currentFiber);
             }
         }
+        */
 
 
         //we sort our fibers by priority and after that we just use FIFO's Switch function
-        public static void CreatePriorityForSwitch()
+        
+        public static void Switch(bool fiberFinished)
         {
-            queueOfActiveFibers.Clear();
-            allFibersWithPriority = allFibersWithPriority.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-            foreach (uint i in allFibersWithPriority.Keys)
+            if(allFibers.Count == 0)
             {
-                queueOfActiveFibers.Enqueue(i);
+                DeleteAllFibers();
             }
-            currentFiber = queueOfActiveFibers.Peek();
-
-            Switch(false);
-           
+            if(fiberFinished)
+            {
+                int idx = allFibers.IndexOf(currentFiber);
+                allFibers.Remove(currentFiber);
+                Priority.Remove(Priority[idx]);
+                if(allFibers.Count == 0)
+                {
+                    Console.WriteLine("This is the end");
+                    Fiber.Switch(Fiber.PrimaryId);
+                }
+                else
+                {
+                    int max = Priority[0];
+                    int curIdx = 0;
+                    for (int i = 0; i < Priority.Count; i++)
+                    {
+                        if(Priority[i] > max)
+                        {
+                            max = Priority[i];
+                            curIdx = i;
+                        }
+                    }
+                    currentFiber = allFibers[curIdx];
+                    Fiber.Switch(currentFiber);
+                }
+            }
+            else
+            {
+                int max = Priority[0];
+                int curIdx = 0;
+                for (int i = 0; i < Priority.Count; i++)
+                {
+                    if(Priority[i] > max)
+                    {
+                        max = Priority[i];
+                        curIdx = i;
+                    }
+                }
+                currentFiber = allFibers[curIdx];
+                Fiber.Switch(currentFiber);
+            }           
         }
-
+        
 
         public static void Main()
         {
@@ -80,15 +118,14 @@ namespace ProcessManager
                 Fiber fiber = new Fiber(new Action(process.Run));
                 queueOfActiveFibers.Enqueue(fiber.Id);
                 allFibers.Add(fiber.Id);
-
+                Priority.Add(process.Priority);
                 allFibersWithPriority.Add(fiber.Id, process.Priority);
                 Console.WriteLine("{0}-{1}", fiber.Id, process.Priority);
             }
             //currentFiber = queueOfActiveFibers.Peek(); //the first elem for switch without priority
-          
 
-            CreatePriorityForSwitch();
-            //Switch(false);
+            currentFiber = allFibers[0];
+            Switch(false);
             Console.ReadLine();
         }
     }
