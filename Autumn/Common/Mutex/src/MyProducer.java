@@ -20,10 +20,8 @@ public class MyProducer<T> implements Runnable {
         while (!exitFlag.get()) {
             try {
                 mutex.lock();
-                Thread.sleep(ThreadLocalRandom.current().nextInt(50, 100));
+                Thread.sleep(ThreadLocalRandom.current().nextInt(1, 7));
                 target.add(obj);
-                System.out.println("[Producer] Thread " +
-                        ((int) Thread.currentThread().getId() % mutex.n + 1) + " produced object");
             } catch (InterruptedException e) {
                 System.out.println("[Producer] Thread " +
                         ((int) Thread.currentThread().getId() % mutex.n + 1) + " has been terminated");
@@ -31,6 +29,11 @@ public class MyProducer<T> implements Runnable {
             } finally {
                 mutex.unlock();
             }
+
+            System.out.println("[Producer] Thread " +
+                    ((int) Thread.currentThread().getId() % mutex.n + 1) + " produced object");
         }
+        System.out.println("[Producer] Thread " +
+                ((int) Thread.currentThread().getId() % mutex.n + 1) + " has finished");
     }
 }
