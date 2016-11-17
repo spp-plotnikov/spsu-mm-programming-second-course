@@ -12,10 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
-<<<<<<< HEAD
-=======
-import javafx.stage.Stage;
->>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
 
 import java.io.File;
 import java.util.Arrays;
@@ -35,10 +31,6 @@ public class ImageTransformationController {
 
     private MainApp mainApp;
     private FileChooser fileChooser = new FileChooser();
-<<<<<<< HEAD
-=======
-    private Stage progressDialog;
->>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
     private Image img;
     private WritableImage dest;
     private int height;
@@ -85,20 +77,12 @@ public class ImageTransformationController {
      * @param nameOfFilter
      */
     private void applyFilter(final String nameOfFilter) {
-<<<<<<< HEAD
         if (img != null) {
             flag = new boolean[1];
             flag[0] = true;
             dest = new WritableImage(width, height);
             filter = new Filters(img, dest, height, width, flag);
             progressIndicator.progressProperty().bindBidirectional(filter.getProgressProperty());
-=======
-        if (file != null && file.getPath().contains(".bmp")) {
-            flag = new boolean[1];
-            flag[0] = true;
-            dest = new WritableImage(width, height);
-            filter = new Filters(img, dest, height, width, flag, progressIndicator);
->>>>>>> 9a1b4de14880177dbb683e45a538e518e934b404
 
             new Thread(new Runnable() {
                 @Override
