@@ -14,9 +14,9 @@ public class Worker extends Thread {
                 Runnable task;
                 synchronized (pending) {
                     while (pending.isEmpty())
-                        pending.wait(50); // now it will not waste CPU
+                        pending.wait(50); // timeout=50, for just in case
                     task = pending.poll();
-                    if (task == null)
+                    if (task == null) // null ptr, however the queue is NOT empty!
                         return;
                     pending.notifyAll();
                 }
