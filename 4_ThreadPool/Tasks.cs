@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-
 public class Tasks
 {
     private int tasksNum;
