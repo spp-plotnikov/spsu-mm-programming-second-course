@@ -18,18 +18,16 @@ public class MyProducer<T> implements Runnable {
 
     public void run() {
         while (!exitFlag.get()) {
-            try {
-                mutex.lock();
-                Thread.sleep(ThreadLocalRandom.current().nextInt(1, 7));
-                target.add(obj);
-            } catch (InterruptedException e) {
-                System.out.println("[Producer] Thread " +
-                        ((int) Thread.currentThread().getId() % mutex.n + 1) + " has been terminated");
-                return;
-            } finally {
-                mutex.unlock();
-            }
+            mutex.lock();
+            target.add(obj);
+            mutex.unlock();
 
+            try {
+                Thread.sleep(ThreadLocalRandom.current().nextLong(10, 20));
+            } catch (InterruptedException e) {
+                // none to be done :)
+            }
+            
             System.out.println("[Producer] Thread " +
                     ((int) Thread.currentThread().getId() % mutex.n + 1) + " produced object");
         }

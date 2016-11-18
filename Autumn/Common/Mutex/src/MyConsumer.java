@@ -15,22 +15,22 @@ public class MyConsumer<T> implements Runnable {
 
     public void run() {
         while (!exitFlag.get()) {
-            T obj = null;
-            try {
-                mutex.lock();
-                Thread.sleep(ThreadLocalRandom.current().nextInt(1, 7));
-                obj = target.poll();
-            } catch (InterruptedException e) {
-                System.out.println("[Consumer] Thread " +
-                        ((int) Thread.currentThread().getId() % mutex.n + 1) + " has been terminated");
-            } finally {
-                mutex.unlock();
-            }
+            T obj;
+            mutex.lock();
+            obj = target.poll();
+            mutex.unlock();
 
             if (obj == null) {
                 System.out.println("[Consumer] Can't consume - empty queue");
                 return;
             }
+
+            try {
+                Thread.sleep(ThreadLocalRandom.current().nextLong(10, 20));
+            } catch (InterruptedException e) {
+                // none to be done :)
+            }
+
             System.out.println("[Consumer] Thread " +
                     ((int) Thread.currentThread().getId() % mutex.n + 1) + " consumed object");
         }
