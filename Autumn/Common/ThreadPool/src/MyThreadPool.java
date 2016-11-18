@@ -1,14 +1,17 @@
 import java.util.Queue;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MyThreadPool {
     public static int threadMax = 2;
     private Queue<Runnable> pending;
     private Worker[] workers;
+    private volatile AtomicBoolean isTerminated;
 
     public MyThreadPool() {
         pending = new LinkedList<>();
         workers = new Worker[threadMax];
+        isTerminated = new AtomicBoolean(false);
     }
 
     public void enqueue(Runnable obj) {
@@ -20,7 +23,7 @@ public class MyThreadPool {
 
     public void start() {
         for (int i = 0; i < threadMax; i++) {
-            Worker cur = new Worker(pending);
+            Worker cur = new Worker(pending, isTerminated);
             cur.start();
             workers[i] = cur;
         }
@@ -31,7 +34,7 @@ public class MyThreadPool {
         for (Worker cur : workers) {
             while (!pending.isEmpty()) pending.poll();
             try {
-                cur.interrupt();
+                isTerminated.set(true);
                 synchronized (pending) {
                     pending.add(null); // empty task means "terminate"
                     pending.notifyAll();

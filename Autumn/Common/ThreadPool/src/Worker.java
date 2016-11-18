@@ -1,15 +1,18 @@
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Worker extends Thread {
     private volatile Queue<Runnable> pending;
+    private volatile AtomicBoolean isTerminated;
 
-    public Worker(Queue<Runnable> q) {
+    public Worker(Queue<Runnable> q, AtomicBoolean flag) {
         pending = q;
+        isTerminated = flag;
     }
 
     @Override
     public void run() {
-        while (!isInterrupted()) {
+        while (!isTerminated.get()) {
             try {
                 Runnable task;
                 synchronized (pending) {
@@ -20,9 +23,9 @@ public class Worker extends Thread {
                         return;
                     pending.notifyAll();
                 }
-                task.run();
+                task.run(); // and now we wait for it to finish anyway :(
             } catch (InterruptedException e) {
-                System.out.println("interrupted");
+                System.out.println("never should happen");
                 return;
             }
         }
