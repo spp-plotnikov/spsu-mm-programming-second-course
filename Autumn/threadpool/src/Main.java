@@ -1,5 +1,5 @@
 public class Main {
-    public static final int count = 4;
+    public static final int count = 2;
     public static void main(String[] args) {
 
         ThreadPoolExecutor executor = new ThreadPoolExecutor(count);

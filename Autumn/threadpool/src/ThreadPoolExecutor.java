@@ -12,8 +12,8 @@ public class ThreadPoolExecutor {
     }
 
     public void add(Runnable r) {
-        taskQueue.add(r);
         synchronized (taskQueue) {
+            taskQueue.add(r);
             taskQueue.notify();
         }
     }
@@ -23,6 +23,10 @@ public class ThreadPoolExecutor {
                 workers[i].installFlagOff();
             }
         }
+        synchronized (taskQueue) {
+            taskQueue.notifyAll();
+        }
+
     }
 }
 
