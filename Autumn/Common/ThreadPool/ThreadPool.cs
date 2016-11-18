@@ -8,51 +8,44 @@ namespace ThreadPool
     class ThreadPool : IDisposable
     {
         private Queue<ThreadStart> queueOfTasks = new Queue<ThreadStart>();
-        private Queue<Thread> queueOfFreeThreads = new Queue<Thread>();
-        private List<Thread> listOfThreads = new List<Thread>();
+        private int numOfThreads;
         private bool disposed = false;
-
+        private static Mutex addTaskMutex = new Mutex(false);
+        private static Mutex getTaskMutex = new Mutex(false);
         public ThreadPool(int numOfThreads) // Constructor
         {
-            listOfThreads = Enumerable.Repeat(new Thread(new ThreadStart(delegate { })), numOfThreads).ToList();
+            this.numOfThreads = numOfThreads;
         }
 
-        private void initQueueOfFreeThreads() // When the queue is empty, reinitializate it
-        {
-            if (disposed) { throw new NotImplementedException(); }
-            Console.WriteLine("Reinit freeThreads");
-            foreach (Thread thread in listOfThreads)
-            {
-                if (!thread.IsAlive) { queueOfFreeThreads.Enqueue(thread); }
-            }
-        }
-   
         public void AddTask(ThreadStart threadStart) // Adding task with some function
         {
+            addTaskMutex.WaitOne();
             if (disposed) { throw new NotImplementedException(); }
             queueOfTasks.Enqueue(threadStart);
+            addTaskMutex.ReleaseMutex();
         }
 
         public void StartWorking() // Start
         {
-            initQueueOfFreeThreads();
+            for (int i = 0; i < numOfThreads; i++)
+            {
+                Thread thread = new Thread(WorlkingCycle);
+                thread.Start();
+            }
+        }
+
+        private void WorlkingCycle()
+        {
             while (!disposed)
             {
-                //Console.WriteLine(isWorking);
-                if (queueOfTasks.Count != 0)
+                getTaskMutex.WaitOne();
+                try
                 {
-                    try
-                    {
-                        Thread thread = queueOfFreeThreads.Dequeue();
-                        ThreadStart curTask = queueOfTasks.Dequeue();
-                        thread = new Thread(curTask);
-                        thread.Start();
-                    }
-                    catch
-                    {
-                        initQueueOfFreeThreads();
-                    }
+                    ThreadStart start = queueOfTasks.Dequeue();
+                    start();
                 }
+                catch { }
+                getTaskMutex.ReleaseMutex();
             }
         }
 
