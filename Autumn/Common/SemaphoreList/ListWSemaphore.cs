@@ -4,7 +4,6 @@ using System.Threading;
 
 public class ListWSemaphore<T> : List<T>
 {
-    public bool endOfWork = false;
     private static int maxNumOfThreads = SemaphoreExample.Constants.maxNumOfThreads;
     private int curNumOfThreads = 0;
     static Semaphore semaphore = new Semaphore(maxNumOfThreads, maxNumOfThreads);
@@ -40,11 +39,6 @@ public class ListWSemaphore<T> : List<T>
         catch { }
         semaphore.Release();
         curNumOfThreads--;
-    }
-
-    public void LockFrvr() // Making object inaccessible to changes
-    {
-        endOfWork = true;
     }
 
     public void WriteList() // WriteLine list
