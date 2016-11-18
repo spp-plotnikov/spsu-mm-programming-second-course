@@ -5,12 +5,6 @@ namespace ThreadPool
 {
     class Program
     {
-        public static void Threadstart()
-        {
-            Thread.Sleep(10);
-            Console.WriteLine("Hello");
-        }
-
         static void Main(string[] args)
         {
             Tasks tasks = new Tasks();
