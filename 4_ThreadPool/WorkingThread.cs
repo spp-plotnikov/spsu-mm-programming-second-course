@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-
 public class WorkingThread
 {
     private Queue<Action> tasks;
