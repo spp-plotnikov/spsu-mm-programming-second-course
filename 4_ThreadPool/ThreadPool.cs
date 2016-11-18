@@ -15,7 +15,6 @@ public class ThreadPool : IDisposable
     {
         this.tasks = new Queue<Action>();
         this.threads = new List<WorkingThread>();
-
     }
 
     public void Enqueue(Action task)
