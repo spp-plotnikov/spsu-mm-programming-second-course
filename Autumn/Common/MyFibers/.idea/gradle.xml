@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/../quasar" />
+        <option name="gradleHome" value="/usr/share/gradle-bin-2.13" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/../quasar" />
+            <option value="$PROJECT_DIR$/../quasar/quasar-actors" />
+            <option value="$PROJECT_DIR$/../quasar/quasar-core" />
+            <option value="$PROJECT_DIR$/../quasar/quasar-disruptor" />
+            <option value="$PROJECT_DIR$/../quasar/quasar-galaxy" />
+            <option value="$PROJECT_DIR$/../quasar/quasar-kotlin" />
+            <option value="$PROJECT_DIR$/../quasar/quasar-reactive-streams" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

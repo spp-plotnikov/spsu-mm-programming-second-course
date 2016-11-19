@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":quasar-actors" external.linked.project.path="$MODULE_DIR$/../../../../quasar/quasar-actors" external.root.project.path="$MODULE_DIR$/../../../../quasar" external.system.id="GRADLE" external.system.module.group="co.paralleluniverse" external.system.module.version="0.7.7-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../quasar/quasar-actors">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../quasar/quasar-actors/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../quasar/quasar-actors/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
