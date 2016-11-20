@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
  public class Future
 {
-
     private static int ArraySize = 99999;
     static void Main(string[] args)
     {
@@ -20,6 +19,5 @@ using System.Threading.Tasks;
         SecondSum second = new SecondSum();
         Console.WriteLine("secon Sum = {0}", second.Sum(array));
         Console.ReadLine();
-
     }
 }
