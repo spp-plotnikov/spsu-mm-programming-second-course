@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-
 public class ThreadPool : IDisposable
 {
     private int poolSize = 1;
@@ -16,7 +15,6 @@ public class ThreadPool : IDisposable
     {
         this.tasks = new Queue<Action>();
         this.threads = new List<WorkingThread>();
-
     }
 
     public void Enqueue(Action task)
