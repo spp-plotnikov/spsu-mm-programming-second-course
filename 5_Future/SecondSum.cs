@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 public class SecondSum : IArraySum
 {
     public int Sum(int[] array)
