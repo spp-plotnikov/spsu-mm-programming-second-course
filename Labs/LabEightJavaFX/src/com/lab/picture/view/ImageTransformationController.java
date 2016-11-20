@@ -101,6 +101,7 @@ public class ImageTransformationController {
     @FXML
     private void onCancel(){
         flag[0] = false;
+        applyingFilter = false;
     }
 
     /**

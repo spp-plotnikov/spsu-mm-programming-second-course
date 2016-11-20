@@ -58,6 +58,7 @@ public class Filters {
 
     private boolean gray() {
 
+        
         PixelReader reader = img.getPixelReader();
         PixelWriter writer = dest.getPixelWriter();
         int size = (height - 1) * (width - 1);
