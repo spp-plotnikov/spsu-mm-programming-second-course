@@ -38,6 +38,7 @@ public class ImageTransformationController {
     private boolean[] flag;
     private Filters filter;
     private File file;
+    private boolean applyingFilter;
 
     // TODO: настроить получение списка от сервера
     private final static List<String> list = Arrays.asList("Gray", "SobelX", "SobelY");
@@ -77,7 +78,7 @@ public class ImageTransformationController {
      * @param nameOfFilter
      */
     private void applyFilter(final String nameOfFilter) {
-        if (img != null) {
+        if (img != null && !applyingFilter) {
             flag = new boolean[1];
             flag[0] = true;
             dest = new WritableImage(width, height);
@@ -87,8 +88,10 @@ public class ImageTransformationController {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    applyingFilter = true;
                     if (filter.applyFilter(nameOfFilter)) {
                         imageView.setImage(dest);
+                        applyingFilter = false;
                     }
                 }
             }).start();

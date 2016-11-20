@@ -2,7 +2,6 @@ package com.lab.picture;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
@@ -57,7 +56,7 @@ public class Filters {
         return answer;
     }
 
-    public boolean gray() {
+    private boolean gray() {
 
         PixelReader reader = img.getPixelReader();
         PixelWriter writer = dest.getPixelWriter();
@@ -84,7 +83,7 @@ public class Filters {
     }
 
 
-    public boolean sobel(String name) {
+    private boolean sobel(String name) {
 
         PixelReader reader = img.getPixelReader();
         PixelWriter writer = dest.getPixelWriter();
