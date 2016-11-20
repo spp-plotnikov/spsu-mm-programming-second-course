@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 class TaskQueue {
 
@@ -10,14 +11,20 @@ class TaskQueue {
     }
 
     public void add(Runnable r) {
-        lst.add(r);
+        synchronized (lst) {
+            lst.add(r);
+        }
     }
 
     public Runnable pop() {
         if(lst.size() > 0) {
             synchronized(lst) {
                 Runnable r = (Runnable)lst.get(0);
-                lst.remove(0);
+                try {
+                    lst.remove(0);
+                } catch (NoSuchElementException ex) {
+                    return null;
+                }
                 return r;
             }
         }
