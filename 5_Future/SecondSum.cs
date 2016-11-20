@@ -11,7 +11,7 @@ public class SecondSum : IArraySum
     public int Sum(int[] array)
     {
         int size = array.Length;
-        if (size != 1)
+        if(size != 1)
         {
             List<Task<int>> tasks = new List<Task<int>>();
             for (int i = 0; i < 2; i++)
