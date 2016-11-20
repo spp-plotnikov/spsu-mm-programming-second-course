@@ -7,7 +7,7 @@ using System.Threading;
 
 public class ThreadPool : IDisposable
 {
-    private int poolSize = 1;
+    private int poolSize = 3;
     private Queue<Action> tasks;
     private List<WorkingThread> threads = new List<WorkingThread>();
 
@@ -43,6 +43,10 @@ public class ThreadPool : IDisposable
             {
                 thread.Close();
             }
+        }
+        foreach (WorkingThread thread in threads)
+        {
+            thread.JoinT();
         }
     }
 }
