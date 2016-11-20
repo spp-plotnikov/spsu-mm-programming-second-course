@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("Prim")]
+[assembly: AssemblyTitle("Prim2")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("UralSOFT")]
-[assembly: AssemblyProduct("Prim")]
-[assembly: AssemblyCopyright("Copyright © UralSOFT 2016")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Prim2")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("80283f2b-1cae-4c82-b727-5bf735df5283")]
+[assembly: Guid("d8ccfb16-8e21-4f4d-96ab-919ef741513d")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
