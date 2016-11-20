@@ -4,8 +4,6 @@ import java.util.Queue;
 public class Main {
     public static final int count = 2;
     public static void main(String[] args) {
-        Queue queue = new LinkedList();
-        queue.remove();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(count);
         for (int i = count * 2; i > 0; i--) {
             Runnable t = new test(1000000009, i);

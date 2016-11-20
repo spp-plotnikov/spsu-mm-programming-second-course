@@ -17,14 +17,10 @@ class TaskQueue {
     }
 
     public Runnable pop() {
-        if(lst.size() > 0) {
-            synchronized(lst) {
+        synchronized(lst) {
+            if(lst.size() > 0) {
                 Runnable r = (Runnable)lst.get(0);
-                try {
-                    lst.remove(0);
-                } catch (NoSuchElementException ex) {
-                    return null;
-                }
+                lst.remove(0);
                 return r;
             }
         }
