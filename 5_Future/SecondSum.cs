@@ -15,8 +15,8 @@ public class SecondSum : IArraySum
             List<Task<int>> tasks = new List<Task<int>>();
             for (int i = 0; i < 2; i++)
             {
-                int[] arrayInThread = new int[size / 2 + (size % 2) * i];
-                Array.Copy(array, (size / 2) * i, arrayInThread, 0, size / 2 + (size % 2) * i);
+                int[] arrayInThread = new int[size / 2 + (size  %  2) * i];
+                Array.Copy(array, (size / 2) * i, arrayInThread, 0, size / 2 + (size  %  2) * i);
                 tasks.Add(Task.Run(() =>
                 {
                     return Sum(arrayInThread);
