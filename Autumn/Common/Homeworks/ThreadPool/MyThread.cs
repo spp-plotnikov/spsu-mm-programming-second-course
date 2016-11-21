@@ -12,29 +12,14 @@ namespace MyThreadPool
         Thread mySubThread_;
         Queue<Action> tasks_;
         bool work_ = true;
-        ManualResetEvent finished_ = new ManualResetEvent(false);
-        ManualResetEvent working_ = new ManualResetEvent(false);
+        public ManualResetEvent Finished = new ManualResetEvent(false);
+        public ManualResetEvent Working = new ManualResetEvent(false);
 
         public MyThread(Queue<Action> acts, int num)
         {
             tasks_ = acts;
             mySubThread_ = new Thread(MyThreadStart);
             mySubThread_.Start(num);
-        }
-
-        // check whether thread is busy or not
-        public bool IsWorking
-        {
-            get
-            {
-                return working_.WaitOne(0);
-            }
-        }
-
-        // notify that some new work appeared
-        public void Notify()
-        {
-            working_.Set();
         }
 
         public void MyThreadStart(object num)
@@ -60,10 +45,10 @@ namespace MyThreadPool
                     Monitor.Exit(tasks_);
 
                     // waiting for some new job or to finish the thread
-                    working_.Reset();
-                    finished_.Set();
-                    working_.WaitOne();
-                    finished_.Reset();
+                    Working.Reset();
+                    Finished.Set();
+                    Working.WaitOne();
+                    Finished.Reset();
                 }
             }
         }
@@ -72,8 +57,8 @@ namespace MyThreadPool
         public void Finish()
         {
             work_ = false;
-            finished_.WaitOne();
-            Notify();
+            Finished.WaitOne();
+            Working.Set();
             mySubThread_.Join();
         }
     }

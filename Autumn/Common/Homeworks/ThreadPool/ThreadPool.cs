@@ -29,14 +29,14 @@ namespace MyThreadPool
                 int itr = 0;
 
                 // find the thread to do the job
-                while (itr < numOfThreads_ && threads_[itr].IsWorking != false)
+                while (itr < numOfThreads_ && threads_[itr].Working.WaitOne(0) != false)
                 {
                     itr++;
                 }
 
                 if(itr < numOfThreads_)
                 {
-                    threads_[itr].Notify();
+                    threads_[itr].Working.Set();
                 }
 
                 Monitor.Pulse(poolActions_);
