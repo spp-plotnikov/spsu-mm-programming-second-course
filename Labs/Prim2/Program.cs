@@ -11,7 +11,12 @@ namespace Prim2
 {
     class Program
     {
-        static int[][] Pars(string namefile, ref List<int> notInQ)
+        static int arraySize;
+        static int[,] parsed = null;
+        static List<int>[] inQueue;
+        static List<int> notInQueue;
+
+        static int[,] Pars(string namefile, ref List<int> notInQ)
         {
             StreamReader file = new StreamReader(@namefile);
             var line = file.ReadLine();
@@ -24,18 +29,16 @@ namespace Prim2
                 return null;
             }
 
-            var arraySize = Convert.ToInt32(subStrings[0]);
-            int[][] arr = new int[arraySize][];
+            arraySize = Convert.ToInt32(subStrings[0]);
+            int[,] arr = new int[arraySize, arraySize + 1];
             int i, j;
 
             for (i = 0; i < arraySize; i++)
             {
                 notInQ.Add(i);
-                arr[i] = new int[arraySize + 1];
-                arr[i][arraySize] = i;
                 for (j = 0; j < arraySize; j++)
                 {
-                    arr[i][j] = 0;
+                    arr[i,j] = 0;
                 }
             }
 
@@ -58,31 +61,31 @@ namespace Prim2
                         return null;
                     }
                     int k = Convert.ToInt32(subStrings[2]);
-                    arr[j][i] = k;
-                    arr[i][j] = k;
+                    arr[j, i] = k;
+                    arr[i, j] = k;
                 }
             }
             return arr;
         }
 
-        static int[] MyMin(int[][] array, List<int> inQ, List<int> notInQ)
+        static int[] MyMin(int num)
         {
             int min = int.MaxValue;
             int line = -1;
             int col = -1;
-            for (int i = 0; i < array.Length; i++)
+            foreach(int i in inQueue[num])
             {
-                foreach (var el in notInQ)
+                foreach (var el in notInQueue)
                 {
                     //Console.Write(el + " ");
-                    if (array[i][el] == 0) continue;
+                    if (parsed[i, el] == 0) continue;
                     else
                     {
-                        if (array[i][el] < min)
+                        if (parsed[i, el] < min)
                         {
-                            min = array[i][el];
+                            min = parsed[i, el];
                             col = el;
-                            line = array[i][array[i].Length - 1];
+                            line = parsed[i, arraySize];
                         }
                           
                     }
@@ -90,6 +93,18 @@ namespace Prim2
                 //Console.WriteLine();
             }
             return new[] { line, col, min };
+        }
+
+        public static int[] TotMin(int[] m1, int[] m2)
+        {
+            if (m1[2] < m2[2])
+            {
+                return m1;
+            }
+            else
+            {
+                return m2;
+            }
         }
 
         static void Main(string[] args)
@@ -106,9 +121,7 @@ namespace Prim2
 
                 string pathIn = "";
                 string pathOut = "";
-                int[][] parsed = null;
-                List<int> inQueue = new List<int>();
-                List<int> notInQueue = new List<int>();
+                notInQueue = new List<int>();
                 int totalLength = 0;
 
                 pathIn = args[0];
@@ -120,6 +133,7 @@ namespace Prim2
                 }
 
                 parsed = Pars(pathIn, ref notInQueue);
+
                 if (parsed == null)
                 {
                     Console.WriteLine("NULL");
@@ -128,11 +142,18 @@ namespace Prim2
                 #endregion 
                 Console.WriteLine("parsed");
                 Stopwatch stopWatch = new Stopwatch();
+                inQueue = new List<int>[comm.Size];
+
+                for (int i = 0; i < comm.Size; i++)
+                {
+                    inQueue[i] = new List<int>();
+                }
+
                 stopWatch.Start();
-                inQueue.Add(0);
+                inQueue[0].Add(0);
                 notInQueue.Remove(0);
 
-                int[] minNow = MyMin(new int[][] { parsed[0]}, inQueue, notInQueue);
+                int[] minNow = MyMin(0);
 
                 //Console.WriteLine("MinNow: " + minNow[0] + " " + minNow[1] + " " + minNow[2]);
 
@@ -140,70 +161,17 @@ namespace Prim2
 
                 //Console.WriteLine("tl: " + totalLength);
 
-                inQueue.Add(minNow[1]);
+                inQueue[1 % comm.Size].Add(minNow[1]);
                 notInQueue.Remove(minNow[1]);
+               
 
-                int[][][] thr = new int[comm.Size][][];
                 int queLen = inQueue.Count();
+
+               
                 while (notInQueue.Any())
                 {
-                    if (comm.Rank == 0)
-                    {
-                        //Console.Write("inQ: ");
-                        //foreach (var q in inQueue)
-                        //{
-                        //    Console.Write(q + " ");
-                        //}
-                        //Console.WriteLine("\n");
-
-                        #region 
-                       // queLen = inQueue.Count();
-                        if (queLen <= comm.Size)
-                        {
-                            for (int i = 0; i < queLen; i++)
-                            {
-                                thr[i] = new int[][] { parsed[inQueue[i]] };
-                            }
-
-                            for (int i = queLen - 1; i < comm.Size; i++)
-                            {
-                                thr[i] = new int[][] { parsed[inQueue[0]] };
-                            }
-                        }
-                        else
-                        {
-                            int delta = queLen / comm.Size;
-                            //Console.WriteLine("delta: " + delta);
-                            for (int i = 0; i < comm.Size; i++)
-                            {
-                                if (i == comm.Size - 1)
-                                {
-                                    int _d = delta + queLen % comm.Size;
-                                    thr[i] = new int[_d][];
-
-                                    for (int j = 0; j < _d; j++)
-                                    {
-                                        //Console.WriteLine("del + _d; inQueue[j + delta * i]: " + inQueue[j + delta * i]);
-                                        thr[i][j] = parsed[inQueue[j + delta * i]];
-                                    }
-                                }
-                                else
-                                {
-                                    thr[i] = new int[delta][];
-
-                                    for (int j = 0; j < delta; j++)
-                                    {
-                                        //Console.WriteLine(i + ": inQueue[j + delta * i]: " + inQueue[j + delta * i]);
-                                        thr[i][j] = parsed[inQueue[j + delta * i]];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    #endregion
-                    int[][] x = comm.Scatter(thr, 0); //start parall
-
-                    int[] minHere = MyMin(x, inQueue, notInQueue);
+                    
+                    int[] minHere = MyMin(comm.Rank);
 
                     //Console.Write("min on " + comm.Rank + " is ");
                     //foreach (var t in minHere)
@@ -212,47 +180,26 @@ namespace Prim2
                     //}
                     //Console.Write("\n");
 
-                    int[][] preMins = comm.Gather(minHere, 0); //finish parall
 
-
-                    //if (comm.Rank == 0)
-                    //{
-                    //    Console.Write("preMin: ");
-                    //    foreach (var t in preMins)
-                    //    {
-                    //        Console.Write(t[2] + ", ");
-                    //    }
-                    //    Console.Write("\n");
-                    //}
-
-
+                    int[] _min = comm.Reduce(minHere, TotMin, 0); //finish parall
                     if (comm.Rank == 0)
                     {
-                        int _min = preMins[0][2];
-                        int[] _preMin = preMins[0];
+                        totalLength += _min[2];
+                        inQueue[queLen % comm.Size].Add(_min[1]);
+                        notInQueue.Remove(_min[1]);
+                        queLen++;                      
 
-                        for (int i = 1; i < preMins.Length; i++)
-                        {
-                            if (_min > preMins[i][2])
-                            {
-                                _min = preMins[i][2];
-                                _preMin = preMins[i];
-                            }
-                        }
-
-                        totalLength += _min;
-                        inQueue.Add(_preMin[1]);
-                        notInQueue.Remove(_preMin[1]);
-                        queLen++;
                         if (queLen % 100 == 0)
                         {
-                            notInQueue.Sort();
+                            //notInQueue.Sort();
                             Console.WriteLine("Qlen: " + queLen + "; tl: " + totalLength);
                         }
-                    }
+                    }                   
 
                     comm.Broadcast(ref notInQueue, 0);
+                    comm.Broadcast(ref inQueue, 0);
                 }
+            
                 stopWatch.Stop();
 
                 if (comm.Rank == 0)
