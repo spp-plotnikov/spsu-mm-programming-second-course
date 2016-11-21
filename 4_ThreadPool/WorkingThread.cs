@@ -21,7 +21,7 @@ public class WorkingThread
 
     public void Run()
     {
-        while (true)
+        while (flag)
         {
             Action task = new Action(() => { });
             lock (tasks)
@@ -33,10 +33,7 @@ public class WorkingThread
                 }
                 else
                 {
-                    if (flag == false)
-                    {
-                        return;
-                    }
+                    Monitor.Wait(tasks);
                 }
             }
             task();

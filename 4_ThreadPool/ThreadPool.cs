@@ -22,6 +22,7 @@ public class ThreadPool : IDisposable
         lock(tasks)
         {
             tasks.Enqueue(task);
+            Monitor.Pulse(tasks);
         }
     }
 
@@ -43,10 +44,7 @@ public class ThreadPool : IDisposable
             {
                 thread.Close();
             }
-        }
-        foreach (WorkingThread thread in threads)
-        {
-            thread.JoinT();
+            Monitor.PulseAll(tasks);
         }
     }
 }
