@@ -13,6 +13,8 @@ namespace Fibers
         public static List<uint> FibersToDelete = new List<uint>();
         public static int CurrentProcess;
         public static uint CurrentFiber;
+        public static int Counter = 0;
+        public static int ShareWithLowFiber = 4;
 
         private static void Delete()
         {
@@ -38,6 +40,7 @@ namespace Fibers
             }
         }
 
+        /*
         // unpriority 
         public static void Switch(bool fiberFinished)
         {
@@ -66,10 +69,10 @@ namespace Fibers
             }
             Fiber.Switch(CurrentFiber);
         }
-        
+        */
         
         // priority
-        /*public static void Switch(bool fiberFinished)
+        public static void Switch(bool fiberFinished)
         {
             if(fiberFinished)
             {
@@ -78,19 +81,40 @@ namespace Fibers
 
             if(FibersList.Count > 1)
             {
-                Process maxPriorityProcess = new Process();
-                int maxPriority = Int32.MinValue;
-                foreach(Process proc in Processes)
+                if (Counter != ShareWithLowFiber)
                 {
-                    if(proc != Processes[CurrentProcess] && proc.Priority > maxPriority)
+                    Counter++;
+                    Process maxPriorityProcess = new Process();
+                    int maxPriority = Int32.MinValue;
+                    foreach (Process proc in Processes)
                     {
-                        maxPriority = proc.Priority;
-                        maxPriorityProcess = proc;
+                        if (proc != Processes[CurrentProcess] && proc.Priority > maxPriority)
+                        {
+                            maxPriority = proc.Priority;
+                            maxPriorityProcess = proc;
+                        }
                     }
+                    CurrentProcess = Processes.IndexOf(maxPriorityProcess);
+                    CurrentFiber = FibersList[CurrentProcess];
+                    Console.WriteLine("Switched on the Fiber with priority {0}", Processes[CurrentProcess].Priority);
                 }
-                CurrentProcess = Processes.IndexOf(maxPriorityProcess);
-                CurrentFiber = FibersList[CurrentProcess];
-                Console.WriteLine("Switched on the Fiber with priority {0}", Processes[CurrentProcess].Priority);
+                else
+                {
+                    Counter = 0;
+                    Process minPriorityProcess = new Process();
+                    int minPriority = Int32.MaxValue;
+                    foreach (Process proc in Processes)
+                    {
+                        if (proc != Processes[CurrentProcess] && proc.Priority < minPriority)
+                        {
+                            minPriority = proc.Priority;
+                            minPriorityProcess = proc;
+                        }
+                    }
+                    CurrentProcess = Processes.IndexOf(minPriorityProcess);
+                    CurrentFiber = FibersList[CurrentProcess];
+                    Console.WriteLine("Switched on the Fiber with priority {0}", Processes[CurrentProcess].Priority);
+                }
             }
             else
             {
@@ -98,7 +122,6 @@ namespace Fibers
             }
             Fiber.Switch(CurrentFiber);
         }
-        */
     }
 
     public class Process
