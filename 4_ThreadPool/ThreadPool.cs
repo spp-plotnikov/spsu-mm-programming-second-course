@@ -19,7 +19,7 @@ public class ThreadPool : IDisposable
 
     public void Enqueue(Action task)
     {
-        lock(tasks)
+        lock (tasks)
         {
             tasks.Enqueue(task);
             Monitor.Pulse(tasks);
