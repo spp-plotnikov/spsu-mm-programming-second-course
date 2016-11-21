@@ -15,7 +15,7 @@ namespace MyThreadPool
             ThreadPool threadPool = new ThreadPool();
 
             Console.WriteLine("To start the creation of tasks provide a key.");
-            Console.WriteLine("Pree any key to finish this process");
+            Console.WriteLine("Press any key to finish this process");
             Console.WriteLine();
             Console.ReadKey();
 
