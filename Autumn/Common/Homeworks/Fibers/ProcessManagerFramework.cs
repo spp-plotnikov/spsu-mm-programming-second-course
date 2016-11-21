@@ -100,6 +100,7 @@ namespace Fibers
                 }
                 else
                 {
+                    // give access to low priority
                     Counter = 0;
                     Process minPriorityProcess = new Process();
                     int minPriority = Int32.MaxValue;
