@@ -11,21 +11,21 @@ namespace MyThreadPool
     {
         int numOfThreads_ = 5;
         MyThread[] threads_ = new MyThread[5];
-        Queue<Action> poolActions_ = new Queue<Action>();
+        public static Queue<Action> PoolActions = new Queue<Action>();
 
         public ThreadPool()
         {
-            for (int i = 1; i <= numOfThreads_; i++)
+            for (int i = 0; i < numOfThreads_; i++)
             {
-                threads_[i - 1] = new MyThread(poolActions_, i);
+                threads_[i] = new MyThread();
             }
         }
 
         public void AddToPool(Action newAction)
         {
-            lock (poolActions_)
+            lock (PoolActions)
             {
-                poolActions_.Enqueue(newAction);
+                PoolActions.Enqueue(newAction);
                 int itr = 0;
 
                 // find the thread to do the job
@@ -39,7 +39,7 @@ namespace MyThreadPool
                     threads_[itr].Working.Set();
                 }
 
-                Monitor.Pulse(poolActions_);
+                Monitor.Pulse(PoolActions);
             }
         }
 
@@ -51,6 +51,60 @@ namespace MyThreadPool
             }
 
             Console.WriteLine("All threads deleted");
+        }
+
+        private class MyThread
+        {
+            Thread mySubThread_;
+            bool work_ = true;
+            public ManualResetEvent Finished = new ManualResetEvent(false);
+            public ManualResetEvent Working = new ManualResetEvent(false);
+
+            public MyThread()
+            {
+                mySubThread_ = new Thread(MyThreadStart);
+                mySubThread_.Start();
+            }
+
+            public void MyThreadStart()
+            {
+                while (work_)
+                {
+                    // prevent from other threads changes of the tasks queue
+                    Monitor.Enter(PoolActions);
+
+                    // if there is something to do
+                    if (PoolActions.Count > 0)
+                    {
+                        Action myCurAction = PoolActions.Dequeue();
+                        myCurAction();
+                        Console.WriteLine("The task is completed");
+                        Console.WriteLine();
+                        Console.WriteLine("---------------------------------------------------");
+                        Monitor.Exit(PoolActions);
+                    }
+                    else
+                    {
+                        // don't need to change the tasks queue, finish blocking immediately
+                        Monitor.Exit(PoolActions);
+
+                        // waiting for some new job or to finish the thread
+                        Working.Reset();
+                        Finished.Set();
+                        Working.WaitOne();
+                        Finished.Reset();
+                    }
+                }
+            }
+
+            // end the thread
+            public void Finish()
+            {
+                work_ = false;
+                Finished.WaitOne();
+                Working.Set();
+                mySubThread_.Join();
+            }
         }
     }
 }

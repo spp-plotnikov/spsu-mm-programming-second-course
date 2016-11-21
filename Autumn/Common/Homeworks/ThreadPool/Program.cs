@@ -22,7 +22,7 @@ namespace MyThreadPool
             }
 
             // wait for tasks to be completed
-            Thread.Sleep(2000);
+            Thread.Sleep(2800);
             threadPool.Dispose();
             Console.ReadLine();
         }
