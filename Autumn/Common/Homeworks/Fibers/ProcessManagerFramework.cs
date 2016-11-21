@@ -14,7 +14,7 @@ namespace Fibers
         public static int CurrentProcess;
         public static uint CurrentFiber;
         public static int Counter = 0;
-        public static int ShareWithLowFiber = 4;
+        public static int ShareWithLowFiber = 5;
 
         private static void Delete()
         {
@@ -81,38 +81,29 @@ namespace Fibers
 
             if(FibersList.Count > 1)
             {
-                if (Counter != ShareWithLowFiber)
+                Counter++;
+                Process maxPriorityProcess = new Process();
+                int maxPriority = Int32.MinValue;
+                foreach (Process proc in Processes)
                 {
-                    Counter++;
-                    Process maxPriorityProcess = new Process();
-                    int maxPriority = Int32.MinValue;
-                    foreach (Process proc in Processes)
+                    if (proc != Processes[CurrentProcess] && proc.Priority > maxPriority)
                     {
-                        if (proc != Processes[CurrentProcess] && proc.Priority > maxPriority)
-                        {
-                            maxPriority = proc.Priority;
-                            maxPriorityProcess = proc;
-                        }
+                        maxPriority = proc.Priority;
+                        maxPriorityProcess = proc;
                     }
-                    CurrentProcess = Processes.IndexOf(maxPriorityProcess);
+                }
+
+                if (Counter == ShareWithLowFiber)
+                {
+                    Counter = 0;
+                    int tmp = new Random().Next(1, Processes.Count - 1);
+                    CurrentProcess = tmp;
                     CurrentFiber = FibersList[CurrentProcess];
                     Console.WriteLine("Switched on the Fiber with priority {0}", Processes[CurrentProcess].Priority);
                 }
                 else
                 {
-                    // give access to low priority
-                    Counter = 0;
-                    Process minPriorityProcess = new Process();
-                    int minPriority = Int32.MaxValue;
-                    foreach (Process proc in Processes)
-                    {
-                        if (proc != Processes[CurrentProcess] && proc.Priority < minPriority)
-                        {
-                            minPriority = proc.Priority;
-                            minPriorityProcess = proc;
-                        }
-                    }
-                    CurrentProcess = Processes.IndexOf(minPriorityProcess);
+                    CurrentProcess = Processes.IndexOf(maxPriorityProcess);
                     CurrentFiber = FibersList[CurrentProcess];
                     Console.WriteLine("Switched on the Fiber with priority {0}", Processes[CurrentProcess].Priority);
                 }
