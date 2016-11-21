@@ -17,16 +17,16 @@ class ProcessComparator implements Comparator<Process> {
 }
 
 public class ProcessScheduler {
-    private PriorityQueue<Process> prQ;
-    private Queue<Process> regQ;
-    private volatile Process next, cur;
+    private volatile TreeSet<Process> prQ;
+    private volatile Queue<Process> regQ;
+    private volatile Process next;
     public volatile AtomicBoolean done;
     public boolean isPriorityMode;
 
     public ProcessScheduler(boolean mode, int n) {
         done = new AtomicBoolean(false);
         isPriorityMode = mode;
-        prQ = new PriorityQueue<>(new ProcessComparator());
+        prQ = new TreeSet<>(new ProcessComparator());
         regQ = new LinkedList<>();
 
         for (int i = 0; i < n; i++) {
@@ -39,24 +39,42 @@ public class ProcessScheduler {
     // isFinished = true if the current fiber has just finished and no longer needs to be resumed
     // returns true if all other fibers are finished
     public boolean switchProcess(Process cur, boolean isFinished) throws SuspendExecution, InterruptedException {
-        // Figuring out who's next...
-        if (isPriorityMode)
-            next = prQ.poll();
-        else
-            next = regQ.poll();
-        if (next == null) {
+        if (isPriorityMode) {
             // All other fibers are already stopped!
-            return true;
+            if (prQ.isEmpty() || prQ.size() == 1 && prQ.first() == cur)
+                return true;
+        } else {
+            if (regQ.isEmpty() || regQ.size() == 1 && regQ.peek() == cur)
+                return true;
         }
+
+        // Figuring out who's next...
+        do {
+            if (isPriorityMode) {
+                Random generator = new Random();
+                int rand = generator.nextInt(10);
+                if (rand < 3) // 30%
+                    next = prQ.last();
+                else
+                    next = prQ.first();
+                prQ.remove(next);
+                System.out.println("removed " + next);
+            } else
+                next = regQ.poll();
+        } while (next == cur);
 
         // If the current fiber hasn't finished yet, forward it
         if (!isFinished) {
+            System.out.println("adding " + cur);
             if (isPriorityMode)
-                prQ.add(cur);
+                if (!prQ.contains(cur))
+                    prQ.add(cur);
             else
-                regQ.add(cur);
+                if (!regQ.contains(cur))
+                    regQ.add(cur);
         }
 
+        System.out.println(next);
         // To avoid non-atomic switch!
         new Fiber<Void>((SuspendableRunnable) () -> {
             while (cur.getState() == Strand.State.RUNNING) { }
@@ -71,18 +89,24 @@ public class ProcessScheduler {
     }
 
     public void activate() {
-        if (isPriorityMode)
-            next = prQ.poll();
+        if (isPriorityMode) {
+            next = prQ.first();
+            prQ.remove(next);
+        }
         else
             next = regQ.poll();
         next.unpark();
     }
 
     public void join() throws Exception {
-        Process cur = null;
+        Process cur;
         for (;;) {
-            if (isPriorityMode)
-                cur = prQ.peek();
+            if (isPriorityMode) {
+                if (!prQ.isEmpty())
+                    cur = prQ.first();
+                else
+                    cur = null;
+            }
             else
                 cur = regQ.peek();
             if (done.get())
