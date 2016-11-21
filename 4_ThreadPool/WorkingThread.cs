@@ -26,7 +26,7 @@ public class WorkingThread
             Action task = new Action(() => { });
             lock (tasks)
             {
-                if (tasks.Count() != 0)
+                if(tasks.Count() != 0)
                 {
                     task = tasks.Dequeue();
                     Console.WriteLine("Thread{0} is working, num of tasks in the queue - {1}", threadNumber, tasks.Count());
@@ -34,6 +34,10 @@ public class WorkingThread
                 else
                 {
                     Monitor.Wait(tasks);
+                    if(flag == false)
+                    {
+                        return;
+                    }
                 }
             }
             task();

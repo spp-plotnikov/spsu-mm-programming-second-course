@@ -40,7 +40,7 @@ public class ThreadPool : IDisposable
         lock (tasks)
         {
             tasks.Clear();
-            foreach(WorkingThread thread in threads)
+            foreach (WorkingThread thread in threads)
             {
                 thread.Close();
             }
