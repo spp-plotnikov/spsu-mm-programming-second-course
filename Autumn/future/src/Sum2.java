@@ -2,23 +2,24 @@ import java.util.concurrent.*;
 
 class Sum2 implements IArraySum{
     public int sum(int a[]) {
-        int countProc = Runtime.getRuntime().availableProcessors() / 2;
-        ExecutorService es = Executors.newFixedThreadPool(countProc);
-        Future<Integer>[] future = new Future[countProc];
-        for (int i = 0; i < countProc; i++) {
-            int countElement = a.length / countProc + 1;
-            int l = i * countElement;
-            int r = l + countElement - 1;
-            if (r >= a.length) {
-                r = a.length - 1;
-            }
-            future[i] = es.submit(new func(a, l, r));
+        if (a.length == 1) {
+            return a[0];
         }
+        ExecutorService es = Executors.newFixedThreadPool(2);
+        int[] buf1 = new int[a.length / 2];
+        int[] buf2 = new int[a.length / 2 + (a.length & 1)];
+        for (int i = 0; i < a.length / 2; i++) {
+            buf1[i] = a[i];
+        }
+        int k = 0;
+        for (int i = a.length / 2; i < a.length; i++) {
+            buf2[k++] = a[i];
+        }
+        Future<Integer> future1 = es.submit(new func(buf1));
+        Future<Integer> future2 = es.submit(new func(buf2));
         int res = 0;
         try {
-            for (int i = 0; i < countProc; i++) {
-                res += future[i].get();
-            }
+            res = future1.get() + future2.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -27,19 +28,15 @@ class Sum2 implements IArraySum{
         es.shutdown();
         return res;
     }
-        static class func implements Callable<Integer> {
-        int[] mas;
-        int l;
-        int r;
-        func(int mas[], int l, int r) {
-            this.mas = mas;
-            this.l = l;
-            this.r = r;
+    static class func implements Callable<Integer> {
+        int[] a;
+        func(int a[]) {
+            this.a = a;
         }
         public Integer call() {
             int sum = 0;
-            for (int i = l; i <= r; i++) {
-                sum += mas[i];
+            for (int i = 0; i < a.length; i++) {
+                sum += a[i];
             }
             return sum;
         }

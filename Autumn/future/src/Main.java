@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class Main {
-    public static final int size = 300000000;
+    public static final int size = 100000000;
     public static void main(String[] args) {
         int[] mas = new int[size];
         Random r = new Random(System.currentTimeMillis());
