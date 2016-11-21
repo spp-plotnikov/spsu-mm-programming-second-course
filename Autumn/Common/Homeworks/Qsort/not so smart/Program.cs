@@ -15,9 +15,9 @@ namespace Qsort
         // declare send operations for root
         public enum SendRoot 
         { 
-            endOfWork = -1,
-            sizeOfArray = 0, 
-            arrayItself = 1 
+            EndOfWork = -1,
+            SizeOfArray = 0, 
+            ArrayItself = 1 
         }
 
         // sequential qsort
@@ -89,8 +89,8 @@ namespace Qsort
                     toSend[j - tmp] = arr[j];
                 }
 
-                comm.Send(numPerOne, (i + 1), (int)SendRoot.sizeOfArray); // send the size of the array
-                comm.Send(toSend, (i + 1), (int)SendRoot.arrayItself); // send subarray
+                comm.Send(numPerOne, (i + 1), (int)SendRoot.SizeOfArray); // send the size of the array
+                comm.Send(toSend, (i + 1), (int)SendRoot.ArrayItself); // send subarray
             }
 
             // the last processor case
@@ -101,13 +101,13 @@ namespace Qsort
                 lastSend[i - (numOfProcesses - 1) * numPerOne] = arr[i];
             }
 
-            comm.Send(lastLen, numOfProcesses, (int)SendRoot.sizeOfArray); // send the size of the array
-            comm.Send(lastSend, numOfProcesses, (int)SendRoot.arrayItself); // send subarray
+            comm.Send(lastLen, numOfProcesses, (int)SendRoot.SizeOfArray); // send the size of the array
+            comm.Send(lastSend, numOfProcesses, (int)SendRoot.ArrayItself); // send subarray
 
             // if there are too many processes abort exceeding
             for (int i = numOfProcesses + 1; i < comm.Size; i++)
             {
-                comm.Send(-1, i, (int)SendRoot.sizeOfArray); // send the size of the array
+                comm.Send(-1, i, (int)SendRoot.SizeOfArray); // send the size of the array
             }
 
             // we will store results in a separate copy
@@ -116,9 +116,9 @@ namespace Qsort
             // now receive all the parts 
             for (int i = 0; i < numOfProcesses; i++)
             {
-                int subarrSize = comm.Receive<int>(i + 1, (int)SendRoot.sizeOfArray);
+                int subarrSize = comm.Receive<int>(i + 1, (int)SendRoot.SizeOfArray);
                 int[] newArr = new int[subarrSize];
-                comm.Receive(i + 1, (int)SendRoot.arrayItself, ref newArr);
+                comm.Receive(i + 1, (int)SendRoot.ArrayItself, ref newArr);
                 for (int j = 0; j < subarrSize; j++)
                 {
                     newCopy[j + i * numPerOne] = newArr[j];
@@ -195,17 +195,17 @@ namespace Qsort
                 return; // we don't need this (we are in child)
             }
 
-            int arrSize = comm.Receive<int>(0, (int)SendRoot.sizeOfArray);
+            int arrSize = comm.Receive<int>(0, (int)SendRoot.SizeOfArray);
             if(arrSize == -1)
             {
                 return; // we don't need this process
             }
 
             int[] newArr = new int[arrSize];
-            comm.Receive(0, (int)SendRoot.arrayItself, ref newArr);
+            comm.Receive(0, (int)SendRoot.ArrayItself, ref newArr);
             PlQsort(ref newArr, 0, arrSize - 1);
-            comm.Send(arrSize, 0, (int)SendRoot.sizeOfArray);
-            comm.Send(newArr, 0, (int)SendRoot.arrayItself);
+            comm.Send(arrSize, 0, (int)SendRoot.SizeOfArray);
+            comm.Send(newArr, 0, (int)SendRoot.ArrayItself);
             return;
         }
 
