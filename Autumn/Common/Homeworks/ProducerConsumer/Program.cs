@@ -41,7 +41,6 @@ namespace ProducerConsumer
             Console.WriteLine("Press the key again to stop the process");
             Console.ReadKey();
 
-            // here the magic happends
             Workspace.DoTheWork();
         }
     }
