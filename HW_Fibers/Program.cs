@@ -15,6 +15,8 @@ namespace ProcessManager
         public static Dictionary<uint, int> allFibersWithPriority = new Dictionary<uint, int>();
         public static Dictionary<int, uint> supportDict = new Dictionary<int, uint>();
         private static uint currentFiber;
+        public static int NumOfIter = 0;
+        public static int Rand = 1000;
 
 
         public static void DeleteAllFibers()
@@ -58,7 +60,37 @@ namespace ProcessManager
 
 
         //we sort our fibers by priority and after that we just use FIFO's Switch function
+
+        public static int GetMaxIdx()
+        {
+            int max = Priority[0];
+            int curIdx = 0;
+            for (int i = 0; i < Priority.Count; i++)
+            {
+                if (Priority[i] > max)
+                {
+                    max = Priority[i];
+                    curIdx = i;
+                }
+            }
+            return curIdx;
+        }
         
+        public static int GetMinIdx()
+        {
+            int min = Priority[0];
+            int curIdx = 0;
+            for (int i = 0; i < Priority.Count; i++)
+            {
+                if (Priority[i] < min)
+                {
+                    min = Priority[i];
+                    curIdx = i;
+                }
+            }
+            return curIdx;
+        }
+
         public static void Switch(bool fiberFinished)
         {
             if(allFibers.Count == 0)
@@ -77,15 +109,16 @@ namespace ProcessManager
                 }
                 else
                 {
-                    int max = Priority[0];
                     int curIdx = 0;
-                    for (int i = 0; i < Priority.Count; i++)
+                    if (NumOfIter == Rand)
                     {
-                        if(Priority[i] > max)
-                        {
-                            max = Priority[i];
-                            curIdx = i;
-                        }
+                        curIdx = GetMinIdx();
+                        NumOfIter = 0;
+                    }
+                    else
+                    {
+                        curIdx = GetMaxIdx();
+                        NumOfIter++;
                     }
                     currentFiber = allFibers[curIdx];
                     Fiber.Switch(currentFiber);
@@ -93,15 +126,16 @@ namespace ProcessManager
             }
             else
             {
-                int max = Priority[0];
                 int curIdx = 0;
-                for (int i = 0; i < Priority.Count; i++)
+                if (NumOfIter == Rand)
                 {
-                    if(Priority[i] > max)
-                    {
-                        max = Priority[i];
-                        curIdx = i;
-                    }
+                    curIdx = GetMinIdx();
+                    NumOfIter = 0;
+                }
+                else
+                {
+                    curIdx = GetMaxIdx();
+                    NumOfIter++;
                 }
                 currentFiber = allFibers[curIdx];
                 Fiber.Switch(currentFiber);
