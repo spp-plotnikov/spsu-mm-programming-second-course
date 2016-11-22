@@ -11,82 +11,98 @@ namespace ProducerConsumer
     {
         // storage for all available things 
         public static List<int> Goods = new List<int>();
-        
-        // storages for producers and consumers respectively 
-        public static List<Producer> Producers = new List<Producer>();
-        public static List<Consumer> Consumers = new List<Consumer>();
-
-        class ThreadProducer
-        {
-            public Thread thread;
-            public bool State;
-            public Producer MyProducer;
-
-            public ThreadProducer(bool status, Producer myProd)
-            {
-                this.State = status;
-                this.MyProducer = myProd;
-                thread = new Thread(this.Run);
-                thread.Start();
-            }
-
-            void Run()
-            {
-                while (State) MyProducer.DoSomething(true, ref Goods);
-            }
-        }
-
-        class ThreadConsumer
-        {
-            public Thread thread;
-            public bool State;
-            public Consumer MyConsumer;
-
-            public ThreadConsumer(bool status, Consumer myCons)
-            {
-                this.State = status;
-                this.MyConsumer = myCons;
-                thread = new Thread(this.Run);
-                thread.Start();
-            }
-
-            void Run()
-            {
-                while (State) MyConsumer.DoSomething(true, ref Goods);
-            }
-        }
+        private static bool _working = true;
+        private static Random _rnd = new Random();
+        public static int NumOfProducers;
+        public static int NumOfConsumers;
 
         public static void DoTheWork()
         {
-            ThreadProducer[] prodsThreads = new ThreadProducer[Producers.Count];
-            ThreadConsumer[] consThreads = new ThreadConsumer[Consumers.Count];
+            ThreadProducer[] prodsThreads = new ThreadProducer[NumOfProducers];
+            ThreadConsumer[] consThreads = new ThreadConsumer[NumOfConsumers];
 
             // creating threads for producers
-            for (int i = 0; i < Producers.Count; i++)
+            for (int i = 0; i < NumOfProducers; i++)
             {
-                prodsThreads[i] = new ThreadProducer(true, Producers[i]);
+                prodsThreads[i] = new ThreadProducer(i);
             }
 
             // creating threads for consumers
-            for (int i = 0; i < Consumers.Count; i++)
+            for (int i = 0; i < NumOfConsumers; i++)
             {
-                consThreads[i] = new ThreadConsumer(true, Consumers[i]);
+                consThreads[i] = new ThreadConsumer(i);
             }
 
             Console.ReadKey(true);
+            _working = false;
+        }
 
-            // finish the work
-            foreach (ThreadConsumer thread in consThreads)
+        private class ThreadProducer
+        {
+            public Thread thread;
+            private readonly int _name;
+            public ThreadProducer(int name)
             {
-                thread.State = false;
+                _name = name;
+                thread = new Thread(this.Run);
+                thread.Start();
             }
 
-            foreach (ThreadProducer thread in prodsThreads)
+            void Run()
             {
-                thread.State = false;
+                while (_working) TakeSomething();
             }
 
-            Console.ReadKey();
+            public void TakeSomething()
+            {
+                int toPut;
+                Monitor.Enter(Goods);
+                toPut = _rnd.Next(0, 1000);
+                Console.WriteLine("Producer number {0} added to list {1}", _name, toPut);
+                Goods.Add(toPut);
+                Monitor.Pulse(Goods);
+                Monitor.Exit(Goods);
+                Thread.Sleep(400);
+            }
+        }
+
+        private class ThreadConsumer
+        {
+            public Thread thread;
+            private readonly int _name;
+             
+            public ThreadConsumer(int name)
+            {
+                _name = name;
+                thread = new Thread(this.Run);
+                thread.Start();
+            }
+
+            void Run()
+            {
+                while (_working) TakeSomething();
+            }
+
+            // removes some element from the given list
+            public void TakeSomething()
+            {
+                Monitor.Enter(Goods);
+
+                if (Goods.Count > 0)
+                {
+                    int toRemove = _rnd.Next(0, Goods.Count - 1);
+                    Console.WriteLine("Consumer number {0} removed from list element {1}", _name, Goods[toRemove]);
+                    Goods.Remove(Goods[toRemove]);
+                }
+                else
+                {
+                    Console.WriteLine("There is nothing to remove from the list!");
+                    Monitor.Wait(Goods);
+                }
+
+                Monitor.Exit(Goods);
+                Thread.Sleep(400);
+            }
         }
     }
 }

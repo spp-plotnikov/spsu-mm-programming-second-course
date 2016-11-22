@@ -20,28 +20,21 @@ namespace ProducerConsumer
             while (!res)
                 res = Int32.TryParse(Console.ReadLine(), out numOfProducers);
 
-            for (int i = 0; i < numOfProducers; i++)
-            {
-                Producer prod = new Producer(i + 1);
-                Workspace.Producers.Add(prod);
-            }
-            
+            Workspace.NumOfProducers = numOfProducers;
             res = false;
             Console.WriteLine("Enter the number of consumers:");
             while (!res)
                 res = Int32.TryParse(Console.ReadLine(), out numOfConsumers);
 
-            for (int i = 0; i < numOfConsumers; i++)
-            {
-                Consumer cons = new Consumer(i + 1);
-                Workspace.Consumers.Add(cons);
-            }
+            Workspace.NumOfConsumers = numOfConsumers;
 
             Console.WriteLine("Press the key to begin");
             Console.WriteLine("Press the key again to stop the process");
             Console.ReadKey();
 
             Workspace.DoTheWork();
+            Console.WriteLine("All threads finished");
+            Console.ReadKey();
         }
     }
 }
