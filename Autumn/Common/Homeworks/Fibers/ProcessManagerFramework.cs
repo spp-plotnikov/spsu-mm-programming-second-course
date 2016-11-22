@@ -14,7 +14,8 @@ namespace Fibers
         public static int CurrentProcess;
         public static uint CurrentFiber;
         public static int Counter = 0;
-        public static int ShareWithLowFiber = 5;
+        public static int ShareWithLowFiber = 3;
+        public static Random Rnd1 = new Random();
 
         private static void Delete()
         {
@@ -96,7 +97,7 @@ namespace Fibers
                 if (Counter == ShareWithLowFiber)
                 {
                     Counter = 0;
-                    int tmp = new Random().Next(1, Processes.Count - 1);
+                    int tmp = Rnd1.Next(0, Processes.Count - 1);
                     CurrentProcess = tmp;
                     CurrentFiber = FibersList[CurrentProcess];
                     Console.WriteLine("Switched on the Fiber with priority {0}", Processes[CurrentProcess].Priority);
