@@ -10,8 +10,7 @@ namespace ThreadPool
         private Queue<ThreadStart> queueOfTasks = new Queue<ThreadStart>();
         private int numOfThreads;
         private bool disposed = false;
-        private static Mutex addTaskMutex = new Mutex(false);
-        private static Mutex getTaskMutex = new Mutex(false);
+        private static Mutex taskMutex = new Mutex(false);
         public ThreadPool(int numOfThreads) // Constructor
         {
             this.numOfThreads = numOfThreads;
@@ -19,10 +18,10 @@ namespace ThreadPool
 
         public void AddTask(ThreadStart threadStart) // Adding task with some function
         {
-            addTaskMutex.WaitOne();
-            if (disposed) { throw new NotImplementedException(); }
+            taskMutex.WaitOne();
+            if (disposed) { throw new ObjectDisposedException("ThreadPool"); }
             queueOfTasks.Enqueue(threadStart);
-            addTaskMutex.ReleaseMutex();
+            taskMutex.ReleaseMutex();
         }
 
         public void StartWorking() // Start
@@ -38,14 +37,17 @@ namespace ThreadPool
         {
             while (!disposed)
             {
-                getTaskMutex.WaitOne();
-                try
+                taskMutex.WaitOne();
+                if (queueOfTasks.Count != 0)
                 {
                     ThreadStart start = queueOfTasks.Dequeue();
+                    taskMutex.ReleaseMutex();
                     start();
                 }
-                catch { }
-                getTaskMutex.ReleaseMutex();
+                else
+                {
+                    taskMutex.ReleaseMutex();
+                }
             }
         }
 
@@ -53,7 +55,5 @@ namespace ThreadPool
         {
             disposed = true;
         }
-
-
     }
 }

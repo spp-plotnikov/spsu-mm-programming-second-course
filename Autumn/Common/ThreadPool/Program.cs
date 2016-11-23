@@ -11,7 +11,6 @@ namespace ThreadPool
             ThreadPool threadPool = new ThreadPool(5);
             TestAddingOfTasks.AddTasks(threadPool);
             threadPool.StartWorking();
-            TestAddingOfTasks.AddTasks(threadPool);
             Thread.Sleep(500);
             threadPool.Dispose();
             Console.ReadKey();
