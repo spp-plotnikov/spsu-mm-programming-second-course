@@ -30,6 +30,9 @@ namespace ProducerConsumer
         void Run()
         {
             while (Program.Working) AddSomething();
+            Monitor.Enter(_goods);
+            Monitor.Pulse(_goods);
+            Monitor.Exit(_goods);
         }
 
         public void AddSomething()

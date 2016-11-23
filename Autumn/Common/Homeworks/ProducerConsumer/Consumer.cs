@@ -35,25 +35,29 @@ namespace ProducerConsumer
         // removes some element from the given list
         public void TakeSomething()
         {
-            if (_goods.Count > 0)
+            Monitor.Enter(_goods);
+
+            if (!Program.Working)
             {
-                Monitor.Enter(_goods);
-
-                if (_goods.Count != 0)
-                {
-                    int toRemove = _rnd.Next(0, _goods.Count - 1);
-                    Console.WriteLine("Consumer number {0} removed from list element {1}", _name, _goods[toRemove]);
-                    _goods.Remove(_goods[toRemove]);
-                }
-                else
-                {
-                    Console.WriteLine("There is nothing to remove from the list!");
-                    Monitor.Wait(_goods);
-                }
-
+                Monitor.Pulse(_goods);
                 Monitor.Exit(_goods);
-                Thread.Sleep(400);
+                return;
             }
+
+            if (_goods.Count != 0)
+            {
+                int toRemove = _rnd.Next(0, _goods.Count - 1);
+                Console.WriteLine("Consumer number {0} removed from list element {1}", _name, _goods[toRemove]);
+                _goods.Remove(_goods[toRemove]);
+            }
+            else
+            {
+                Console.WriteLine("There is nothing to remove from the list!");
+                Monitor.Wait(_goods);
+            }
+
+            Monitor.Exit(_goods);
+            Thread.Sleep(400);
         }
     }
 }

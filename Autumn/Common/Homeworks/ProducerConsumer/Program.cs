@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProducerConsumer
@@ -18,7 +19,6 @@ namespace ProducerConsumer
             List<int> goods = new List<int>();
 
             // reading the initial number of producers and consumers
-
             Console.WriteLine("Enter the number of producers:");
             while (!res)
                 res = Int32.TryParse(Console.ReadLine(), out numOfProducers);
@@ -28,8 +28,8 @@ namespace ProducerConsumer
             while (!res)
                 res = Int32.TryParse(Console.ReadLine(), out numOfConsumers);
 
-            List <Producer> prods = new List <Producer>();
-            List <Consumer> cons = new List <Consumer>();
+            Producer[] prods = new Producer[numOfProducers];
+            Consumer[] cons = new Consumer[numOfConsumers];
 
             Console.WriteLine("Press the key to begin");
             Console.WriteLine("Press the key again to stop the process");
@@ -38,30 +38,25 @@ namespace ProducerConsumer
             // creating threads for producers
             for (int i = 0; i < numOfProducers; i++)
             {
-                Producer prod = new Producer(i, goods);
-                prods.Add(prod);
+                prods[i] = new Producer(i, goods);
             }
 
             // creating threads for consumers
             for (int i = 0; i < numOfConsumers; i++)
             {
-                Consumer con = new Consumer(i, goods);
-                cons.Add(con);
+                cons[i] = new Consumer(i, goods);
             }
 
             Console.ReadKey(true);
             Working = false;
-
             for (int i = 0; i < numOfProducers; i++)
             {
-                prods[0].Finish();
-                prods.RemoveAt(0);
+                prods[i].Finish();
             }
             
             for (int i = 0; i < numOfConsumers; i++)
             {
-                cons[0].Finish();
-                cons.RemoveAt(0);
+                cons[i].Finish();
             }
             
             Console.WriteLine("All threads finished");
