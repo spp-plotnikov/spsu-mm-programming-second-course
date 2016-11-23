@@ -1,11 +1,22 @@
 public class Main {
+    final static int size = 8000000; // if crashes, it means we have to enlarge it
+    final static int count = 10;
 
     public static void main(String[] args) throws Exception {
-        //FirstExamSystem f = new FirstExamSystem();
-        SecondExamSystem es = new SecondExamSystem(500000);
-        Deanery d = new Deanery(es);
-        Thread t = new Thread(d);
-        t.start();
-        t.join();
+        ExamSystem systems[] = { new FirstExamSystem(size), new SecondExamSystem(size) };
+        for (ExamSystem es: systems) {
+            System.out.println("System type: " + es.getClass());
+            long startTime = System.currentTimeMillis();
+            Thread threads[] = new Thread[count];
+            for (int i = 0; i < count; i++) {
+                AngryRectorate r = new AngryRectorate(es);
+                threads[i] = new Thread(r);
+                threads[i].start();
+            }
+            for (Thread t: threads)
+                t.join();
+            System.out.println(es.getStats());
+            System.out.println("== Elapsed: " + (System.currentTimeMillis() - startTime) + "ms ==");
+        }
     }
 }

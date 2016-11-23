@@ -7,8 +7,10 @@ public class SecondExamSystem implements ExamSystem {
     private volatile int mutexesUsed;
     private HashMap<Long, ArrayList<Long>> table;
     private HashMap<Long, Integer> idToMutex;
+    int contCount, addCount, remCount;
 
     public SecondExamSystem(int maxSize) {
+        contCount = addCount = remCount = 0;
         mutexesUsed = 0;
         idToMutex = new HashMap<>(maxSize);
         table = new HashMap<>(maxSize);
@@ -18,6 +20,7 @@ public class SecondExamSystem implements ExamSystem {
     }
 
     public void add(long studentId, long courseId) {
+        addCount += 1;
         int mutexIdx;
         synchronized (idToMutex) {
             if (!idToMutex.containsKey(studentId)) {
@@ -37,8 +40,7 @@ public class SecondExamSystem implements ExamSystem {
                 newList.add(courseId);
                 table.put(studentId, newList);
             } else {
-                if (!list.contains(courseId))
-                    list.add(courseId);
+                list.add(courseId);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -48,10 +50,11 @@ public class SecondExamSystem implements ExamSystem {
     }
 
     public void remove(long studentId, long courseId) {
+        remCount += 1;
         int mutexIdx;
         synchronized (idToMutex) {
             if (!idToMutex.containsKey(studentId)) {
-                System.out.println("No such student: " + studentId);
+                // System.out.println("No such student: " + studentId);
                 return; // nothing to delete
             } else {
                 mutexIdx = idToMutex.get(studentId);
@@ -61,13 +64,8 @@ public class SecondExamSystem implements ExamSystem {
         try {
             mutexes[mutexIdx].acquire();
             ArrayList<Long> list = table.get(studentId);
-            if (list == null) {
-                System.out.println("No records for student: " + studentId);
-            } else {
-                if (!list.contains(courseId))
-                    System.out.println("No such record: " + studentId + " course: " + courseId);
-                else
-                    list.remove(courseId);
+            if (list != null) {
+                list.remove(courseId);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -77,17 +75,19 @@ public class SecondExamSystem implements ExamSystem {
     }
 
     public boolean contains(long studentId, long courseId) {
+        contCount += 1;
         int mutexIdx;
         synchronized (idToMutex) {
             if (!idToMutex.containsKey(studentId))
-                return false; // nothing to delete
+                return false;
             else
                 mutexIdx = idToMutex.get(studentId);
         }
 
         try {
             mutexes[mutexIdx].acquire();
-            return table.get(studentId).contains(courseId);
+            ArrayList<Long> list = table.get(studentId);
+            return !(list == null || !list.contains(courseId));
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -95,5 +95,12 @@ public class SecondExamSystem implements ExamSystem {
         }
 
         return false; // unreachable
+    }
+
+    public String getStats() {
+        return    "Contains queries: " + contCount + "\n"
+                + "Add queries: " + addCount + "\n"
+                + "Remove queries: " + remCount + "\n"
+                + "Total queries: " + (contCount + addCount + remCount);
     }
 }

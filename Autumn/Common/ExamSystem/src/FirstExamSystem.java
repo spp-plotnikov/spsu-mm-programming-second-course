@@ -3,12 +3,15 @@ import java.util.HashMap;
 
 public class FirstExamSystem implements ExamSystem {
     private HashMap<Long, ArrayList<Long>> table;
+    int contCount, addCount, remCount;
 
     public FirstExamSystem(int maxSize) {
+        contCount = addCount = remCount = 0;
         table = new HashMap<>(maxSize);
     }
 
     public void add(long studentId, long courseId) {
+        addCount += 1;
         synchronized (table) {
             ArrayList<Long> list = table.get(studentId);
             if (list == null) {
@@ -16,29 +19,35 @@ public class FirstExamSystem implements ExamSystem {
                 list.add(courseId);
                 table.put(studentId, list);
             } else {
-                list.add(courseId);
+                if (!list.contains(courseId))
+                    list.add(courseId);
             }
         }
     }
 
     public void remove(long studentId, long courseId) {
+        remCount += 1;
         synchronized (table) {
             ArrayList<Long> list = table.get(studentId);
-            if (list == null)
-                System.out.println("No records for student: " + studentId);
-            else {
-                if (!list.contains(courseId))
-                    System.out.println("No such record: " + studentId + " course: " + courseId);
-                else
+            if (list != null) {
+                if (list.contains(courseId))
                     list.remove(courseId);
             }
         }
     }
 
     public boolean contains(long studentId, long courseId) {
+        contCount += 1;
         synchronized (table) {
             ArrayList<Long> list = table.get(studentId);
             return !(list == null || !list.contains(courseId));
         }
+    }
+
+    public String getStats() {
+        return    "Contains queries: " + contCount + "\n"
+                + "Add queries: " + addCount + "\n"
+                + "Remove queries: " + remCount + "\n"
+                + "Total queries: " + (contCount + addCount + remCount);
     }
 }
