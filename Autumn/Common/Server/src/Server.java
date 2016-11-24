@@ -9,14 +9,15 @@ import com.google.gson.Gson;
 public class Server implements Runnable {
     String[] args;
     Filter[] filters;
-    protected int          serverPort   = 1424;
+    protected int serverPort = 1424;
     protected ServerSocket serverSocket = null;
-    protected boolean      isStopped    = false;
+    protected boolean isStopped = false;
 
     public Server(String[] args) {
         this.args = args;
     }
 
+    // Parse the config and so on...
     private void init() {
         if (args.length != 1) {
             System.err.println("Usage: java -jar server.jar config.json");
@@ -30,6 +31,7 @@ public class Server implements Runnable {
             System.err.println("Config file " + args[0] + " not found!");
             System.exit(1);
         }
+
         Gson gson = new Gson();
         filters = gson.fromJson(config, Filter[].class);
         System.out.println("Loaded " + filters.length + " filters");
@@ -47,12 +49,14 @@ public class Server implements Runnable {
         while (!isStopped()) {
             Socket client = null;
             try {
+                // for each client we got...
                 client = serverSocket.accept();
             } catch (IOException e) {
                 if (isStopped())
                     return;
                 e.printStackTrace();
             }
+            // ... start the new processing thread
             new Thread(new ImageProcessor(client, filters)).start();
         }
     }
