@@ -9,8 +9,6 @@ namespace ProducerConsumer
 {
     class Program
     {
-        public static bool Working = true;
-
         static void Main(string[] args)
         {
             bool res = false;
@@ -48,15 +46,26 @@ namespace ProducerConsumer
             }
 
             Console.ReadKey(true);
-            Working = false;
+            Console.WriteLine("All threads will be finished soon");
+
             for (int i = 0; i < numOfProducers; i++)
             {
-                prods[i].Finish();
+                prods[i].State = false;
             }
-            
+
+            for (int i = 0; i < numOfConsumers; i++)
+            {
+                cons[i].State = false;
+            }
+
             for (int i = 0; i < numOfConsumers; i++)
             {
                 cons[i].Finish();
+            }
+            
+            for (int i = 0; i < numOfProducers; i++)
+            {
+                prods[i].Finish();
             }
             
             Console.WriteLine("All threads finished");

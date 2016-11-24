@@ -13,6 +13,7 @@ namespace ProducerConsumer
         private readonly int _name;
         private  List<int> _goods;
         private Random _rnd = new Random();
+        public bool State = true;
 
         public Consumer(int name, List <int> goods)
         {
@@ -24,25 +25,21 @@ namespace ProducerConsumer
 
         public void Finish()
         {
+            Monitor.Enter(_goods);
+            Monitor.Pulse(_goods);
+            Monitor.Exit(_goods);
             _thread.Join();
         }
 
         void Run()
         {
-            while (Program.Working) TakeSomething();
+            while (State) TakeSomething();
         }
 
         // removes some element from the given list
         public void TakeSomething()
         {
             Monitor.Enter(_goods);
-
-            if (!Program.Working)
-            {
-                Monitor.Pulse(_goods);
-                Monitor.Exit(_goods);
-                return;
-            }
 
             if (_goods.Count != 0)
             {
@@ -54,6 +51,12 @@ namespace ProducerConsumer
             {
                 Console.WriteLine("There is nothing to remove from the list!");
                 Monitor.Wait(_goods);
+                if (!State)
+                {
+                    Monitor.Pulse(_goods);
+                    Monitor.Exit(_goods);
+                    return;
+                }
             }
 
             Monitor.Exit(_goods);
