@@ -9,96 +9,101 @@ namespace ProducerConsumer
 {
     class Program
     {
+        public static int IsLocked = 0; //0 - free
+
+
         static void Main(string[] args)
         {
-            Execute newProgram = new Execute();
-            newProgram.Run();
-            return;
-        }        
-    }
+            List<Producer> currentProducer = new List<Producer>();
+            List<Consumer> currentConsumer = new List<Consumer>();
 
-    public class Execute
-    {
+            const int numOfProd = 3;
+            const int numOfCons = 3;
 
 
-        const int numOfProd = 3;
-        const int numOfCons = 3;
-
-        public int wait = 1000;
-        public int isLocked = 0; //0 - free
-        public bool isEnd = false;
-
-        public List<int> sharedList = new List<int>();
-        public List<Producer> currentProducer = new List<Producer>();
-        public List<Consumer> currentConsumer = new List<Consumer>();
-
-        public void Run()
-        {
-            Console.WriteLine("press any key for end:");
-
+            List<int> sharedList = new List<int>();
 
             for (int i = 0; i < numOfProd; i++)
             {
-                Producer prod = new Producer(i + 1, this);
+                Producer prod = new Producer(i + 1, sharedList);
                 currentProducer.Add(prod);
             }
 
             for (int i = 0; i < numOfCons; i++)
             {
-                Consumer cons = new Consumer(i + 1, this);
+                Consumer cons = new Consumer(i + 1, sharedList);
                 currentConsumer.Add(cons);
             }
             Console.ReadKey();
 
-            while (0 != Interlocked.CompareExchange(ref isLocked, 1, 0))
+            while (0 != Interlocked.CompareExchange(ref IsLocked, 1, 0))
             { }
 
-            Console.WriteLine("that's all");
-
-            isEnd = true;
+            
 
             for (int i = 0; i < numOfCons; i++)
             {
-                currentConsumer[0].Delete();
+                currentConsumer[0].SetIsEnd();
+                currentConsumer[0].Stop();
                 currentConsumer.RemoveAt(0);
             }
             for (int i = 0; i < numOfProd; i++)
             {
-                currentProducer[0].Delete();
+                currentProducer[0].SetIsEnd();
+                currentProducer[0].Stop();
                 currentProducer.RemoveAt(0);
             }
 
-        }
+            Console.WriteLine("that's all");
+
+            return;
+        }     
     }
+
+    
 
     public class Producer
     {
         int name;
         Thread myThread;
-        public Producer(int name, Execute NewProgram)
+        List<int> sharedList;
+        const int wait = 1000;
+        bool isEnd = false;
+
+        public Producer(int name, List<int> sharedList)
         {
             this.name = name;
-            myThread = new Thread(() => this.Run(NewProgram));
+            this.sharedList = sharedList;
+            myThread = new Thread(() => this.Run());
             myThread.Start();
         }
 
-        public void Delete()
+
+        public void SetIsEnd()
+        {
+            this.isEnd = true;
+        }
+
+        public void Stop()
         {
             myThread.Join();
         }
 
-        public void Run(Execute NewProgram)
+        public void Run()
         {
-            while (!NewProgram.isEnd)
+            while (!this.isEnd)
             {
-                while (0 != Interlocked.CompareExchange(ref NewProgram.isLocked, 1, 0))
+                while (0 != Interlocked.CompareExchange(ref Program.IsLocked, 1, 0) && !this.isEnd)
                 { }
-                Random rand = new Random();
-                int val = rand.Next(100);
-                NewProgram.sharedList.Add(val);
-                Console.WriteLine("Producer # {0} add number {1} to list", name, val);
-                Interlocked.Exchange(ref NewProgram.isLocked, 0);
-                Thread.Sleep(NewProgram.wait);
+                if (!this.isEnd)
+                {
+                    Random rand = new Random();
+                    int val = rand.Next(100);
+                    sharedList.Add(val);
+                    Console.WriteLine("Producer # {0} add number {1} to list", name, val);
+                    Interlocked.Exchange(ref Program.IsLocked, 0);
+                    Thread.Sleep(wait);
+                }
             }
         }
 
@@ -108,38 +113,49 @@ namespace ProducerConsumer
     {
         int name;
         Thread myThread;
+        List<int> sharedList;
+        int wait = 1000;
+        bool isEnd = false;
 
-        public Consumer(int name, Execute NewProgram)
+        public Consumer(int name, List <int> sharedList)
         {
             this.name = name;
-            myThread = new Thread(() => this.Run(NewProgram));
+            this.sharedList = sharedList;
+            myThread = new Thread(() => this.Run());
             myThread.Start();
         }
 
-
-        public void Delete()
+        public void SetIsEnd()
+        {
+            this.isEnd = true;
+        }
+        
+        public void Stop()
         {
             myThread.Join();
         }
 
-        public void Run(Execute NewProgram)
+        public void Run()
         {
-            while (!NewProgram.isEnd)
+            while (!this.isEnd)
             {
-                while (0 != Interlocked.CompareExchange(ref NewProgram.isLocked, 1, 0))
+                while (0 != Interlocked.CompareExchange(ref Program.IsLocked, 1, 0) && !this.isEnd)
                 { }
-                if (NewProgram.sharedList.Count == 0)
+                if (!this.isEnd)
                 {
-                    Console.WriteLine("Consumer # {0} can't get number because list is empty", name);
+                    if (sharedList.Count == 0)
+                    {
+                        Console.WriteLine("Consumer # {0} can't get number because list is empty", name);
+                    }
+                    else
+                    {
+                        int val = sharedList.Last();
+                        Console.WriteLine("Consumer # {0} get {1} from list", name, val);
+                        sharedList.Remove(val);
+                    }
+                    Interlocked.Exchange(ref Program.IsLocked, 0);
+                    Thread.Sleep(wait);
                 }
-                else
-                {
-                    int val = NewProgram.sharedList.Last();
-                    Console.WriteLine("Consumer # {0} get {1} from list", name, val);
-                    NewProgram.sharedList.Remove(val);
-                }
-                Interlocked.Exchange(ref NewProgram.isLocked, 0);
-                Thread.Sleep(NewProgram.wait);
             }
         }
     }
