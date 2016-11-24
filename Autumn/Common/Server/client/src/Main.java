@@ -17,7 +17,7 @@ class ImageSender {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(im, "jpg", byteArrayOutputStream);
-            byte[] magicWord = { 0x01 }; // means "I want to send an image, not the filter request"
+            byte[] magicWord = { (byte) 0xFF }; // means "I want to send an image, not the filter request"
             byte[] filterNum = ByteBuffer.allocate(4).putInt(num).array();
             byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
             stream.write(magicWord);

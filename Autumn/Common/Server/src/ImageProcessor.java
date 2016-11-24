@@ -1,4 +1,5 @@
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ConvolveOp;
@@ -61,6 +62,29 @@ class ImageReceiver {
     }
 }
 
+class ProgressSender {
+    private OutputStream os;
+    private long last = 0;
+
+    public ProgressSender(OutputStream os) {
+        this.os = os;
+    }
+
+    public void send(int progress) {
+        if (System.currentTimeMillis() - last < 1000)
+            return;
+        byte magic[] = { 0x01 };
+        byte cur[] = ByteBuffer.allocate(4).putInt(progress).array();
+        try {
+            os.write(magic);
+            os.write(cur);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        last = System.currentTimeMillis();
+    }
+}
+
 // This class is used to process single client
 public class ImageProcessor implements Runnable {
     private Filter[] filters;
@@ -100,6 +124,7 @@ public class ImageProcessor implements Runnable {
                 // sending filter names
                 for (Filter f: filters)
                     output.writeUTF(f.name);
+                return;
             }
             else { // unknown magic number
                 System.err.println("protocol violation, disconnecting client...");
@@ -110,19 +135,19 @@ public class ImageProcessor implements Runnable {
         }
 
         if (filterNum >= filters.length || filterNum < 0) {
-            System.err.println("Got wrong filter number from client, disconnecting...");
+            System.err.println("Got wrong filter number (" + filterNum + ") from client, disconnecting...");
             return;
         }
-
-        // Process the image
-        Filter filter = filters[filterNum];
-        Kernel kernel = new Kernel(filter.h, filter.w, filter.values);
-        BufferedImageOp op = new ConvolveOp(kernel);
-        BufferedImage res = op.filter(image, null);
 
         // Send the image back
         try {
             OutputStream output = client.getOutputStream();
+
+            Filter filter = filters[filterNum];
+            Kernel kernel = new Kernel(filter.h, filter.w, filter.values);
+            BufferedImageOp op = new MyConvolveOp(kernel, new ProgressSender(output));
+            BufferedImage res = op.filter(image, null);
+
             byte magicWord[] = { (byte) 0xFF }; // means "image"
             output.write(magicWord);
             new ImageSender(res, output).send();

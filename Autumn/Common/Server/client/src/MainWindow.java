@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.border.Border;
@@ -17,34 +18,70 @@ public class MainWindow {
     private GridBagConstraints c;
     private String path;
     private String[] filters;
+    private SwingWorker worker;
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    private void submitImage() {
-        // Making it thread-safe
-        if (!SwingUtilities.isEventDispatchThread())
-            SwingUtilities.invokeLater(() -> submitImage());
+    private void submitImageButtonHandler() {
+        if (!isRunning.get()) {
+            if (srcImg == null) {
+                JOptionPane.showMessageDialog(frame, "Please load an image first");
+                return;
+            }
+            worker = new SwingWorker<Void, Void>() {
+                @Override
+                public Void doInBackground() {
+                    isRunning.set(true);
+                    JButton button = (JButton) frame.getContentPane().getComponent(7);
+                    button.setText("Abort");
+                    JProgressBar progressBar = (JProgressBar) frame.getContentPane().getComponent(5);
+                    try {
+                        // send it
+                        Socket s = new Socket("127.0.0.1", 1424);
+                        OutputStream output = s.getOutputStream();
+                        JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(6);
+                        new ImageSender(srcImg, output).send(comboBox.getSelectedIndex());
 
-        if (srcImg == null) {
-            JOptionPane.showMessageDialog(frame, "Please load an image first");
-            return;
+                        // and receive the result
+                        InputStream input = s.getInputStream();
+                        byte[] magicWord = new byte[1];
+                        System.out.println("shit1");
+                        do {
+                            input.read(magicWord);
+                            if (magicWord[0] == (byte) 0xFF) { // progress update
+                                System.out.println("asfasf");
+                                break;
+                            }
+                            byte[] cur = new byte[4];
+                            input.read(cur);
+                            System.out.println(ByteBuffer.wrap(cur).getInt());
+                            progressBar.setValue(ByteBuffer.wrap(cur).getInt());
+                        } while (!isCancelled());
+                        if (isCancelled()) {
+                            System.out.println("shit");
+                            return null;
+                        }
+                        System.out.println("lol");
+                        resImg = new ImageReceiver(input).recv();
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(frame, "Communication problem");
+                    }
+                    setResIcon(resImg);
+                    progressBar.setValue(100);
+                    return null;
+                }
+
+                @Override
+                public void done() {
+                    JButton button = (JButton) frame.getContentPane().getComponent(7);
+                    button.setText("Submit");
+                    isRunning.set(false);
+                }
+            };
+            worker.execute();
+        } else {
+            worker.cancel(false);
+            isRunning.set(false);
         }
-
-        try {
-            // send it
-            Socket s = new Socket("127.0.0.1", 1424);
-            OutputStream output = s.getOutputStream();
-            JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(6);
-            new ImageSender(srcImg, output).send(comboBox.getSelectedIndex());
-
-            // and receive the result
-            InputStream input = s.getInputStream();
-            byte[] magicWord = new byte[1];
-            input.read(magicWord);
-            assert magicWord[0] == (byte) 0xFF;
-            resImg = new ImageReceiver(input).recv();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Communication problem");
-        }
-        setResIcon(resImg);
     }
 
     public void addComponentsToPane(Container pane) {
@@ -115,7 +152,7 @@ public class MainWindow {
         JProgressBar progressBar = new JProgressBar();
         c.gridx = 0;
         c.ipadx = 0;
-        c.ipady = 0;
+        c.ipady = 10;
         c.gridy = 2;
         pane.add(progressBar, c);
 
@@ -133,7 +170,7 @@ public class MainWindow {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 3;
-        submitButton.addActionListener(actionEvent -> this.submitImage());
+        submitButton.addActionListener(actionEvent -> this.submitImageButtonHandler());
         pane.add(submitButton, c);
 
         // Exit button
