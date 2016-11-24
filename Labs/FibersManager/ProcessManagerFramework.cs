@@ -105,7 +105,16 @@ namespace FibersManager
             }
             else
             {
-                fibNow = fibers.Count() - 1;
+                int rand = new Random().Next(0, fibers.Count() - 1);
+                if ((rand / fibers.Count) * 100.0 > 7)
+                {
+                    fibNow = rand;
+                }
+                else
+                {
+                    fibNow = fibers.Count() - 1;
+                }
+
                 Fiber.Switch(fibers[fibNow].Id);
             }
         }
