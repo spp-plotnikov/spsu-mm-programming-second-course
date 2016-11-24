@@ -11,6 +11,8 @@ namespace ThreadPool
         private int numOfThreads;
         private bool disposed = false;
         private static Mutex taskMutex = new Mutex(false);
+        ManualResetEvent notEmptyTaskQueue = new ManualResetEvent(false);
+
         public ThreadPool(int numOfThreads) // Constructor
         {
             this.numOfThreads = numOfThreads;
@@ -22,6 +24,7 @@ namespace ThreadPool
             if (disposed) { throw new ObjectDisposedException("ThreadPool"); }
             queueOfTasks.Enqueue(threadStart);
             taskMutex.ReleaseMutex();
+            notEmptyTaskQueue.Set();
         }
 
         public void StartWorking() // Start
@@ -47,6 +50,8 @@ namespace ThreadPool
                 else
                 {
                     taskMutex.ReleaseMutex();
+                    notEmptyTaskQueue.Reset();
+                    notEmptyTaskQueue.WaitOne();
                 }
             }
         }
@@ -54,6 +59,7 @@ namespace ThreadPool
         public void Dispose()
         {
             disposed = true;
+            notEmptyTaskQueue.Set();
         }
     }
 }

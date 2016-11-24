@@ -9,10 +9,12 @@ namespace ThreadPool
         {
             Tasks tasks = new Tasks();
             ThreadPool threadPool = new ThreadPool(5);
-            TestAddingOfTasks.AddTasks(threadPool);
-            threadPool.StartWorking();
-            Thread.Sleep(500);
-            threadPool.Dispose();
+            TestAddingOfTasks.AddTasks(threadPool); // Adding tasks
+            threadPool.StartWorking(); // Starting
+            Console.ReadKey(); 
+            TestAddingOfTasks.AddTasks(threadPool); // Adding tasks during work
+            Console.ReadKey();
+            threadPool.Dispose(); // Disposing
             Console.ReadKey();
         }
     }
