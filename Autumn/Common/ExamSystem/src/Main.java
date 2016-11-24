@@ -1,5 +1,5 @@
 public class Main {
-    final static int size = 8000000; // if crashes, it means we have to enlarge it
+    final static int size = 10000000; // if crashes, it means we have to enlarge it
     final static int count = 10;
 
     public static void main(String[] args) throws Exception {
