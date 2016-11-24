@@ -1,9 +1,7 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.InputStream;
 import java.io.*;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 
 class ImageSender {
@@ -15,12 +13,15 @@ class ImageSender {
         this.stream = stream;
     }
 
-    public void send() {
+    public void send(int num) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(im, "jpg", byteArrayOutputStream);
-
+            byte[] magicWord = { 0x01 }; // means "I want to send an image, not the filter request"
+            byte[] filterNum = ByteBuffer.allocate(4).putInt(num).array();
             byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+            stream.write(magicWord);
+            stream.write(filterNum);
             stream.write(size);
             stream.write(byteArrayOutputStream.toByteArray());
             stream.flush();
@@ -58,17 +59,7 @@ class ImageReceiver {
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        File fr = new File("/tmp/test.jpg");
-        BufferedImage im = ImageIO.read(fr);
-
-        Socket s = new Socket("127.0.0.1", 1424);
-        OutputStream output = s.getOutputStream();
-        new ImageSender(im, output).send();
-
-        InputStream input = s.getInputStream();
-        BufferedImage res = new ImageReceiver(input).recv();
-
-        File fw = new File("/tmp/out1.jpg");
-        ImageIO.write(res, "jpeg", fw);
+        MainWindow window = new MainWindow();
+        window.run();
     }
 }
