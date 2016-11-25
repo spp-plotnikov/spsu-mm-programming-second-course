@@ -43,7 +43,7 @@ public class ConcurrentCuckoo : CuckooHashSet
         }
         try
         {
-            if (Size != oldSize)
+            if(Size != oldSize)
             {
                 return;
             }
