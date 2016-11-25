@@ -105,6 +105,7 @@ namespace FibersManager
             }
             else
             {
+                Thread.Sleep(1);
                 int rand = new Random().Next(0, fibers.Count() - 1);
                 if ((rand / fibers.Count) * 100.0 > 7)
                 {
