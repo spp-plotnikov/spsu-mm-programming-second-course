@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 public abstract class CuckooHashSet
 {
     private volatile int Size;
-    internal int PROBE_SIZE;
-    internal int THRESHOLD;
+    protected int PROBE_SIZE;
+    protected int THRESHOLD;
     private int LIMIT = 20; //number of attempts to relocate element before giving up
-    internal volatile List<Tuple<long, long>>[,] Table;
+    protected volatile List<Tuple<long, long>>[,] Table;
     public CuckooHashSet(int size)
     {
         this.PROBE_SIZE = 100;
@@ -26,18 +26,18 @@ public abstract class CuckooHashSet
         }
     }
 
-    internal long Hash0(Tuple<long, long> elem)
+    protected long Hash0(Tuple<long, long> elem)
     {
         return (elem.Item1 % 1001) + (elem.Item2 % 113);
     }
-    internal long Hash1(Tuple<long, long> elem)
+    protected long Hash1(Tuple<long, long> elem)
     {
         return (elem.Item1 % 10001) + (elem.Item2 % 101);
     }
 
-    internal abstract void Acquire(Tuple<long, long> x);
-    internal abstract void Release(Tuple<long, long> x);
-    internal abstract void Resize();
+    protected abstract void Acquire(Tuple<long, long> x);
+    protected abstract void Release(Tuple<long, long> x);
+    protected abstract void Resize();
 
     public bool Remove(Tuple<long, long> x)
     {
