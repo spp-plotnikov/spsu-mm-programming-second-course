@@ -111,11 +111,7 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
                 }
             }
             progress += perStep;
-            try {
-                Thread.sleep(3);
-            } catch (InterruptedException e) {
 
-            }
             if (progress > 1.0) {
                 percents += 1;
                 progressSender.send(percents);

@@ -5,12 +5,16 @@ import javax.swing.*;
 import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 class MainWindow {
     private JFrame frame;
@@ -18,7 +22,7 @@ class MainWindow {
     private String path;
     private SwingWorker worker;
     private AtomicBoolean isRunning = new AtomicBoolean(false);
-    private String serverIp = "127.0.0.1";
+    private InetAddress serverIp;
     private int serverPort = 1424;
 
     private void submitImageButtonHandler() {
@@ -91,6 +95,25 @@ class MainWindow {
         }
     }
 
+    // Saves the image on click
+    private void saveButtonHandler() {
+        JFileChooser chooser = new JFileChooser();
+        int option = chooser.showSaveDialog(this.frame.getContentPane());
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            String path = selectedFile.getAbsolutePath();
+            try {
+                String extension = "";
+                int i = path.lastIndexOf('.');
+                if (i >= 0)
+                    extension = path.substring(i + 1);
+                ImageIO.write(resImg, extension, new File(path));
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this.frame.getContentPane(), "Can't save image :(");
+            }
+        }
+    }
+
     // This method builds the GUI, very long and messy
     private void createAndShowGUI() {
         frame = new JFrame("Best GUI ever");
@@ -105,6 +128,20 @@ class MainWindow {
 
         // Path edit
         JTextField pathField = new JTextField();
+        pathField.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                warn();
+            }
+            public void removeUpdate(DocumentEvent e) {
+                warn();
+            }
+            public void insertUpdate(DocumentEvent e) {
+                warn();
+            }
+            public void warn() {
+                path = pathField.getText();
+            }
+        });
         c.weightx = 0.5;
         c.ipadx = 300;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -186,6 +223,14 @@ class MainWindow {
         c.gridy = 3;
         submitButton.addActionListener(actionEvent -> this.submitImageButtonHandler());
         pane.add(submitButton, c);
+
+        // Save button
+        JButton saveButton = new JButton("Save");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 2;
+        c.gridy = 3;
+        saveButton.addActionListener(actionEvent -> this.saveButtonHandler());
+        pane.add(saveButton, c);
 
         // Exit button
         JButton exitButton = new JButton("Exit");
@@ -275,10 +320,16 @@ class MainWindow {
 
     public void run() {
         try {
+            serverIp = InetAddress.getByName(JOptionPane.showInputDialog("Type the server IPv4", "127.0.0.1"));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this.frame, "Error: Can't parse or connect");
+        }
+        try {
             SwingUtilities.invokeAndWait(() -> createAndShowGUI());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.frame.setSize(400, 300);
         SwingUtilities.invokeLater(() -> recvFilterList());
     }
 }
