@@ -45,7 +45,7 @@ public abstract class CuckooHashSet
         try
         {
             List<Tuple<long, long>> set0 = Table[0, Hash0(x) % Size];
-            if (set0.Contains(x))
+            if(set0.Contains(x))
             {
                 set0.Remove(x);
                 return true;
@@ -53,7 +53,7 @@ public abstract class CuckooHashSet
             else
             {
                 List<Tuple<long, long>> set1 = Table[1, Hash1(x) % Size];
-                if (set1.Contains(x))
+                if(set1.Contains(x))
                 {
                     set1.Remove(x);
                     return true;
@@ -73,7 +73,7 @@ public abstract class CuckooHashSet
         try
         {
             List<Tuple<long, long>> list0 = Table[0, Hash0(x) % Size];
-            if (list0.Contains(x))
+            if(list0.Contains(x))
             {
                 return true;
             }
@@ -108,7 +108,7 @@ public abstract class CuckooHashSet
             {
                 return false;
             }
-            if (set0.Count() < THRESHOLD)
+            if(set0.Count() < THRESHOLD)
             {
                 set0.Add(x);
                 return true;
