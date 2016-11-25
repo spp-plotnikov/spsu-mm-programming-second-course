@@ -12,11 +12,11 @@ namespace Producer_consumer
         private Thread thread;
         private bool isWorking;
         private int delay;
-        private Additional additional;
+        private Buffer buffer;
         
-        public Producer(int num, Additional a)
+        public Producer(int num, Buffer buf)
         {
-            additional = a;
+            buffer = buf;
             delay = 500;
             name = num;
             thread = new Thread(() => Run());
@@ -27,12 +27,8 @@ namespace Producer_consumer
         {
             while (isWorking)
             {
-                additional.MtxWait();
-                Console.WriteLine("Producer " + name + " has bocked mutex");
-                additional.BufEnque(name);
+                buffer.BufEnque(name);
                 Console.WriteLine("Producer " + name + " add " + name + " at top of buffer");
-                additional.MtxRelease();
-                Console.WriteLine("Producer " + name + " has released mutex");
                 Thread.Sleep(delay);
             }
         }

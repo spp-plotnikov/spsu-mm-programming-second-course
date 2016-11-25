@@ -13,7 +13,8 @@ namespace Producer_consumer
 
         static void Main(string[] args)
         {
-            Additional main = new Additional(NumConsumers, NumProducers);
+            Buffer buf = new Buffer();
+            Additional main = new Additional(NumConsumers, NumProducers, buf);
             main.Add();
 
             Console.ReadKey();

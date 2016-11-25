@@ -8,33 +8,31 @@ namespace Producer_consumer
 {
     class Additional
     {
-        private Mutex mtx;
         private List<Consumer> consumerList;
         private List<Producer> producerList;
         private int numConsumers;
         private int numProducers;
-        private List<int> buf;
+        private Buffer buffer;
 
-        public Additional(int numCons, int numProd)
+        public Additional(int numCons, int numProd, Buffer buf)
         {
             consumerList = new List<Consumer>();
             producerList = new List<Producer>();
-            buf = new List<int>();
             numConsumers = numCons;
             numProducers = numProd;
-            mtx = new Mutex();
+            buffer = buf;
         }
 
         private void addProducer(int i)
         {
-            Producer newProducer = new Producer(i, this);
+            Producer newProducer = new Producer(i, buffer);
             producerList.Add(newProducer);
             newProducer.Start();
         }
 
         private void addConsumer(int i)
         {
-            Consumer newConsumer = new Consumer(i, this);
+            Consumer newConsumer = new Consumer(i, buffer);
             consumerList.Add(newConsumer);
             newConsumer.Start();
         }
@@ -50,33 +48,6 @@ namespace Producer_consumer
             {
                 addConsumer(i);
             }
-        }
-
-        public void BufEnque(int x)
-        {
-            buf.Add(x);
-        }
-
-        public int BufDeque()
-        {
-            int x = buf.First();
-            buf.Remove(x);
-            return x;
-        }
-
-        public int GetBufSize()
-        {
-            return buf.Count();
-        }
-
-        public void MtxWait()
-        {
-            mtx.WaitOne();
-        }
-
-        public void MtxRelease()
-        {
-            mtx.ReleaseMutex();
         }
 
         public void Close()
