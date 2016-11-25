@@ -9,13 +9,14 @@ namespace ProducerConsumer
 {
     class Program
     {
-        public static int IsLocked = 0; //0 - free
-
 
         static void Main(string[] args)
         {
             List<Producer> currentProducer = new List<Producer>();
             List<Consumer> currentConsumer = new List<Consumer>();
+            int[] isLocked = new int[1];
+
+            isLocked[0] = 0;
 
             const int numOfProd = 3;
             const int numOfCons = 3;
@@ -25,18 +26,18 @@ namespace ProducerConsumer
 
             for (int i = 0; i < numOfProd; i++)
             {
-                Producer prod = new Producer(i + 1, sharedList);
+                Producer prod = new Producer(i + 1, sharedList, isLocked);
                 currentProducer.Add(prod);
             }
 
             for (int i = 0; i < numOfCons; i++)
             {
-                Consumer cons = new Consumer(i + 1, sharedList);
+                Consumer cons = new Consumer(i + 1, sharedList, isLocked);
                 currentConsumer.Add(cons);
             }
             Console.ReadKey();
 
-            while (0 != Interlocked.CompareExchange(ref IsLocked, 1, 0))
+            while (0 != Interlocked.CompareExchange(ref isLocked[0], 1, 0))
             { }
 
             
@@ -70,11 +71,11 @@ namespace ProducerConsumer
         const int wait = 1000;
         bool isEnd = false;
 
-        public Producer(int name, List<int> sharedList)
+        public Producer(int name, List<int> sharedList, int[] isLocked)
         {
             this.name = name;
             this.sharedList = sharedList;
-            myThread = new Thread(() => this.Run());
+            myThread = new Thread(() => this.Run(isLocked));
             myThread.Start();
         }
 
@@ -89,11 +90,11 @@ namespace ProducerConsumer
             myThread.Join();
         }
 
-        public void Run()
+        public void Run(int[] isLocked)
         {
             while (!this.isEnd)
             {
-                while (0 != Interlocked.CompareExchange(ref Program.IsLocked, 1, 0) && !this.isEnd)
+                while (0 != Interlocked.CompareExchange(ref isLocked[0], 1, 0) && !this.isEnd)
                 { }
                 if (!this.isEnd)
                 {
@@ -101,7 +102,7 @@ namespace ProducerConsumer
                     int val = rand.Next(100);
                     sharedList.Add(val);
                     Console.WriteLine("Producer # {0} add number {1} to list", name, val);
-                    Interlocked.Exchange(ref Program.IsLocked, 0);
+                    Interlocked.Exchange(ref isLocked[0], 0);
                     Thread.Sleep(wait);
                 }
             }
@@ -117,11 +118,11 @@ namespace ProducerConsumer
         int wait = 1000;
         bool isEnd = false;
 
-        public Consumer(int name, List <int> sharedList)
+        public Consumer(int name, List <int> sharedList, int[] isLocked)
         {
             this.name = name;
             this.sharedList = sharedList;
-            myThread = new Thread(() => this.Run());
+            myThread = new Thread(() => this.Run(isLocked));
             myThread.Start();
         }
 
@@ -135,11 +136,11 @@ namespace ProducerConsumer
             myThread.Join();
         }
 
-        public void Run()
+        public void Run(int[] isLocked)
         {
             while (!this.isEnd)
             {
-                while (0 != Interlocked.CompareExchange(ref Program.IsLocked, 1, 0) && !this.isEnd)
+                while (0 != Interlocked.CompareExchange(ref isLocked[0], 1, 0) && !this.isEnd)
                 { }
                 if (!this.isEnd)
                 {
@@ -153,7 +154,7 @@ namespace ProducerConsumer
                         Console.WriteLine("Consumer # {0} get {1} from list", name, val);
                         sharedList.Remove(val);
                     }
-                    Interlocked.Exchange(ref Program.IsLocked, 0);
+                    Interlocked.Exchange(ref isLocked[0], 0);
                     Thread.Sleep(wait);
                 }
             }
