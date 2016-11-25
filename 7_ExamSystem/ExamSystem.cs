@@ -10,7 +10,7 @@ class ExamSystem
     {
         var counter = System.Diagnostics.Stopwatch.StartNew();
         List<Worker> workers = new List<Worker>();
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 30; i++)
         {
             workers.Add(new Worker(marks));
         }

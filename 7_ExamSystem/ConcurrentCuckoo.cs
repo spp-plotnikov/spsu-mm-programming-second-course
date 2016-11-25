@@ -13,7 +13,7 @@ public class ConcurrentCuckoo : CuckooHashSet
     public ConcurrentCuckoo(int size) : base(size)
     {
         this.Size = size;
-        this.NumLocks = 3;
+        this.NumLocks = 1;
         this.Locks0 = new Semaphore[size];
         this.Locks1 = new Semaphore[size];
         for (int j = 0; j < size; j++)
@@ -49,6 +49,7 @@ public class ConcurrentCuckoo : CuckooHashSet
             }
             List<Tuple<long, long>>[,] oldTable = Table;
             Size = 2 * Size;
+            Console.WriteLine(Size);
             Table = new List<Tuple<long, long>>[2, Size];
             for (int i = 0; i < 2; i++)
             {
@@ -59,11 +60,11 @@ public class ConcurrentCuckoo : CuckooHashSet
             }
             for (int i = 0; i < 2; i++)
             {
-                for (int j = 0; j < Size; j++)
+                for (int j = 0; j < Size / 2; j++)
                 {
                     foreach (Tuple<long, long> oldX in oldTable[i, j])
                     {
-                        Add(oldX);
+                        Table[0, Hash0(oldX) % Size].Add(oldX);
                     }
                 }
             }
