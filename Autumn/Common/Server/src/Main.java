@@ -6,7 +6,6 @@ public class Main {
 
         Thread.sleep(1000);
 
-        //server.stop();
         try {
             thread.join();
         } catch (InterruptedException e) {

@@ -40,48 +40,19 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 
-// Copy-pasted from somewhere
+// Copy-pasted from GNU-classpath
 // Original ConvolveOp implementation
 public class MyConvolveOp implements BufferedImageOp, RasterOp {
-    /** Edge pixels are set to 0. */
-    public static final int EDGE_ZERO_FILL = 0;
-
-    /** Edge pixels are copied from the source. */
-    public static final int EDGE_NO_OP = 1;
-
     private Kernel kernel;
-    private int edge;
     private RenderingHints hints;
     private ProgressSender progressSender;
 
     public MyConvolveOp(Kernel kernel, ProgressSender ps) {
         this.kernel = kernel;
-        edge = EDGE_ZERO_FILL;
         hints = new RenderingHints(
                 RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_QUALITY);
         progressSender = ps;
-    }
-
-    public final BufferedImage filter(BufferedImage src, BufferedImage dst)  {
-        if (src == dst)
-            throw new IllegalArgumentException("Source and destination images " +
-                     "cannot be the same.");
-        if (dst == null)
-            dst = createCompatibleDestImage(src, (ColorModel) src.getColorModel());
-
-        // Make sure source image is premultiplied
-        BufferedImage src1 = src;
-
-        BufferedImage dst1 = dst;
-        if (src1.getColorModel().getColorSpace().getType() != dst.getColorModel().getColorSpace().getType())
-            dst1 = createCompatibleDestImage(src, src.getColorModel());
-
-        filter(src1.getRaster(), dst1.getRaster());
-        // Convert between color models if needed
-        if (dst1 != dst)
-            new ColorConvertOp(hints).filter(dst1, dst);
-        return dst;
     }
 
     public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel dstCM) {
@@ -90,18 +61,6 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
                                    src.getRaster().createCompatibleWritableRaster(),
                                    src.isAlphaPremultiplied(), null);
         return new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
-    }
-
-    public final RenderingHints getRenderingHints()  {
-        return hints;
-    }
-
-    public int getEdgeCondition() {
-        return edge;
-    }
-
-    public final Kernel getKernel() {
-        return (Kernel) kernel.clone();
     }
 
     public final WritableRaster filter(Raster src, WritableRaster dest)  {
@@ -127,7 +86,8 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
         int[] maxValue = src.getSampleModel().getSampleSize();
         for (int i = 0; i < maxValue.length; i++)
             maxValue[i] = (int)Math.pow(2, maxValue[i]) - 1;
-            // process the region that is reachable...
+
+        // process the region that is reachable...
         int regionW = src.getWidth() - left - right;
         int regionH = src.getHeight() - top - bottom;
         float[] kvals = kernel.getKernelData(null);
@@ -138,7 +98,6 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
 
         for (int x = 0; x < regionW; x++)  {
             for (int y = 0; y < regionH; y++) {
-                // FIXME: This needs a much more efficient implementation
                 for (int b = 0; b < src.getNumBands(); b++) {
                     float v = 0;
                     src.getSamples(x, y, kWidth, kHeight, b, tmp);
@@ -165,36 +124,53 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
         }
 
         // fill in the top border
-        fillEdge(src, dest, 0, 0, src.getWidth(), top, edge);
+        fillEdge(src, dest, 0, 0, src.getWidth(), top);
 
-        fillEdge(src, dest, 0, src.getHeight() - bottom, src.getWidth(), bottom, edge);
+        fillEdge(src, dest, 0, src.getHeight() - bottom, src.getWidth(), bottom);
 
         // fill in the left border
-        fillEdge(src, dest, 0, top, left, regionH, edge);
+        fillEdge(src, dest, 0, top, left, regionH);
 
         // fill in the right border
-        fillEdge(src, dest, src.getWidth() - right, top, right, regionH, edge);
+        fillEdge(src, dest, src.getWidth() - right, top, right, regionH);
 
         return dest;
-        }
+    }
 
-    private void fillEdge(Raster src, WritableRaster dest, int x, int y, int w,
-                               int h, int edgeOp) {
+    private void fillEdge(Raster src, WritableRaster dest, int x, int y, int w, int h) {
         if (w <= 0)
             return;
         if (h <= 0)
             return;
-        if (edgeOp == EDGE_ZERO_FILL)  // fill region with zeroes
-        {
-            float[] zeros = new float[src.getNumBands() * w * h];
-            dest.setPixels(x, y, w, h, zeros);
-        }
-        else  // copy pixels from source
-        {
-            float[] pixels = new float[src.getNumBands() * w * h];
-            src.getPixels(x, y, w, h, pixels);
-            dest.setPixels(x, y, w, h, pixels);
-        }
+
+        // set borders to zeros
+        float[] zeros = new float[src.getNumBands() * w * h];
+        dest.setPixels(x, y, w, h, zeros);
+    }
+
+    public final BufferedImage filter(BufferedImage src, BufferedImage dst)  {
+        if (src == dst)
+            throw new IllegalArgumentException("Source and destination images " +
+                    "cannot be the same.");
+        if (dst == null)
+            dst = createCompatibleDestImage(src, (ColorModel) src.getColorModel());
+
+        // Make sure source image is premultiplied
+        BufferedImage src1 = src;
+
+        BufferedImage dst1 = dst;
+        if (src1.getColorModel().getColorSpace().getType() != dst.getColorModel().getColorSpace().getType())
+            dst1 = createCompatibleDestImage(src, src.getColorModel());
+
+        filter(src1.getRaster(), dst1.getRaster());
+        // Convert between color models if needed
+        if (dst1 != dst)
+            new ColorConvertOp(hints).filter(dst1, dst);
+        return dst;
+    }
+
+    public final RenderingHints getRenderingHints()  {
+        return hints;
     }
 
     public WritableRaster createCompatibleDestRaster(Raster src) {

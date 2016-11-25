@@ -12,31 +12,37 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.border.Border;
 
-public class MainWindow {
+class MainWindow {
     private JFrame frame;
     private BufferedImage srcImg = null, resImg = null;
-    private GridBagConstraints c;
     private String path;
-    private String[] filters;
     private SwingWorker worker;
     private AtomicBoolean isRunning = new AtomicBoolean(false);
+    private String serverIp = "127.0.0.1";
+    private int serverPort = 1424;
 
     private void submitImageButtonHandler() {
         if (!isRunning.get()) {
+
             if (srcImg == null) {
                 JOptionPane.showMessageDialog(frame, "Please load an image first");
                 return;
             }
+
+            // This describes the thread, which communicates with the server
             worker = new SwingWorker<Void, Void>() {
                 @Override
                 public Void doInBackground() {
                     isRunning.set(true);
+                    // get components
                     JButton button = (JButton) frame.getContentPane().getComponent(7);
-                    button.setText("Abort");
                     JProgressBar progressBar = (JProgressBar) frame.getContentPane().getComponent(5);
+                    button.setText("Abort");
+
+                    // The following code needs to be in try-block, almost evert operation can throw IOException
                     try {
                         // send it
-                        Socket s = new Socket("127.0.0.1", 1424);
+                        Socket s = new Socket(serverIp, serverPort);
                         OutputStream output = s.getOutputStream();
                         JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(6);
                         new ImageSender(srcImg, output).send(comboBox.getSelectedIndex());
@@ -44,27 +50,26 @@ public class MainWindow {
                         // and receive the result
                         InputStream input = s.getInputStream();
                         byte[] magicWord = new byte[1];
-                        System.out.println("shit1");
                         do {
                             input.read(magicWord);
-                            if (magicWord[0] == (byte) 0xFF) { // progress update
-                                System.out.println("asfasf");
+                            if (magicWord[0] == (byte) 0xFF) // image, not progress update
                                 break;
-                            }
+                            // retrieve the progress
                             byte[] cur = new byte[4];
                             input.read(cur);
-                            System.out.println(ByteBuffer.wrap(cur).getInt());
+                            // and set the progress bar
                             progressBar.setValue(ByteBuffer.wrap(cur).getInt());
                         } while (!isCancelled());
-                        if (isCancelled()) {
-                            System.out.println("shit");
+                        if (isCancelled())
                             return null;
-                        }
-                        System.out.println("lol");
+
+                        // finally, get the result image
                         resImg = new ImageReceiver(input).recv();
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(frame, "Communication problem");
                     }
+
+                    // and set it
                     setResIcon(resImg);
                     progressBar.setValue(100);
                     return null;
@@ -77,16 +82,25 @@ public class MainWindow {
                     isRunning.set(false);
                 }
             };
+
+            // starts the thread
             worker.execute();
-        } else {
-            worker.cancel(false);
+        } else { // Abort button pressed
+            worker.cancel(true);
             isRunning.set(false);
         }
     }
 
-    public void addComponentsToPane(Container pane) {
+    // This method builds the GUI, very long and messy
+    private void createAndShowGUI() {
+        frame = new JFrame("Best GUI ever");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Container pane = frame.getContentPane();
+        frame.pack();
+        frame.setVisible(true);
+
+        GridBagConstraints c = new GridBagConstraints();
         pane.setLayout(new GridBagLayout());
-        c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
 
         // Path edit
@@ -187,6 +201,7 @@ public class MainWindow {
         pane.add(exitButton, c);
     }
 
+    // This method outputs the source image on the GUI
     private void setSrcIcon(BufferedImage src) {
         if (src == null)
             return;
@@ -201,6 +216,7 @@ public class MainWindow {
         frame.setSize(500, 500);
     }
 
+    // This method outputs the resulting image on the GUI
     private void setResIcon(BufferedImage src) {
         if (src == null)
             return;
@@ -214,10 +230,10 @@ public class MainWindow {
         label.setBorder(null);
     }
 
+    // This method loads the source image from file
     private void loadImage() {
         if (path == null)
             return;
-
         try {
             srcImg = ImageIO.read(new File(path));
             if (srcImg == null)
@@ -229,30 +245,25 @@ public class MainWindow {
         }
     }
 
-    private void createAndShowGUI() {
-        frame = new JFrame("Best GUI ever");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        addComponentsToPane(frame.getContentPane());
-        frame.pack();
-        frame.setVisible(true);
-    }
-
+    // Fetches the filter list
     private void recvFilterList() {
         try {
-            Socket s = new Socket("127.0.0.1", 1424);
+            Socket s = new Socket(serverIp, serverPort);
             OutputStream outputStream = s.getOutputStream();
             DataInputStream inputStream = new DataInputStream(s.getInputStream());
 
-            byte magicWord[] = { (byte) 0xFA };
+            byte magicWord[] = { (byte) 0xFA }; // FA stands for Filter Array :)
             outputStream.write(magicWord);
 
+            // Read the filters count
             byte len[] = new byte[4];
             inputStream.read(len);
             ByteBuffer wrapped = ByteBuffer.wrap(len);
             int size = wrapped.getInt();
-            System.out.println(size);
+
+            // Receive filters
             JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(6);
-            filters = new String[size];
+            String[] filters = new String[size];
             for (int i = 0; i < size; i++) {
                 filters[i] = inputStream.readUTF();
                 comboBox.addItem(filters[i]);
@@ -264,10 +275,10 @@ public class MainWindow {
 
     public void run() {
         try {
-            javax.swing.SwingUtilities.invokeAndWait(() -> createAndShowGUI());
+            SwingUtilities.invokeAndWait(() -> createAndShowGUI());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        javax.swing.SwingUtilities.invokeLater(() -> recvFilterList());
+        SwingUtilities.invokeLater(() -> recvFilterList());
     }
 }
