@@ -21,6 +21,7 @@ class ExamSystem
         counter.Stop();
         return counter.ElapsedMilliseconds;
     }
+    
     static void Main(string[] args)
     {
         long[] students = new long[500000];
