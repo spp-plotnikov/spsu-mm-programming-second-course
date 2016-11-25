@@ -9,7 +9,7 @@ public abstract class CuckooHashSet
     private volatile int Size;
     internal int PROBE_SIZE;
     internal int THRESHOLD;
-    private int LIMIT = 20; //number of attempts to realocate element before giving up
+    private int LIMIT = 20; //number of attempts to relocate element before giving up
     internal volatile List<Tuple<long, long>>[,] Table;
     public CuckooHashSet(int size)
     {
