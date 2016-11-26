@@ -13,7 +13,7 @@ public class ConcurrentCuckoo : CuckooHashSet
     public ConcurrentCuckoo(int size) : base(size)
     {
         this.Size = size;
-        this.NumLocks = 1;
+        this.NumLocks = 5;
         this.Locks0 = new Semaphore[size];
         this.Locks1 = new Semaphore[size];
         for (int j = 0; j < size; j++)
