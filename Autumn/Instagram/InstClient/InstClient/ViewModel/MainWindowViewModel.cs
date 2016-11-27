@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Windows;
 using System.Windows.Data;
 using InstClient.Command;
 using InstClient.Model;
@@ -20,7 +20,11 @@ namespace InstClient.ViewModel
         private SimpleCommand _openPict;
         private SimpleCommand _sendPict;
         private SimpleCommand _saveResult;
-        private ClientModel _model;
+        private readonly ClientModel _model;
+
+        public event ClientEventHandler ShowMessage;
+        public event EventHandler OpenPictRequested;
+        public event EventHandler SavePictRequested;
 
         public MainWindowViewModel(ClientModel model)
         {
@@ -29,10 +33,10 @@ namespace InstClient.ViewModel
             model.GotAnyError += OnAnyError;
             model.PictProcessed += OnPictProcessed;
             model.ProgressChanged += OnProgressChanged;
-            OpenPict = new SimpleCommand(GetOpenedPictPath);
+            OpenPict = new SimpleCommand(HandleOpenPictRequest);
             UpdateFilterList = new SimpleCommand(model.GetFilters);
-            SendPict = new SimpleCommand(UploadPict);
-            SaveResult = new SimpleCommand(SaveResultWithDialog);
+            SendPict = new SimpleCommand(EditPict);
+            SaveResult = new SimpleCommand(HandleSavePictRequest);
             IsInitalPictVisible = true;
             IsResultPictVisible = false;
         }
@@ -192,37 +196,13 @@ namespace InstClient.ViewModel
             }
         }
 
+
         public void OnProgressChanged(object sender, ClientEventArgs args)
         {
             ProcessingProgress = Math.Min(100, int.Parse(args.Message));
         }
 
-        public void GetOpenedPictPath()
-        {
-            OpenFileDialog dlg = new OpenFileDialog
-            {
-                Filter = "Bitmap| *.bmp",
-                CheckFileExists = true
-            };
-            if (dlg.ShowDialog() == true)
-            {
-                InitalPictPath = dlg.FileName;
-            }
-        }
 
-        public void SaveResultWithDialog()
-        {
-            SaveFileDialog dlg = new SaveFileDialog
-            {
-                FileName = "temp",
-                DefaultExt = ".bmp",
-                Filter = "Bitmap(.bmp)|*.bmp"
-            };
-            if (dlg.ShowDialog() == true)
-            {
-                File.Copy(ResultPictPath, dlg.FileName);
-            }
-        }
 
         public void OnReceivedFilters(object sender, ClientEventArgs args)
         {
@@ -232,16 +212,22 @@ namespace InstClient.ViewModel
 
         public void OnAnyError(object sender, ClientEventArgs args)
         {
-            MessageBox.Show(args.Message, "Error");
+            ShowMessage?.BeginInvoke(this, new ClientEventArgs("Error" + args.Message), null, null);
         }
 
         public void OnPictProcessed(object sender, ClientEventArgs args)
         {
             ResultPictPath = Directory.GetCurrentDirectory() + "/" + args.Message;
-            MessageBox.Show("Pict successfully processed. Click on it to compare", "Success!");
+            ShowMessage?.BeginInvoke(this, new ClientEventArgs("Success! Pict was successfully edited. Click on it to compare."), null, null);
             IsInitalPictVisible = false;
             IsResultPictVisible = true;
             ProcessingProgress = 0;
+        }
+
+        public void OnClosing(object sender, EventArgs args)
+        {
+
+            DeleteUsedPicts(_model.UsedPicts);
         }
 
         public void ChangePictsVisibility(object sender, EventArgs args)
@@ -258,13 +244,47 @@ namespace InstClient.ViewModel
             }
         }
 
-        public void UploadPict()
+        private void DeleteUsedPicts(List<string> usedPicts)
+        {
+
+            try
+            {
+                foreach (var pictPath in usedPicts)
+                {
+                    File.Delete(pictPath);
+                }
+            }
+            catch (Exception e)
+            {
+                OnAnyError(this, new ClientEventArgs(e.ToString()));
+            }
+        }
+
+        private void EditPict()
         {
 
             ResultPictPath = null;
 
+            try
+            {
+                _model.EditPict(new UploadingData(new Pict(InitalPictPath), (string)FiltersCollectionView.CurrentItem));
+            }
+            catch (Exception e)
+            {
 
-            _model.UploadPict(new UploadingData(new Pict(InitalPictPath), (string)FiltersCollectionView.CurrentItem));
+                ShowMessage?.BeginInvoke(this, new ClientEventArgs("Error " + e.ToString()), null, null);
+            }
+
+        }
+
+        private void HandleOpenPictRequest()
+        {
+            OpenPictRequested?.Invoke(this, EventArgs.Empty); //, null, null);
+        }
+
+        private void HandleSavePictRequest()
+        {
+            SavePictRequested?.BeginInvoke(this, EventArgs.Empty, null, null);
         }
 
     }

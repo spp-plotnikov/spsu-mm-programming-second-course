@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.ServiceModel;
 using System.Text;
@@ -13,6 +14,12 @@ namespace InstClient.Model
         public event ClientEventHandler GotAnyError;
         public event ClientEventHandler PictProcessed;
         public event ClientEventHandler ProgressChanged;
+        public List<string> UsedPicts { get; set; }
+
+        public ClientModel()
+        {
+            UsedPicts = new List<string>();
+        }
 
         public class NotificationHandler : IInstServiceCallback
         {
@@ -50,40 +57,36 @@ namespace InstClient.Model
             thread.Start();
         }
 
-        public void UploadPict(object data)
+        public void EditPict(object data)
         {
             Thread thread = new Thread(() =>
             {
                 try
                 {
-                    Pict pict = ((UploadingData)data).Picture;
-                    string filter = ((UploadingData)data).Filter;
+                    Pict pict = ((UploadingData) data).Picture;
+                    string filter = ((UploadingData) data).Filter;
                     pict.PathToResult = GetValidName();
 
-                    /*byte[] picture = new byte[pict.PictBytes.Length]; //JUST DON'T ASK
-
-                    for (int i = 0; i < pict.PictBytes.Length; i++)
-                    {
-                        picture[i] = pict.PictBytes[i];
-                    }*/
-
-
-                    var client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)), "NetTcpBinding_IInstService");
-                    var result = client.ProcessPict(pict.PictBytes, filter);
+                    var client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)),
+                        "NetTcpBinding_IInstService");
+                    var result = client.EditPict(pict.PictBytes, filter);
                     client.Close();
 
                     pict.SavePict(result);
+                    ProgressChanged?.Invoke(this, new ClientEventArgs("100"));
                     PictProcessed?.Invoke(this, new ClientEventArgs(pict.PathToResult));
                 }
                 catch (Exception e)
                 {
                     GotAnyError?.Invoke(this, new ClientEventArgs(e.ToString()));
                 }
+
             });
-            thread.Start();
+
+                thread.Start();
         }
 
-        private static string GetValidName()
+        private string GetValidName()
         {
             string result = "temp.bmp";
             int count = 0;
@@ -94,6 +97,11 @@ namespace InstClient.Model
                     string tempResult = "~" + count + result;
                     if (!File.Exists(tempResult)) return tempResult;
                     File.Open(tempResult, FileMode.Open).Close();
+
+                    if (!UsedPicts.Contains(tempResult))
+                    {
+                        UsedPicts.Add(tempResult);
+                    }
                     return tempResult;
                 }
                 catch (Exception)

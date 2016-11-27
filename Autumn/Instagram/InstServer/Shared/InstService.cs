@@ -23,7 +23,7 @@ namespace Shared
             return Filters;
         }
 
-        public byte[] ProcessPict(byte[] data, string filter)
+        public byte[] EditPict(byte[] data, string filter)
         {
             try
             {

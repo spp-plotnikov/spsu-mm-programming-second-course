@@ -21,11 +21,11 @@ namespace ServiceInterface.InstSevrRef {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/GetFilters", ReplyAction="http://tempuri.org/IInstService/GetFiltersResponse")]
         System.Threading.Tasks.Task<string[]> GetFiltersAsync();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/ProcessPict", ReplyAction="http://tempuri.org/IInstService/ProcessPictResponse")]
-        byte[] ProcessPict(byte[] data, string filter);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/EditPict", ReplyAction="http://tempuri.org/IInstService/EditPictResponse")]
+        byte[] EditPict(byte[] data, string filter);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/ProcessPict", ReplyAction="http://tempuri.org/IInstService/ProcessPictResponse")]
-        System.Threading.Tasks.Task<byte[]> ProcessPictAsync(byte[] data, string filter);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/EditPict", ReplyAction="http://tempuri.org/IInstService/EditPictResponse")]
+        System.Threading.Tasks.Task<byte[]> EditPictAsync(byte[] data, string filter);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -71,12 +71,12 @@ namespace ServiceInterface.InstSevrRef {
             return base.Channel.GetFiltersAsync();
         }
         
-        public byte[] ProcessPict(byte[] data, string filter) {
-            return base.Channel.ProcessPict(data, filter);
+        public byte[] EditPict(byte[] data, string filter) {
+            return base.Channel.EditPict(data, filter);
         }
         
-        public System.Threading.Tasks.Task<byte[]> ProcessPictAsync(byte[] data, string filter) {
-            return base.Channel.ProcessPictAsync(data, filter);
+        public System.Threading.Tasks.Task<byte[]> EditPictAsync(byte[] data, string filter) {
+            return base.Channel.EditPictAsync(data, filter);
         }
     }
 }

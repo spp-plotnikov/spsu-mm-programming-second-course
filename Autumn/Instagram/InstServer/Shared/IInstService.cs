@@ -16,6 +16,6 @@ namespace Shared
         string[] GetFilters();
 
         [OperationContract]
-        byte[] ProcessPict(byte[] data, string filter);
+        byte[] EditPict(byte[] data, string filter);
     }
 }
