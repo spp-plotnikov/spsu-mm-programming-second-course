@@ -16,7 +16,7 @@ namespace future
             if (size != 1)
             {
                 List<Task<int>> tasks = new List<Task<int>>();
-                Tuple<int[], int[]> intrArr = RunTheProgramm.Slice(arr);
+                Tuple<int[], int[]> intrArr = Slice(arr);
 
                 // counting the first half
                 tasks.Add(Task.Run(() =>
@@ -45,5 +45,14 @@ namespace future
             }
         }
 
+        private Tuple<int[], int[]> Slice(int[] arr)
+        {
+            int size = arr.Length;
+            int[] arrSumFirst = new int[size / 2 + size % 2];
+            Array.Copy(arr, 0, arrSumFirst, 0, size / 2 + size % 2);
+            int[] arrSumSecond = new int[size / 2];
+            Array.Copy(arr, size / 2 + size % 2, arrSumSecond, 0, size / 2);
+            return new Tuple<int[], int[]>(arrSumFirst, arrSumSecond);
+        }
     }
 }

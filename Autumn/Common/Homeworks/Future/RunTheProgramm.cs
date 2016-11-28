@@ -15,16 +15,6 @@ namespace future
             _arr = arr;
         }
 
-        public static Tuple<int[], int[]> Slice(int[] arr)
-        {
-            int size = arr.Length;
-            int[] arrSumFirst = new int[size / 2 + size % 2];
-            Array.Copy(arr, 0, arrSumFirst, 0, size / 2 + size % 2);
-            int[] arrSumSecond = new int[size / 2];
-            Array.Copy(arr, size / 2 + size % 2, arrSumSecond, 0, size / 2);
-            return new Tuple<int[], int[]>(arrSumFirst, arrSumSecond);
-        }
-
         public void Run()
         {
             FirstSum fi = new FirstSum();

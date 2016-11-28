@@ -8,7 +8,6 @@ namespace future
 {
     class SecondSum : IArraySum
     {
-        // very simple approach: divide the array in two parts and count the sum
         public int IterativeSum(int[] arr)
         {
             int result = 0;
@@ -21,19 +20,34 @@ namespace future
 
         public int Sum(int[] arr)
         {
+            int numOfParts = 1115;
+            int size = arr.Length;
             List<Task<int>> tasks = new List<Task<int>>();
-            Tuple<int[], int[]> intrArr = RunTheProgramm.Slice(arr);
 
-            // counting the first half
+            if (numOfParts > size)
+            {
+                numOfParts = size;
+            }
+
+            int numInOne = size / numOfParts;
+            int left = size % numOfParts;
+            // for all parts but last
+            for (int i = 0; i < numOfParts - 1; i++ )
+            {
+                int[] arrSum = new int[numInOne];
+                Array.Copy(arr, i * numInOne, arrSum, 0, numInOne);
+                tasks.Add(Task.Run(() =>
+                {
+                    return IterativeSum(arrSum);
+                }));
+            }
+
+            // count for the last element
+            int[] arrLast = new int[numInOne + left];
+            Array.Copy(arr, (numOfParts - 1) * numInOne, arrLast, 0, numInOne + left);
             tasks.Add(Task.Run(() =>
             {
-                return IterativeSum(intrArr.Item1);
-            }));
-
-            // counting the second half
-            tasks.Add(Task.Run(() =>
-            {
-                return IterativeSum(intrArr.Item2);
+                return IterativeSum(arrLast);
             }));
 
             Task.WaitAll();
