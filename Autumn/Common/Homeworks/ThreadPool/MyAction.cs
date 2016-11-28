@@ -12,6 +12,9 @@ namespace MyThreadPool
         public static void DoTheJob()
         {
             Console.WriteLine("Hello, I'm the new job, which will be finished soon.");
+            Console.WriteLine("The task is completed");
+            Console.WriteLine();
+            Console.WriteLine("---------------------------------------------------");
         }
     }
 }

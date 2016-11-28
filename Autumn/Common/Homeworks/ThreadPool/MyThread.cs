@@ -45,11 +45,8 @@ namespace MyThreadPool
                 if (_poolActions.Count > 0)
                 {
                     Action myCurAction = _poolActions.Dequeue();
-                    myCurAction();
-                    Console.WriteLine("The task is completed");
-                    Console.WriteLine();
-                    Console.WriteLine("---------------------------------------------------");
                     Monitor.Exit(_poolActions);
+                    myCurAction();
                 }
                 else
                 {
