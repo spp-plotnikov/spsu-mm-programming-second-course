@@ -35,13 +35,13 @@ public abstract class CuckooHashSet
         return (elem.Item1 % 10001) + (elem.Item2 % 101);
     }
 
-    protected abstract void acquire(Tuple<long, long> x);
-    protected abstract void release(Tuple<long, long> x);
-    protected abstract void resize();
+    protected abstract void Acquire(Tuple<long, long> x);
+    protected abstract void Release(Tuple<long, long> x);
+    protected abstract void Resize();
 
     public bool Remove(Tuple<long, long> x)
     {
-        acquire(x);
+        Acquire(x);
         try
         {
             List<Tuple<long, long>> firstSet = table[0, firstHash(x) % size];
@@ -63,13 +63,13 @@ public abstract class CuckooHashSet
         }
         finally
         {
-            release(x);
+            Release(x);
         }
     }
 
     public bool Contains(Tuple<long, long> x)
     {
-        acquire(x);
+        Acquire(x);
         try
         {
             List<Tuple<long, long>> firstList = table[0, firstHash(x) % size];
@@ -89,13 +89,13 @@ public abstract class CuckooHashSet
         }
         finally
         {
-            release(x);
+            Release(x);
         }
     }
 
     public bool Add(Tuple<long, long> x)
     {
-        acquire(x);
+        Acquire(x);
         long firstH = firstHash(x) % size, secondH = secondHash(x) % size;
         int i = -1;
         long h = -1;
@@ -137,16 +137,16 @@ public abstract class CuckooHashSet
         }
         finally
         {
-            release(x);
+            Release(x);
         }
         if(mustResize)
         {
-            resize();
+            Resize();
             Add(x);
         }
         else if(!Relocate(i, h))
         {
-            resize();
+            Resize();
         }
         return true;
     }
@@ -172,7 +172,7 @@ public abstract class CuckooHashSet
                     break;
                 }
             }
-            acquire(y);
+            Acquire(y);
             List<Tuple<long, long>> jSet = table[j, hj];
             try
             {
@@ -207,7 +207,7 @@ public abstract class CuckooHashSet
             }
             finally
             {
-                release(y);
+                Release(y);
             }
         }
         return false;

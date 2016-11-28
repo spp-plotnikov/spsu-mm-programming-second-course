@@ -23,18 +23,18 @@ public class ConcurrentCuckoo : CuckooHashSet
         }
     }
 
-    protected override void acquire(Tuple<long, long> x)
+    protected override void Acquire(Tuple<long, long> x)
     {
         firstLocks[firstHash(x) % numLocks].WaitOne();
         secondLocks[secondHash(x) % numLocks].WaitOne();
     }
 
-    protected override void release(Tuple<long, long> x)
+    protected override void Release(Tuple<long, long> x)
     {
         firstLocks[firstHash(x) % numLocks].Release();
         secondLocks[secondHash(x) % numLocks].Release();
     }
-    protected override void resize()
+    protected override void Resize()
     {
         int oldSize = size;
         foreach (Semaphore semaphore in firstLocks)
