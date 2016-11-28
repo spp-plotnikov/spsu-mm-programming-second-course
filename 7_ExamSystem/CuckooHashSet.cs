@@ -26,11 +26,11 @@ public abstract class CuckooHashSet
         }
     }
 
-    protected long Hash0(Tuple<long, long> elem)
+    protected long firstHash(Tuple<long, long> elem)
     {
         return (elem.Item1 % 1001) + (elem.Item2 % 113);
     }
-    protected long Hash1(Tuple<long, long> elem)
+    protected long secondHash(Tuple<long, long> elem)
     {
         return (elem.Item1 % 10001) + (elem.Item2 % 101);
     }
@@ -44,15 +44,15 @@ public abstract class CuckooHashSet
         Acquire(x);
         try
         {
-            List<Tuple<long, long>> set0 = Table[0, Hash0(x) % Size];
-            if(set0.Contains(x))
+            List<Tuple<long, long>> firstSet = Table[0, firstHash(x) % Size];
+            if(firstSet.Contains(x))
             {
-                set0.Remove(x);
+                firstSet.Remove(x);
                 return true;
             }
             else
             {
-                List<Tuple<long, long>> set1 = Table[1, Hash1(x) % Size];
+                List<Tuple<long, long>> set1 = Table[1, secondHash(x) % Size];
                 if(set1.Contains(x))
                 {
                     set1.Remove(x);
@@ -72,15 +72,15 @@ public abstract class CuckooHashSet
         Acquire(x);
         try
         {
-            List<Tuple<long, long>> list0 = Table[0, Hash0(x) % Size];
-            if(list0.Contains(x))
+            List<Tuple<long, long>> firstList = Table[0, firstHash(x) % Size];
+            if(firstList.Contains(x))
             {
                 return true;
             }
             else
             {
-                List<Tuple<long, long>> list1 = Table[1, Hash1(x) % Size];
-                if (list1.Contains(x))
+                List<Tuple<long, long>> secondList = Table[1, secondHash(x) % Size];
+                if (secondList.Contains(x))
                 {
                     return true;
                 }
@@ -96,7 +96,7 @@ public abstract class CuckooHashSet
     public bool Add(Tuple<long, long> x)
     {
         Acquire(x);
-        long h0 = Hash0(x) % Size, h1 = Hash1(x) % Size;
+        long h0 = firstHash(x) % Size, h1 = secondHash(x) % Size;
         int i = -1;
         long h = -1;
         bool mustResize = false;
@@ -163,12 +163,12 @@ public abstract class CuckooHashSet
             {
                 case 0:
                 {
-                    hj = Hash1(y) % Size;
+                    hj = secondHash(y) % Size;
                     break;
                 }
                 case 1:
                 {
-                    hj = Hash0(y) % Size;
+                    hj = firstHash(y) % Size;
                     break;
                 }
             }

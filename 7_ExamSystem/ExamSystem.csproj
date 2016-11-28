@@ -47,7 +47,6 @@
     <Compile Include="CuckooHashSet.cs" />
     <Compile Include="Worker.cs" />
     <Compile Include="IExamSystem.cs" />
-    <Compile Include="Marks.cs" />
     <Compile Include="SystemFirst.cs" />
     <Compile Include="ExamSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

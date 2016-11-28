@@ -25,14 +25,14 @@ public class ConcurrentCuckoo : CuckooHashSet
 
     protected override void Acquire(Tuple<long, long> x)
     {
-        Locks0[Hash0(x) % NumLocks].WaitOne();
-        Locks1[Hash1(x) % NumLocks].WaitOne();
+        Locks0[firstHash(x) % NumLocks].WaitOne();
+        Locks1[secondHash(x) % NumLocks].WaitOne();
     }
 
     protected override void Release(Tuple<long, long> x)
     {
-        Locks0[Hash0(x) % NumLocks].Release();
-        Locks1[Hash1(x) % NumLocks].Release();
+        Locks0[firstHash(x) % NumLocks].Release();
+        Locks1[secondHash(x) % NumLocks].Release();
     }
     protected override void Resize()
     {
@@ -64,7 +64,7 @@ public class ConcurrentCuckoo : CuckooHashSet
                 {
                     foreach (Tuple<long, long> oldX in oldTable[i, j])
                     {
-                        Table[0, Hash0(oldX) % Size].Add(oldX);
+                        Table[0, firstHash(oldX) % Size].Add(oldX);
                     }
                 }
             }

@@ -10,7 +10,7 @@ public class SystemSecond : IExamSystem
 
     public SystemSecond()
     {
-        this.Table = new ConcurrentCuckoo(300000);
+        this.Table = new ConcurrentCuckoo(10);
     }
     public void Add(long studentId, long courseId)
     {
