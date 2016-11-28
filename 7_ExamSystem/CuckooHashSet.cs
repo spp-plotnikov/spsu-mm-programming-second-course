@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 public abstract class CuckooHashSet
 {
     private volatile int size;
-    protected int PROBE_SIZE;
-    protected int THRESHOLD;
-    private int LIMIT = 20; //number of attempts to relocate element before giving up
+    protected int probeSize;
+    protected int threShold;
+    private int limit = 20; //number of attempts to relocate element before giving up
     protected volatile List<Tuple<long, long>>[,] table;
     public CuckooHashSet(int size)
     {
-        this.PROBE_SIZE = 100;
-        this.THRESHOLD = PROBE_SIZE / 4 * 3;
+        this.probeSize = 100;
+        this.threShold = probeSize / 4 * 3;
         this.size = size;
         this.table = new List<Tuple<long, long>>[2, size];
         for (int i = 0; i < 2; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                table[i, j] = new List<Tuple<long, long>>(PROBE_SIZE);
+                table[i, j] = new List<Tuple<long, long>>(probeSize);
             }
         }
     }
@@ -52,10 +52,10 @@ public abstract class CuckooHashSet
             }
             else
             {
-                List<Tuple<long, long>> set1 = table[1, secondHash(x) % size];
-                if(set1.Contains(x))
+                List<Tuple<long, long>> secondSet = table[1, secondHash(x) % size];
+                if(secondSet.Contains(x))
                 {
-                    set1.Remove(x);
+                    secondSet.Remove(x);
                     return true;
                 }
             }
@@ -96,39 +96,39 @@ public abstract class CuckooHashSet
     public bool Add(Tuple<long, long> x)
     {
         acquire(x);
-        long h0 = firstHash(x) % size, h1 = secondHash(x) % size;
+        long firstH = firstHash(x) % size, secondH = secondHash(x) % size;
         int i = -1;
         long h = -1;
         bool mustResize = false;
         try
         {
-            List<Tuple<long, long>> set0 = table[0, h0];
-            List<Tuple<long, long>> set1 = table[1, h1];
-            if(set0.Contains(x) || set1.Contains(x))
+            List<Tuple<long, long>> firstSet = table[0, firstH];
+            List<Tuple<long, long>> secondSet = table[1, secondH];
+            if(firstSet.Contains(x) || secondSet.Contains(x))
             {
                 return false;
             }
-            if(set0.Count() < THRESHOLD)
+            if(firstSet.Count() < threShold)
             {
-                set0.Add(x);
+                firstSet.Add(x);
                 return true;
             }
-            else if(set1.Count() < THRESHOLD)
+            else if(secondSet.Count() < threShold)
             {
-                set1.Add(x);
+                secondSet.Add(x);
                 return true;
             }
-            else if(set0.Count() < PROBE_SIZE)
+            else if(firstSet.Count() < probeSize)
             {
-                set0.Add(x);
+                firstSet.Add(x);
                 i = 0;
-                h = h0;
+                h = firstH;
             }
-            else if(set1.Count() < PROBE_SIZE)
+            else if(secondSet.Count() < probeSize)
             {
-                set1.Add(x);
+                secondSet.Add(x);
                 i = 1;
-                h = h1;
+                h = secondH;
             }
             else
             {
@@ -155,7 +155,7 @@ public abstract class CuckooHashSet
     {
         long hj = 0;
         int j = 1 - i;
-        for (int round = 0; round < LIMIT; round++)
+        for (int round = 0; round < limit; round++)
         {
             List<Tuple<long, long>> iSet = table[i, hi];
             Tuple<long, long> y = iSet.ElementAt(0);
@@ -178,12 +178,12 @@ public abstract class CuckooHashSet
             {
                 if(iSet.Remove(y))
                 {
-                    if(jSet.Count() < THRESHOLD)
+                    if(jSet.Count() < threShold)
                     {
                         jSet.Add(y);
                         return true;
                     }
-                    else if(jSet.Count() < PROBE_SIZE)
+                    else if(jSet.Count() < probeSize)
                     {
                         jSet.Add(y);
                         i = 1 - i;
@@ -196,7 +196,7 @@ public abstract class CuckooHashSet
                         return false;
                     }
                 }
-                else if(iSet.Count() >= THRESHOLD)
+                else if(iSet.Count() >= threShold)
                 {
                     continue;
                 }

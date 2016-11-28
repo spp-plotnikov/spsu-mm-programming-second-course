@@ -24,7 +24,7 @@ class ExamSystem
     
     static void Main(string[] args)
     {
-        long[] students = new long[50];
+        long[] students = new long[500];
         long[] courses = new long[10];
         for(long i = 0; i < 50; i++)
         {

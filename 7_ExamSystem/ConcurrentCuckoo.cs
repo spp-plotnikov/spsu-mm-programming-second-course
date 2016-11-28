@@ -55,7 +55,7 @@ public class ConcurrentCuckoo : CuckooHashSet
             {
                 for (int j = 0; j < size; j++)
                 {
-                    table[i, j] = new List<Tuple<long, long>>(PROBE_SIZE);
+                    table[i, j] = new List<Tuple<long, long>>(probeSize);
                 }
             }
             for (int i = 0; i < 2; i++)

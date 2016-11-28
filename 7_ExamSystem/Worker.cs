@@ -10,7 +10,7 @@ public class Worker
     private long[] courses;
     private IExamSystem table;
     public Thread ThreadWorker;
-    Random rnd = new Random();
+    private Random rnd = new Random();
 
     public Worker(long[] students, long[] courses, IExamSystem table)
     {
