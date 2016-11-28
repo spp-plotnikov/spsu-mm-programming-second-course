@@ -13,7 +13,6 @@ namespace ThreadPool
         private Thread thread;
         private bool isWorking;
         private Queue<Action> tasks;
-        private readonly int delay = 500;
         private Mutex mutex;
 
         public WorkingThread(Queue <Action> que, int num, Mutex mtx)
