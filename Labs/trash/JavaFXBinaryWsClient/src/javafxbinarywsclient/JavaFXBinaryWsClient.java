@@ -1,5 +1,6 @@
 package javafxbinarywsclient;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,7 +56,9 @@ public class JavaFXBinaryWsClient extends Application {
             ImageVO img = (ImageVO) oos.readObject();
             System.out.println("WebSocket message Received!");
             WritableImage wimg = new WritableImage(img.image.getIconWidth(), img.image.getIconHeight());
-            Image image = toFXImage((BufferedImage)img.image.getImage(),wimg);
+          
+            BufferedImage buffered = toBufferedImage(img.image.getImage());
+            Image image = toFXImage(buffered,wimg);
             imageView.setImage(image);
         } catch (IOException ex) {
             Logger.getLogger(JavaFXBinaryWsClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,6 +66,22 @@ public class JavaFXBinaryWsClient extends Application {
             Logger.getLogger(JavaFXBinaryWsClient.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    public BufferedImage toBufferedImage(java.awt.Image img) {
+        if (img instanceof BufferedImage) {
+            return (BufferedImage) img;
+        }
+
+        // Create a buffered image with transparency
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the image on to the buffered image
+        Graphics2D bGr = bimage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+
+        // Return the buffered image
+        return bimage;
     }
 
     @OnClose
