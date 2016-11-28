@@ -22,11 +22,10 @@ namespace MyThreadPool
             while (Console.KeyAvailable == false)
             {
                 threadPool.AddToPool(MyAction.DoTheJob);
-                Thread.Sleep(600);
+                Thread.Sleep(500);
             }
 
             Console.WriteLine();
-            Thread.Sleep(200);
             threadPool.Dispose();
             Console.ReadKey();
             Console.ReadKey();

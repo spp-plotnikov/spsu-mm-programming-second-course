@@ -9,45 +9,43 @@ namespace MyThreadPool
 {
     public class ThreadPool : IDisposable
     {
-        int numOfThreads_ = 5;
-        MyThread[] threads_ = new MyThread[5];
+        int _numOfThreads = 5;
+        MyThread[] _threads = new MyThread[5];
         public static Queue<Action> PoolActions = new Queue<Action>();
 
         public ThreadPool()
         {
-            for (int i = 0; i < numOfThreads_; i++)
+            for (int i = 0; i < _numOfThreads; i++)
             {
-                threads_[i] = new MyThread();
+                _threads[i] = new MyThread();
             }
         }
 
         public void AddToPool(Action newAction)
         {
-            lock (PoolActions)
+            Monitor.Enter(PoolActions);
+            PoolActions.Enqueue(newAction);
+            int itr = 0;
+
+            // find the thread to do the job
+            while (itr < _numOfThreads && _threads[itr].Busy != false)
             {
-                PoolActions.Enqueue(newAction);
-                int itr = 0;
-
-                // find the thread to do the job
-                while (itr < numOfThreads_ && threads_[itr].Working.WaitOne(0) != false)
-                {
-                    itr++;
-                }
-
-                if(itr < numOfThreads_)
-                {
-                    threads_[itr].Working.Set();
-                }
-
-                Monitor.Pulse(PoolActions);
+                itr++;
             }
+
+            if(itr < _numOfThreads)
+            {
+                _threads[itr].GiveSignal();
+            }
+
+            Monitor.Exit(PoolActions);
         }
 
         public void Dispose()
         {
-            for (int i = 0; i < numOfThreads_; i++)
+            for (int i = 0; i < _numOfThreads; i++)
             {
-                threads_[i].Finish();
+                _threads[i].Finish();
             }
 
             Console.WriteLine("All threads deleted");
@@ -55,20 +53,33 @@ namespace MyThreadPool
 
         private class MyThread
         {
-            Thread mySubThread_;
-            bool work_ = true;
-            public ManualResetEvent Finished = new ManualResetEvent(false);
-            public ManualResetEvent Working = new ManualResetEvent(false);
+            private Thread _mySubThread;
+            private bool _work = true;
+            private ManualResetEvent _finished = new ManualResetEvent(false);
+            private ManualResetEvent _working = new ManualResetEvent(false);
 
             public MyThread()
             {
-                mySubThread_ = new Thread(MyThreadStart);
-                mySubThread_.Start();
+                _mySubThread = new Thread(MyThreadStart);
+                _mySubThread.Start();
+            }
+
+            public bool Busy
+            {
+                get
+                {
+                    return _working.WaitOne(0);
+                }
+            }
+
+            public void GiveSignal()
+            {
+                _working.Set();
             }
 
             public void MyThreadStart()
             {
-                while (work_)
+                while (_work)
                 {
                     // prevent from other threads changes of the tasks queue
                     Monitor.Enter(PoolActions);
@@ -89,10 +100,10 @@ namespace MyThreadPool
                         Monitor.Exit(PoolActions);
 
                         // waiting for some new job or to finish the thread
-                        Working.Reset();
-                        Finished.Set();
-                        Working.WaitOne();
-                        Finished.Reset();
+                        _working.Reset();
+                        _finished.Set();
+                        _working.WaitOne();
+                        _finished.Reset();
                     }
                 }
             }
@@ -100,10 +111,10 @@ namespace MyThreadPool
             // end the thread
             public void Finish()
             {
-                work_ = false;
-                Finished.WaitOne();
-                Working.Set();
-                mySubThread_.Join();
+                _work = false;
+                _finished.WaitOne();
+                _working.Set();
+                _mySubThread.Join();
             }
         }
     }
