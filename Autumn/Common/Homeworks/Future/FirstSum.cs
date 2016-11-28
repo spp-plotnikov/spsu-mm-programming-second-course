@@ -9,7 +9,7 @@ namespace future
 {
     class FirstSum : IArraySum
     {
-        // rucursion
+        // recursion
         public int Sum(int[] arr)
         {
             int size = arr.Length;
