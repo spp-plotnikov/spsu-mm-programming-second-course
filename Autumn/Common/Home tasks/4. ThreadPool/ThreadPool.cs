@@ -10,21 +10,19 @@ namespace ThreadPool
     {
         private Queue<Action> tasks;
         private List<WorkingThread> threads;
-        private Mutex mutex;
         private int numThreads = 5;
 
         public ThreadPool()
         {
             tasks = new Queue<Action>();
             threads = new List<WorkingThread>();
-            mutex = new Mutex();
         }
 
         public void Start()
         {
             for (int i = 0; i < numThreads; i++)
             {
-                WorkingThread thread = new WorkingThread(tasks, i, mutex);
+                WorkingThread thread = new WorkingThread(tasks, i);
                 threads.Add(thread);
                 thread.Start();
             }
@@ -32,20 +30,24 @@ namespace ThreadPool
 
         public void Enqueue(Action task)
         {
-            mutex.WaitOne();
-            tasks.Enqueue(task);
-            mutex.ReleaseMutex();
+            lock(tasks)
+            {
+                tasks.Enqueue(task);
+                Monitor.Pulse(tasks);
+            }
         }
 
         public void Dispose()
         {
-            mutex.WaitOne();
-            tasks.Clear();
-            for (int i = 0; i < numThreads; i++)
+            lock (tasks)
             {
-                threads[i].Stop();
+                tasks.Clear();
+                for (int i = 0; i < numThreads; i++)
+                {
+                    threads[i].Stop();
+                }
+                Monitor.PulseAll(tasks);
             }
-            mutex.ReleaseMutex();
             threads.Clear();
         }
     }

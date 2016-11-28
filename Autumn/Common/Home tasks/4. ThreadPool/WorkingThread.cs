@@ -13,15 +13,13 @@ namespace ThreadPool
         private Thread thread;
         private bool isWorking;
         private Queue<Action> tasks;
-        private Mutex mutex;
 
-        public WorkingThread(Queue <Action> que, int num, Mutex mtx)
+        public WorkingThread(Queue <Action> que, int num)
         {
             name = num;
             thread = new Thread(() => Run());
             isWorking = true;
             tasks = que;
-            mutex = mtx;
         }
 
         public void Start()
@@ -33,19 +31,19 @@ namespace ThreadPool
         {
             while (isWorking)
             {
-                if (tasks.Count() == 0)
+                lock (tasks)
                 {
-                    continue;
+                    if (tasks.Count() == 0)
+                    {
+                        Monitor.Wait(tasks);
+                    }
+                    if (!isWorking)
+                    {
+                        return;
+                    }
+                    task = tasks.Dequeue();
+                    Console.WriteLine("Thread " + name + " is working on task");
                 }
-                mutex.WaitOne();
-                if (tasks.Count() == 0 || !isWorking)
-                {
-                    mutex.ReleaseMutex();
-                    continue;
-                }
-                task = tasks.Dequeue();
-                Console.WriteLine("Thread " + name + " is working on task");
-                mutex.ReleaseMutex();
                 task();
             }
         }
@@ -53,7 +51,6 @@ namespace ThreadPool
         public void Stop()
         {
             isWorking = false;
-            thread.Join();
         }
     }
 }
