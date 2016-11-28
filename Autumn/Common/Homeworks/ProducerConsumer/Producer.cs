@@ -13,7 +13,7 @@ namespace ProducerConsumer
         private readonly int _name;
         private List<int> _goods;
         private Random _rnd = new Random();
-        public bool State = true;
+        private bool _state = true;
 
         public Producer(int name, List <int> goods)
         {
@@ -25,12 +25,13 @@ namespace ProducerConsumer
 
         public void Finish()
         {
+            _state = false;
             _thread.Join();
         }
 
         void Run()
         {
-            while (State) AddSomething();
+            while (_state) AddSomething();
         }
 
         public void AddSomething()
