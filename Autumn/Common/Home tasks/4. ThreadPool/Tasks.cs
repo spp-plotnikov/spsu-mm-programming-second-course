@@ -28,14 +28,10 @@ namespace ThreadPool
         public void Stop()
         {
             isWorking = false;
-        }
-
-        public void ThreadJoin()
-        {
             task.Join();
         }
 
-        private Action newAct()
+        private Action NewAct()
         {
             Action tmp = () =>
             {
@@ -50,7 +46,7 @@ namespace ThreadPool
             while (isWorking)
             {
                 Console.WriteLine("New task");
-                pool.Enqueue(newAct());
+                pool.Enqueue(NewAct());
                 Thread.Sleep(delay);
             }
         }

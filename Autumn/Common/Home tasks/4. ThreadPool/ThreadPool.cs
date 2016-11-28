@@ -9,14 +9,14 @@ namespace ThreadPool
     class ThreadPool : IDisposable
     {
         private Queue<Action> tasks;
-        private List<Threads> threads;
+        private List<WorkingThread> threads;
         private Mutex mutex;
         private int numThreads = 5;
 
         public ThreadPool()
         {
             tasks = new Queue<Action>();
-            threads = new List<Threads>();
+            threads = new List<WorkingThread>();
             mutex = new Mutex();
         }
 
@@ -24,7 +24,7 @@ namespace ThreadPool
         {
             for (int i = 0; i < numThreads; i++)
             {
-                Threads thread = new Threads(tasks, i, mutex);
+                WorkingThread thread = new WorkingThread(tasks, i, mutex);
                 threads.Add(thread);
                 thread.Start();
             }
@@ -46,10 +46,6 @@ namespace ThreadPool
                 threads[i].Stop();
             }
             mutex.ReleaseMutex();
-            for (int i = 0; i < numThreads; i++)
-            {
-                threads[i].ThreadJoin();
-            }
             threads.Clear();
         }
     }

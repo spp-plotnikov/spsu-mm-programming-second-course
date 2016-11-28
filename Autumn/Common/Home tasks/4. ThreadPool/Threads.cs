@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace ThreadPool
 {
-    class Threads
+    class WorkingThread
     {
         private Action task;
         private int name;
@@ -16,7 +16,7 @@ namespace ThreadPool
         private readonly int delay = 500;
         private Mutex mutex;
 
-        public Threads(Queue <Action> que, int num, Mutex mtx)
+        public WorkingThread(Queue <Action> que, int num, Mutex mtx)
         {
             name = num;
             thread = new Thread(() => Run());
@@ -34,9 +34,9 @@ namespace ThreadPool
         {
             while (isWorking)
             {
-                while (tasks.Count() == 0 && !isWorking)
+                if (tasks.Count() == 0)
                 {
-                    Thread.Sleep(delay);
+                    continue;
                 }
                 mutex.WaitOne();
                 if (tasks.Count() == 0 || !isWorking)
@@ -54,10 +54,6 @@ namespace ThreadPool
         public void Stop()
         {
             isWorking = false;
-        }
-
-        public void ThreadJoin()
-        {
             thread.Join();
         }
     }
