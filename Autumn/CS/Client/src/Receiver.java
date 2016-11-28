@@ -22,7 +22,9 @@ class Receiver {
 
         int size = dataInputStream.readInt();
         byte[] imageAr = new byte[size];
-        dataInputStream.read(imageAr);
+        for (int i = 0; i < size; i++) {
+            imageAr[i] = dataInputStream.readByte();
+        }
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
 
         return image;

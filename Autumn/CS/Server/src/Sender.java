@@ -3,6 +3,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -30,7 +31,11 @@ class Sender {
 
         int size = byteArrayOutputStream.toByteArray().length;
         dataOutputStream.writeInt(size);
-        dataOutputStream.write(byteArrayOutputStream.toByteArray());
+        byte[] buffer = byteArrayOutputStream.toByteArray();
+        for (int i = 0; i < size; i++) {
+            dataOutputStream.writeByte(buffer[i]);
+        }
+
         dataOutputStream.flush();
     }
 

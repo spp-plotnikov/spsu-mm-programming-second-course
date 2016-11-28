@@ -1,9 +1,6 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -33,7 +30,10 @@ class Receiver {
         nameFilter.append(dataInputStream.readUTF().toString());
         int size = dataInputStream.readInt();
         byte[] imageAr = new byte[size];
-        dataInputStream.read(imageAr);
+        for (int i = 0; i < size; i++) {
+            imageAr[i] = dataInputStream.readByte();
+        }
+
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageAr);
         BufferedImage image = ImageIO.read(byteArrayInputStream);
 

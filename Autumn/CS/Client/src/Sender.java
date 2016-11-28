@@ -25,10 +25,14 @@ class Sender {
             System.out.println("едва ли это был настоящий jpg");
             System.exit(1);
         }
+        int size = byteArrayOutputStream.toByteArray().length;
         dataOutputStream.writeByte(0xFE);
         dataOutputStream.writeUTF(nameFilter);
-        dataOutputStream.writeInt(byteArrayOutputStream.toByteArray().length);
-        dataOutputStream.write(byteArrayOutputStream.toByteArray());
+        dataOutputStream.writeInt(size);
+        byte[] buffer = byteArrayOutputStream.toByteArray();
+        for (int i = 0; i < size; i++) {
+            dataOutputStream.writeByte(buffer[i]);
+        }
         dataOutputStream.flush();
     }
 }
