@@ -23,7 +23,6 @@ class Receiver {
         int size = dataInputStream.readInt();
         byte[] imageAr = new byte[size];
         dataInputStream.read(imageAr);
-
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
 
         return image;
@@ -37,5 +36,6 @@ class Receiver {
         for (int i = 0; i < n; i++) {
             strings.add(dataInputStream.readUTF().toString());
         }
+        dataOutputStream.flush();
     }
 }

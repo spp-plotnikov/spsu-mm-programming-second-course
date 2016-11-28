@@ -1,3 +1,4 @@
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -20,11 +21,17 @@ class Sender {
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", byteArrayOutputStream);
+        try {
+            ImageIO.write(image, "jpg", byteArrayOutputStream);
+        } catch (IIOException ex) {
+            System.out.println("babax");
+            System.exit(5);
+        }
 
         int size = byteArrayOutputStream.toByteArray().length;
         dataOutputStream.writeInt(size);
         dataOutputStream.write(byteArrayOutputStream.toByteArray());
+        dataOutputStream.flush();
     }
 
     void sendFilters(ArrayList<MyFilter> filters) throws IOException {
@@ -34,9 +41,11 @@ class Sender {
         for (int i = 0; i < filters.size(); i++) {
             dataOutputStream.writeUTF(filters.get(i).getNameFilter());
         }
+        dataOutputStream.flush();
     }
     void sendProgress(byte n) throws IOException {
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
         dataOutputStream.writeByte(n);
+        dataOutputStream.flush();
     }
 }

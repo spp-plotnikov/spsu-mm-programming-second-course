@@ -1,5 +1,6 @@
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.UTFDataFormatException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -37,7 +38,12 @@ public class Server {
                             new Sender(serv, socket).sendFilters(filters);
                         } else if (b == -2) {
                             StringBuffer nameFilter = new StringBuffer("");
-                            BufferedImage image = new Receiver(serv, socket).recvImage(nameFilter);
+                            BufferedImage image = null;
+                            try {
+                                 image = new Receiver(serv, socket).recvImage(nameFilter);
+                            } catch (UTFDataFormatException ex) {
+                                System.out.println("Ооопс... потеря данных или при приеме или при отправке");
+                            }
                             for (int i = 0; i < filters.size(); i++) {
                                 if (filters.get(i).getNameFilter().equalsIgnoreCase(nameFilter.toString())) {
                                     image = filters.get(i).processImage(image, sender);

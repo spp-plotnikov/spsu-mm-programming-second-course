@@ -19,7 +19,6 @@ public class Form {
     JLabel jLabel2 = null;
     JLabel jLabel1 = null;
     JComboBox jComboBox = null;
-    ArrayList<String> strings;
     int sizeImageW = 350;
     int getSizeImageH = 350;
     private void addComponent() throws IOException {
@@ -35,32 +34,28 @@ public class Form {
         progressBar = new JProgressBar();
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
-        progressBar.setBorder(BorderFactory.createTitledBorder("Progress..."));
+        progressBar.setBorder(BorderFactory.createTitledBorder("Прогресс..."));
         container.add(progressBar);
         progressBar.setBounds(10, 400, 780, 40);
         progressBar.setVisible(false);
 
-        strings = new ArrayList();
-
-        jComboBox = new JComboBox(strings.toArray());
-        container.add(jComboBox);
-        jComboBox.setBounds(10, 10, 200, 20);
-
-
+        ArrayList<String> strings = new ArrayList();
         Socket socket = null;
         try {
             socket = new Socket("localhost", 2500);
             new Receiver(socket).recieveFilters(strings);
-            initComboBox();
             socket.close();
         } catch (ConnectException ex) {
             JPanel myRootPane = new JPanel();
             JOptionPane.showMessageDialog(myRootPane, "Отсутствует соединение с сервером", "Ошибка", JOptionPane.DEFAULT_OPTION );
         }
 
+        jComboBox = new JComboBox(strings.toArray());
+        container.add(jComboBox);
+        jComboBox.setBounds(10, 10, 200, 20);
 
 
-        JButton button1 = new JButton("open file");
+        JButton button1 = new JButton("выбрать файл");
         container.add(button1);
         button1.setBounds(220, 10, 150, 20);
 
@@ -98,6 +93,12 @@ public class Form {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     path = file.toString();
+                    if (!path.toString().endsWith("jpg")) {
+                        JPanel myRootPane = new JPanel();
+                        JOptionPane.showMessageDialog(myRootPane, "выбрите jpg файл", "ошибка", JOptionPane.DEFAULT_OPTION );
+                        return;
+                    }
+
                     try {
                         jLabel1.setIcon(new ImageIcon(compressImage(ImageIO.read(new File(path)))));
                     } catch (IOException e) {
@@ -116,11 +117,7 @@ public class Form {
 
         }
     }
-    void initComboBox() {
-        for (String s : strings) {
-            jComboBox.addItem(s);
-        }
-    }
+
     class forUpdate implements Runnable {
         private JButton button;
         private JButton button2;
@@ -133,19 +130,7 @@ public class Form {
             try {
                 socket = new Socket("localhost", 2500);
                 Receiver receiver = new Receiver(socket);
-                try {
-                    new Sender(socket).sendImage(path, jComboBox.getSelectedItem().toString());
-                } catch (NullPointerException ex) {
-                    JPanel myRootPane = new JPanel();
-                    JOptionPane.showMessageDialog(myRootPane, "Выберите фильтр", "Ошибка", JOptionPane.DEFAULT_OPTION );
-                    new Receiver(socket).recieveFilters(strings);
-                    initComboBox();
-                    button.setVisible(true);
-                    button2.setVisible(false);
-                    progressBar.setVisible(false);
-                    return;
-                }
-
+                new Sender(socket).sendImage(path, jComboBox.getSelectedItem().toString());
                 byte b = 0;
                 while (b != 100) {
                     b = receiver.recv();
@@ -186,7 +171,7 @@ public class Form {
     private void createAndShowGUI() throws IOException {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
-        JFrame frame = new JFrame("AbsoluteLayoutDemo");
+        JFrame frame = new JFrame("Приложение наложения фильтров на JPG");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
