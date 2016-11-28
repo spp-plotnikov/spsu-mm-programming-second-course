@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 public abstract class CuckooHashSet
 {
-    private volatile int Size;
+    private volatile int size;
     protected int PROBE_SIZE;
     protected int THRESHOLD;
     private int LIMIT = 20; //number of attempts to relocate element before giving up
-    protected volatile List<Tuple<long, long>>[,] Table;
+    protected volatile List<Tuple<long, long>>[,] table;
     public CuckooHashSet(int size)
     {
         this.PROBE_SIZE = 100;
         this.THRESHOLD = PROBE_SIZE / 4 * 3;
-        this.Size = size;
-        this.Table = new List<Tuple<long, long>>[2, size];
+        this.size = size;
+        this.table = new List<Tuple<long, long>>[2, size];
         for (int i = 0; i < 2; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                Table[i, j] = new List<Tuple<long, long>>(PROBE_SIZE);
+                table[i, j] = new List<Tuple<long, long>>(PROBE_SIZE);
             }
         }
     }
@@ -35,16 +35,16 @@ public abstract class CuckooHashSet
         return (elem.Item1 % 10001) + (elem.Item2 % 101);
     }
 
-    protected abstract void Acquire(Tuple<long, long> x);
-    protected abstract void Release(Tuple<long, long> x);
-    protected abstract void Resize();
+    protected abstract void acquire(Tuple<long, long> x);
+    protected abstract void release(Tuple<long, long> x);
+    protected abstract void resize();
 
     public bool Remove(Tuple<long, long> x)
     {
-        Acquire(x);
+        acquire(x);
         try
         {
-            List<Tuple<long, long>> firstSet = Table[0, firstHash(x) % Size];
+            List<Tuple<long, long>> firstSet = table[0, firstHash(x) % size];
             if(firstSet.Contains(x))
             {
                 firstSet.Remove(x);
@@ -52,7 +52,7 @@ public abstract class CuckooHashSet
             }
             else
             {
-                List<Tuple<long, long>> set1 = Table[1, secondHash(x) % Size];
+                List<Tuple<long, long>> set1 = table[1, secondHash(x) % size];
                 if(set1.Contains(x))
                 {
                     set1.Remove(x);
@@ -63,23 +63,23 @@ public abstract class CuckooHashSet
         }
         finally
         {
-            Release(x);
+            release(x);
         }
     }
 
     public bool Contains(Tuple<long, long> x)
     {
-        Acquire(x);
+        acquire(x);
         try
         {
-            List<Tuple<long, long>> firstList = Table[0, firstHash(x) % Size];
+            List<Tuple<long, long>> firstList = table[0, firstHash(x) % size];
             if(firstList.Contains(x))
             {
                 return true;
             }
             else
             {
-                List<Tuple<long, long>> secondList = Table[1, secondHash(x) % Size];
+                List<Tuple<long, long>> secondList = table[1, secondHash(x) % size];
                 if (secondList.Contains(x))
                 {
                     return true;
@@ -89,21 +89,21 @@ public abstract class CuckooHashSet
         }
         finally
         {
-            Release(x);
+            release(x);
         }
     }
 
     public bool Add(Tuple<long, long> x)
     {
-        Acquire(x);
-        long h0 = firstHash(x) % Size, h1 = secondHash(x) % Size;
+        acquire(x);
+        long h0 = firstHash(x) % size, h1 = secondHash(x) % size;
         int i = -1;
         long h = -1;
         bool mustResize = false;
         try
         {
-            List<Tuple<long, long>> set0 = Table[0, h0];
-            List<Tuple<long, long>> set1 = Table[1, h1];
+            List<Tuple<long, long>> set0 = table[0, h0];
+            List<Tuple<long, long>> set1 = table[1, h1];
             if(set0.Contains(x) || set1.Contains(x))
             {
                 return false;
@@ -137,43 +137,43 @@ public abstract class CuckooHashSet
         }
         finally
         {
-            Release(x);
+            release(x);
         }
         if(mustResize)
         {
-            Resize();
+            resize();
             Add(x);
         }
         else if(!Relocate(i, h))
         {
-            Resize();
+            resize();
         }
         return true;
     }
 
-    protected bool Relocate(int i, long hi)
+    public bool Relocate(int i, long hi)
     {
         long hj = 0;
         int j = 1 - i;
         for (int round = 0; round < LIMIT; round++)
         {
-            List<Tuple<long, long>> iSet = Table[i, hi];
+            List<Tuple<long, long>> iSet = table[i, hi];
             Tuple<long, long> y = iSet.ElementAt(0);
             switch (i)
             {
                 case 0:
                 {
-                    hj = secondHash(y) % Size;
+                    hj = secondHash(y) % size;
                     break;
                 }
                 case 1:
                 {
-                    hj = firstHash(y) % Size;
+                    hj = firstHash(y) % size;
                     break;
                 }
             }
-            Acquire(y);
-            List<Tuple<long, long>> jSet = Table[j, hj];
+            acquire(y);
+            List<Tuple<long, long>> jSet = table[j, hj];
             try
             {
                 if(iSet.Remove(y))
@@ -207,7 +207,7 @@ public abstract class CuckooHashSet
             }
             finally
             {
-                Release(y);
+                release(y);
             }
         }
         return false;

@@ -6,17 +6,17 @@ using System.Threading;
 
 public class Worker
 {
-    private long[] Students;
-    private long[] Courses;
-    private IExamSystem Table;
+    private long[] students;
+    private long[] courses;
+    private IExamSystem table;
     public Thread ThreadWorker;
     Random rnd = new Random();
 
     public Worker(long[] students, long[] courses, IExamSystem table)
     {
-        this.Students = students;
-        this.Courses = courses;
-        this.Table = table;
+        this.students = students;
+        this.courses = courses;
+        this.table = table;
         this.ThreadWorker = new Thread(() => Run());
         ThreadWorker.Start();
     }
@@ -27,17 +27,17 @@ public class Worker
         {
             j = rnd.Next(50);
             k = rnd.Next(10);
-            Table.Add(Students[j], Courses[k]);
+            table.Add(students[j], courses[k]);
         }
         for (int i = 0; i < 9; i++)
         {
             j = rnd.Next(50);
             k = rnd.Next(10);
-            Table.Remove(Students[j], Courses[k]);
+            table.Remove(students[j], courses[k]);
         }
         j = rnd.Next(50);
         k = rnd.Next(10);
         //Table.Contains(Students[j], Courses[k]);
-        Console.WriteLine(Table.Contains(Students[j], Courses[k]));
+        Console.WriteLine(table.Contains(students[j], courses[k]));
     }
 }
