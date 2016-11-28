@@ -46,10 +46,6 @@ namespace Producer_consumer
         public void Stop()
         {
             isWorking = false;
-        }
-
-        public void ThreadJoin()
-        {
             thread.Join();
         }
     }

@@ -23,14 +23,14 @@ namespace Producer_consumer
             buffer = buf;
         }
 
-        private void addProducer(int i)
+        private void AddProducer(int i)
         {
             Producer newProducer = new Producer(i, buffer);
             producerList.Add(newProducer);
             newProducer.Start();
         }
 
-        private void addConsumer(int i)
+        private void AddConsumer(int i)
         {
             Consumer newConsumer = new Consumer(i, buffer);
             consumerList.Add(newConsumer);
@@ -41,12 +41,12 @@ namespace Producer_consumer
         {
             for (int i = 1; i <= numProducers; i++)
             {
-                addProducer(i);
+                AddProducer(i);
             }
 
             for (int i = 1; i <= numConsumers; i++)
             {
-                addConsumer(i);
+                AddConsumer(i);
             }
         }
 
@@ -55,13 +55,11 @@ namespace Producer_consumer
             for (int i = 1; i <= numProducers; i++)
             {
                 producerList[0].Stop();
-                producerList[0].ThreadJoin();
                 producerList.RemoveAt(0);
             }
             for (int i = 1; i <= numConsumers; i++)
             {
                 consumerList[0].Stop();
-                consumerList[0].ThreadJoin();
                 consumerList.RemoveAt(0);
             }
         }
