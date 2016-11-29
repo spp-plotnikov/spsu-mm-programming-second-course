@@ -20,8 +20,8 @@ namespace ThreadPool
            
         public void StartWork()
         {
-            int r = new Random().Next(1000, 10000) * (num + 1) / 3;
-            Console.WriteLine("{0} start, work {1}", name, r);
+            int r = new Random(num).Next(1000, 5000) * (num + 3) / (num + 1);
+            Console.WriteLine("{0} start, work {1} on {2}", name, r, Thread.CurrentThread.Name);
             Thread.Sleep(r);
         }
     }

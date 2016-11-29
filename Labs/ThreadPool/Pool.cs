@@ -14,7 +14,6 @@ namespace ThreadPool
         bool flag = true;
         List<Action> actList = new List<Action>();
         Semaphore sem = new Semaphore(1, 1);
-        public int ended = 0;
 
         public Pool(int num)
         {
@@ -31,7 +30,9 @@ namespace ThreadPool
         {
             for (int i = 0; i < numOfThr; i++)
             {
-                threadList.Add(new Thread(WorkInThread));
+                Thread t = new Thread(WorkInThread);
+                t.Name = "Thread_" + i;
+                threadList.Add(t);
             }
         }
 
@@ -66,7 +67,6 @@ namespace ThreadPool
                 {
                     myAct = actList[0];
                     actList.RemoveAt(0);
-                    ended++;
                     sem.Release();
                 }
                 myAct();
