@@ -23,11 +23,15 @@ namespace ThreadPool
             this.curThread.Start();
         }
 
+        public void SetWork()
+        {
+            work = false;
+            Console.WriteLine(name);
+        }
         public void Run()
         {
             while (work)
             {
-                // Monitor.Enter(tasks);
                 Action curAction = new Action(() => { });
                 lock (tasks)
                 {
@@ -35,26 +39,22 @@ namespace ThreadPool
                     {
                         Console.WriteLine("Thread {0} has new task", this.name);
                         curAction = tasks.Dequeue();
-                       // Monitor.Exit(tasks);
                         curAction();
                     }
                     else
                     {
+                        Console.WriteLine("{0} now wait", name);
                         Monitor.Wait(tasks);
-                        if (!work)
-                        {
-                            break;
-                        }
+
                     }
                 }
-                curAction();
             }
         }
 
         public void Stop()
         {
-            work = false;
             curThread.Join();
+            Console.WriteLine("ENDEND");
         }
     }
 }

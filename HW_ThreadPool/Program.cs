@@ -12,7 +12,7 @@ namespace ThreadPool
         {
             ThreadPool threadPool = new ThreadPool();
             threadPool.Start();
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 15; i++)
             {
                 threadPool.Enqueue(Task.MyTask);
             }

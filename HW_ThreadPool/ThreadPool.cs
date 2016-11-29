@@ -24,6 +24,7 @@ namespace ThreadPool
             {
                 tasks.Enqueue(task);
                 Monitor.Pulse(tasks);
+                Monitor.Exit(tasks);
             }
         }
         
@@ -38,11 +39,25 @@ namespace ThreadPool
 
         public void Dispose()
         {
-            for (int i = 0; i < numOfThreads; i++)
+            lock (tasks)
             {
-                threads[i].Stop();
+                tasks.Clear();
+                for (int i = 0; i < numOfThreads; i++)
+                {
+                    threads[i].SetWork();
+                }
+                for (int i = 0; i < numOfThreads; i++)
+                {
+                    Monitor.Pulse(tasks);
+                }
+                Console.WriteLine("all threads have been stopped");
+                for (int i = 0; i < numOfThreads; i++)
+                {
+                    threads[i].Stop();
+                }
+                Monitor.Pulse(tasks);
+                Console.WriteLine("all threads have been stopped");
             }
-            Console.WriteLine("all threads have been stopped");
         }
     }
 }
