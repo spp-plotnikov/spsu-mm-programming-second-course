@@ -13,8 +13,8 @@ namespace FibersManager
         static Dictionary<uint, int> idPrior = new Dictionary<uint, int>(); //fiberId: fiberpriority
         static Queue<int> fibQueue = new Queue<int>();
         static int fibNow = 0;
-
-        static void create(uint size, bool prior)
+        static int number = 0;
+        static void Create(uint size, bool prior)
         {
             for (int i = 0; i < size; i++)
             {
@@ -105,8 +105,8 @@ namespace FibersManager
             }
             else
             {
-                Thread.Sleep(1);
-                int rand = new Random(0).Next(0, fibers.Count() - 1);
+                Thread.Sleep(2);
+                int rand = new Random(number / (fibers.Count + 1)).Next(0, fibers.Count() - 1);
                 if ((rand / (float)fibers.Count) * 100.0 < 7)
                 {
                     fibNow = rand;
@@ -115,6 +115,8 @@ namespace FibersManager
                 {
                     fibNow = fibers.Count() - 1;
                 }
+
+                number += 1000;
 
                 Fiber.Switch(fibers[fibNow].Id);
             }
@@ -126,7 +128,7 @@ namespace FibersManager
             bool prior = true;
             Console.WriteLine("Input number of fibers:");
             uint size = Convert.ToUInt32(Console.ReadLine());
-            create(size, prior);
+            Create(size, prior);
             
             Switch(false);
             Console.ReadKey();
