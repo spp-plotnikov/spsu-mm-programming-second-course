@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,10 +24,10 @@ namespace ArrSum
             Console.WriteLine("Input size of Array");
             int s = Convert.ToInt32(Console.ReadLine());
             int[] arr = CreateArray(s);
-            int res1 = new Summator1().Sum(arr);
-            Console.WriteLine("sum1: " + res1);
-            int res2 = new Summator2().Sum(arr);
-            Console.WriteLine("sum2: " + res2);
+            int res = new FirstSummator().Sum(arr);
+            Console.WriteLine("sum1: " + res);
+            res = new SecondSummator().Sum(arr);
+            Console.WriteLine("sum2: " + res);
             Console.ReadKey();
 
         }

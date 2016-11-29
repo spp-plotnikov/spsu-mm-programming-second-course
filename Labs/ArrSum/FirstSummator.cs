@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArrSum
 {
-    class Summator1 : IArraySum
+    class FirstSummator : IArraySum
     {
         int numOfTasks = 5;      
         List<Task<int>> tasks = new List<Task<int>>();
