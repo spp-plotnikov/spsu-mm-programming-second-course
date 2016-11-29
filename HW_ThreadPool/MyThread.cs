@@ -26,26 +26,29 @@ namespace ThreadPool
         public void SetWork()
         {
             work = false;
-            Console.WriteLine(name);
         }
+
         public void Run()
         {
             while (work)
             {
-                Action curAction = new Action(() => { });
-                lock (tasks)
+                Monitor.Enter(tasks);
+                if (tasks.Count() > 0)
                 {
-                    if (tasks.Count > 0)
-                    {
-                        Console.WriteLine("Thread {0} has new task", this.name);
-                        curAction = tasks.Dequeue();
-                        curAction();
-                    }
-                    else
-                    {
-                        Console.WriteLine("{0} now wait", name);
-                        Monitor.Wait(tasks);
+                    Action task = tasks.Dequeue();
+                    Monitor.Pulse(tasks);
+                    Monitor.Exit(tasks);
 
+                    Console.WriteLine("{0} has new work", name);
+                    task();
+                    Thread.Sleep(500);
+                }
+                else
+                {
+                    Monitor.Exit(tasks);
+                    lock (tasks)
+                    {
+                        Monitor.Wait(tasks);
                     }
                 }
             }
@@ -54,7 +57,6 @@ namespace ThreadPool
         public void Stop()
         {
             curThread.Join();
-            Console.WriteLine("ENDEND");
         }
     }
 }

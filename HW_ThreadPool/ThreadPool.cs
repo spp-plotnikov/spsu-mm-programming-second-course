@@ -9,7 +9,7 @@ namespace ThreadPool
 {
     public class ThreadPool : IDisposable
     {
-        const int numOfThreads = 2;
+        const int numOfThreads = 10;
         private Queue<Action> tasks = new Queue<Action>();
         private List<MyThread> threads = new List<MyThread>();
 
@@ -21,9 +21,10 @@ namespace ThreadPool
         public void Enqueue (Action task)
         {
             lock (tasks)
-            {
+           {
+                Monitor.Enter(tasks);
                 tasks.Enqueue(task);
-                Monitor.Pulse(tasks);
+                Monitor.PulseAll(tasks);
                 Monitor.Exit(tasks);
             }
         }
@@ -50,7 +51,6 @@ namespace ThreadPool
                 {
                     Monitor.Pulse(tasks);
                 }
-                Console.WriteLine("all threads have been stopped");
                 for (int i = 0; i < numOfThreads; i++)
                 {
                     threads[i].Stop();
