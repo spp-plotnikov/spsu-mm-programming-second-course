@@ -20,9 +20,11 @@ namespace ThreadPool
 
         public void Enqueue (Action task)
         {
-            Monitor.Enter(tasks);
-            tasks.Enqueue(task);
-            Monitor.Exit(tasks);
+            lock (tasks)
+            {
+                tasks.Enqueue(task);
+                Monitor.Pulse(tasks);
+            }
         }
         
         public void Start()
