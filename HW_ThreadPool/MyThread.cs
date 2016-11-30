@@ -32,25 +32,26 @@ namespace ThreadPool
         {
             while (work)
             {
-                Monitor.Enter(tasks);
-                if (tasks.Count() > 0)
+                Action task = new Action(() => { });
+                lock (tasks)
                 {
-                    Action task = tasks.Dequeue();
-                    Monitor.Pulse(tasks);
-                    Monitor.Exit(tasks);
+                    if (tasks.Count() > 0)
+                    {
+                        task = tasks.Dequeue();
 
-                    Console.WriteLine("{0} has new work", name);
-                    task();
-                    Thread.Sleep(500);
-                }
-                else
-                {
-                    Monitor.Exit(tasks);
-                    lock (tasks)
+                        Console.WriteLine("{0} has new work", name);
+                        Monitor.Pulse(tasks);
+                    }
+                    else
                     {
                         Monitor.Wait(tasks);
+                        if (!work)
+                        {
+                            return;
+                        }
                     }
                 }
+                task();
             }
         }
 
