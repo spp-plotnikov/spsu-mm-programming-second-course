@@ -22,6 +22,7 @@ class Receiver {
 
         int size = dataInputStream.readInt();
         byte[] imageAr = new byte[size];
+
         for (int i = 0; i < size; i++) {
             imageAr[i] = dataInputStream.readByte();
         }

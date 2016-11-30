@@ -25,6 +25,7 @@ class Sender {
             System.out.println("едва ли это был настоящий jpg");
             System.exit(1);
         }
+
         int size = byteArrayOutputStream.toByteArray().length;
         dataOutputStream.writeByte(0xFE);
         dataOutputStream.writeUTF(nameFilter);

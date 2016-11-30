@@ -1,5 +1,6 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,17 +25,17 @@ public class Form {
     private void addComponent() throws IOException {
         container.setLayout(null);
 
-        jLabel1 = new JLabel("Загрузите изображение", SwingConstants.CENTER);
+        jLabel1 = new JLabel("Download image", SwingConstants.CENTER);
         container.add(jLabel1);
         jLabel1.setBounds(30, 50, sizeImageW, getSizeImageH);
-        jLabel2 = new JLabel("Здесь будет полученное изображение", SwingConstants.CENTER);
+        jLabel2 = new JLabel("There will be new image", SwingConstants.CENTER);
         container.add(jLabel2);
         jLabel2.setBounds(420, 50, sizeImageW, getSizeImageH);
 
         progressBar = new JProgressBar();
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
-        progressBar.setBorder(BorderFactory.createTitledBorder("Прогресс..."));
+        progressBar.setBorder(BorderFactory.createTitledBorder("Progress..."));
         container.add(progressBar);
         progressBar.setBounds(10, 400, 780, 40);
         progressBar.setVisible(false);
@@ -47,7 +48,7 @@ public class Form {
             socket.close();
         } catch (ConnectException ex) {
             JPanel myRootPane = new JPanel();
-            JOptionPane.showMessageDialog(myRootPane, "Отсутствует соединение с сервером", "Ошибка", JOptionPane.DEFAULT_OPTION );
+            JOptionPane.showMessageDialog(myRootPane, "No connection with server", "Error", JOptionPane.DEFAULT_OPTION );
         }
 
         jComboBox = new JComboBox(strings.toArray());
@@ -55,57 +56,54 @@ public class Form {
         jComboBox.setBounds(10, 10, 200, 20);
 
 
-        JButton button1 = new JButton("выбрать файл");
-        container.add(button1);
-        button1.setBounds(220, 10, 150, 20);
+        JButton chooseFile = new JButton("Open File");
+        container.add(chooseFile);
+        chooseFile.setBounds(220, 10, 150, 20);
 
 
-        JButton button3 = new JButton("Отмена");
-        JButton button2 = new JButton("Отправить");
-        container.add(button2);
-        button2.setBounds(380, 10, 150, 20);
-        button2.setEnabled(false);
-        button2.addActionListener(new ActionListener() {
+        JButton cancel = new JButton("Cancel");
+        JButton send = new JButton("Send");
+        container.add(send);
+        send.setBounds(380, 10, 150, 20);
+        send.setEnabled(false);
+        send.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 progressBar.setVisible(true);
-                button2.setVisible(false);
-                button3.setVisible(true);
-                new Thread(new forUpdate(button2, button3)).start();
+                newProgressBarValue(0);
+                send.setVisible(false);
+                cancel.setVisible(true);
+                new Thread(new forUpdate(send, cancel)).start();
             }
         });
 
 
-        container.add(button3);
-        button3.setBounds(380, 10, 150, 20);
-        button3.addActionListener(new ActionListener() {
+        container.add(cancel);
+        cancel.setBounds(380, 10, 150, 20);
+        cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                button3.setVisible(false);
-                button2.setVisible(true);
+                cancel.setVisible(false);
+                send.setVisible(true);
                 newProgressBarValue(0);
                 disconncet();
             }
         });
-        button1.addActionListener(new ActionListener() {
+        chooseFile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 JFileChooser fc = new JFileChooser();
+                fc.setAcceptAllFileFilterUsed(false);
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("Image (*.jpg)", "jpg"));
                 int returnVal = fc.showOpenDialog(null);
 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     path = file.toString();
-                    if (!path.toString().endsWith("jpg")) {
-                        JPanel myRootPane = new JPanel();
-                        JOptionPane.showMessageDialog(myRootPane, "выбрите jpg файл", "ошибка", JOptionPane.DEFAULT_OPTION );
-                        return;
-                    }
-
                     try {
                         jLabel1.setIcon(new ImageIcon(compressImage(ImageIO.read(new File(path)))));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                button2.setEnabled(true);
+                send.setEnabled(true);
             }
         });
     }
@@ -140,7 +138,7 @@ public class Form {
                 jLabel2.setIcon(new ImageIcon(compressImage(image)));
             } catch (ConnectException ex) {
                 JPanel myRootPane = new JPanel();
-                JOptionPane.showMessageDialog(myRootPane, "Отсутствует соединение с сервером", "ошибка", JOptionPane.DEFAULT_OPTION );
+                JOptionPane.showMessageDialog(myRootPane, "No connection with server", "Error", JOptionPane.DEFAULT_OPTION );
             } catch (SocketException ex) {
                 //disconnect
             } catch (IOException e) {
@@ -171,7 +169,7 @@ public class Form {
     private void createAndShowGUI() throws IOException {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
-        JFrame frame = new JFrame("Приложение наложения фильтров на JPG");
+        JFrame frame = new JFrame("Filters overlay application to JPG");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
