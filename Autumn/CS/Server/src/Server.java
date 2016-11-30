@@ -23,43 +23,47 @@ public class Server {
     }
     void start() throws IOException {
         serv = new ServerSocket(2500);
+        while (true) {
+            Socket socket = serv.accept();
+            new Thread(new ForClient(socket)).start();
+        }
+    }
+    class ForClient implements Runnable {
 
-        new Thread(new Runnable() {
-            public void run() {
-                System.out.println("waiting...");
+        Socket socket;
 
-                while (true) {
+        ForClient(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            try {
+                Sender sender = new Sender(serv, socket);
+                Receiver receiver = new Receiver(serv, socket);
+                byte b = receiver.recv();
+                if (b == -1) {
+                    new Sender(serv, socket).sendFilters(filters);
+                } else if (b == -2) {
+                    StringBuffer nameFilter = new StringBuffer("");
+                    BufferedImage image = null;
                     try {
-                        Socket socket = serv.accept();
-                        Sender sender = new Sender(serv, socket);
-                        Receiver receiver = new Receiver(serv, socket);
-                        byte b = receiver.recv();
-                        if (b == -1) {
-                            new Sender(serv, socket).sendFilters(filters);
-                        } else if (b == -2) {
-                            StringBuffer nameFilter = new StringBuffer("");
-                            BufferedImage image = null;
-                            try {
-                                 image = new Receiver(serv, socket).recvImage(nameFilter);
-                            } catch (UTFDataFormatException ex) {
-                                System.out.println("Ооопс... потеря данных или при приеме или при отправке");
-                            }
-                            for (int i = 0; i < filters.size(); i++) {
-                                if (filters.get(i).getNameFilter().equalsIgnoreCase(nameFilter.toString())) {
-                                    image = filters.get(i).processImage(image, sender);
-                                    break;
-                                }
-                            }
-                            sender.sendImage(image);
-                        }
-                    } catch (SocketException ex) {
-
-                    } catch (IOException ex) {
-                        System.out.println(ex);
+                        image = new Receiver(serv, socket).recvImage(nameFilter);
+                    } catch (UTFDataFormatException ex) {
+                        System.out.println("Ооопс... потеря данных или при приеме или при отправке");
                     }
+                    for (int i = 0; i < filters.size(); i++) {
+                        if (filters.get(i).getNameFilter().equalsIgnoreCase(nameFilter.toString())) {
+                            image = filters.get(i).processImage(image, sender);
+                            break;
+                        }
+                    }
+                    sender.sendImage(image);
                 }
+            } catch (SocketException ex) {
+
+            } catch (IOException ex) {
+                System.out.println(ex);
             }
-        }).start();
+        }
     }
 }
-
