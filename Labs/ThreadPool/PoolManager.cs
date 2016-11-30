@@ -23,7 +23,8 @@ namespace ThreadPool
             int i = 0;
             while (!Console.KeyAvailable)
             {
-                myPool.Enqueue(new MyTask(i).StartWork);
+                taskList.Add(new MyTask(i));
+                myPool.Enqueue(taskList.Last().StartWork);
                 i++;
                 if (i == int.MaxValue) i = 0;
             }

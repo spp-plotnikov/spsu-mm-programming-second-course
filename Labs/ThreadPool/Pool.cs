@@ -12,8 +12,7 @@ namespace ThreadPool
         int numOfThr;
         List<Thread> threadList = new List<Thread>();
         bool flag = true;
-        List<Action> actList = new List<Action>();
-        Semaphore sem = new Semaphore(1, 1);
+        List<Action> taskList = new List<Action>();
 
         public Pool(int num)
         {
@@ -38,9 +37,11 @@ namespace ThreadPool
 
         public void Enqueue(Action a) // добавление задачи в поток
         {
-            sem.WaitOne();
-            actList.Add(a);
-            sem.Release();
+            lock (taskList)
+            {
+                taskList.Add(a);
+                Monitor.Pulse(taskList);
+            }
         }
 
         public void Dispose() // освободить ресурсы
@@ -57,19 +58,21 @@ namespace ThreadPool
             Action myAct = () => { };
             while(flag)
             {
-                sem.WaitOne();
-                if (actList.Count() == 0)
+                lock (taskList)
                 {
-                    sem.Release();
-                    continue;
-                }
-                else
-                {
-                    myAct = actList[0];
-                    actList.RemoveAt(0);
-                    sem.Release();
+                    if (taskList.Count() == 0)
+                    {
+                        Monitor.Wait(taskList);
+                    }
+                    if (!flag)
+                    {
+                        break;
+                    }
+                    myAct = taskList[0];
+                    taskList.RemoveAt(0);
                 }
                 myAct();
+                
             }
         }
     }
