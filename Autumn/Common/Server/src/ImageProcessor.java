@@ -7,6 +7,7 @@ import java.awt.image.Kernel;
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 // The following classes are used to transfer images
 class ImageSender {
@@ -24,12 +25,17 @@ class ImageSender {
             ImageIO.write(im, "jpg", byteArrayOutputStream);
 
             // Send the size of the image in bytes
-            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+            int len = byteArrayOutputStream.size(), block_size = 256;
+            byte[] size = ByteBuffer.allocate(4).putInt(len).array();
             stream.write(size);
 
             // Then the image itself
-            stream.write(byteArrayOutputStream.toByteArray());
-            stream.flush();
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+            for (int i = 0; i < len / block_size + 1; i++) {
+                byte[] chunk = Arrays.copyOfRange(bytes, i * block_size, (i+1) * block_size);
+                stream.write(chunk);
+                stream.flush();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,14 +53,20 @@ class ImageReceiver {
         byte[] sizeAr = new byte[4];
         BufferedImage image = null;
         try {
+            System.out.println("receiving image...");
             // Recv. the image size
             stream.read(sizeAr);
-            int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+            int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get(), chunk_size = 256;
 
             // And the image itself
-            byte[] imageAr = new byte[size];
-            stream.read(imageAr);
-            image = ImageIO.read(new ByteArrayInputStream(imageAr));
+            byte[] imageAr = new byte[size + chunk_size];
+            for (int i = 0; i < size / chunk_size + 1; i++) {
+                byte[] chunk = new byte[chunk_size];
+                stream.read(chunk);
+                System.arraycopy(chunk, 0, imageAr, i * chunk_size, chunk_size);
+            }
+            image = ImageIO.read(new ByteArrayInputStream(Arrays.copyOfRange(imageAr, 0, size)));
+            System.out.println("image received");
         } catch (IOException e) {
             e.printStackTrace();
         }
