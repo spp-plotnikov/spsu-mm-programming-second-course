@@ -17,20 +17,20 @@ public class Form {
     JProgressBar progressBar;
     String path = null;
     Container container;
-    JLabel jLabel2 = null;
-    JLabel jLabel1 = null;
+    JLabel resultImage = null;
+    JLabel sourceImage = null;
     JComboBox jComboBox = null;
     int sizeImageW = 350;
     int getSizeImageH = 350;
     private void addComponent() throws IOException {
         container.setLayout(null);
 
-        jLabel1 = new JLabel("Download image", SwingConstants.CENTER);
-        container.add(jLabel1);
-        jLabel1.setBounds(30, 50, sizeImageW, getSizeImageH);
-        jLabel2 = new JLabel("There will be new image", SwingConstants.CENTER);
-        container.add(jLabel2);
-        jLabel2.setBounds(420, 50, sizeImageW, getSizeImageH);
+        sourceImage = new JLabel("Download image", SwingConstants.CENTER);
+        container.add(sourceImage);
+        sourceImage.setBounds(30, 50, sizeImageW, getSizeImageH);
+        resultImage = new JLabel("There will be new image", SwingConstants.CENTER);
+        container.add(resultImage);
+        resultImage.setBounds(420, 50, sizeImageW, getSizeImageH);
 
         progressBar = new JProgressBar();
         progressBar.setValue(0);
@@ -56,38 +56,38 @@ public class Form {
         jComboBox.setBounds(10, 10, 200, 20);
 
 
-        JButton chooseFile = new JButton("Open File");
-        container.add(chooseFile);
-        chooseFile.setBounds(220, 10, 150, 20);
+        JButton OpenFileButton = new JButton("Open File");
+        container.add(OpenFileButton);
+        OpenFileButton.setBounds(220, 10, 150, 20);
 
 
-        JButton cancel = new JButton("Cancel");
-        JButton send = new JButton("Send");
-        container.add(send);
-        send.setBounds(380, 10, 150, 20);
-        send.setEnabled(false);
-        send.addActionListener(new ActionListener() {
+        JButton CancelButton = new JButton("Cancel");
+        JButton SendButton = new JButton("Send");
+        container.add(SendButton);
+        SendButton.setBounds(380, 10, 150, 20);
+        SendButton.setEnabled(false);
+        SendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 progressBar.setVisible(true);
                 newProgressBarValue(0);
-                send.setVisible(false);
-                cancel.setVisible(true);
-                new Thread(new forUpdate(send, cancel)).start();
+                SendButton.setVisible(false);
+                CancelButton.setVisible(true);
+                new Thread(new NetworkHelper(SendButton, CancelButton)).start();
             }
         });
 
 
-        container.add(cancel);
-        cancel.setBounds(380, 10, 150, 20);
-        cancel.addActionListener(new ActionListener() {
+        container.add(CancelButton);
+        CancelButton.setBounds(380, 10, 150, 20);
+        CancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                cancel.setVisible(false);
-                send.setVisible(true);
+                CancelButton.setVisible(false);
+                SendButton.setVisible(true);
                 newProgressBarValue(0);
-                disconncet();
+                disconnect();
             }
         });
-        chooseFile.addActionListener(new ActionListener() {
+        OpenFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 JFileChooser fc = new JFileChooser();
                 fc.setAcceptAllFileFilterUsed(false);
@@ -98,17 +98,17 @@ public class Form {
                     File file = fc.getSelectedFile();
                     path = file.toString();
                     try {
-                        jLabel1.setIcon(new ImageIcon(compressImage(ImageIO.read(new File(path)))));
+                        sourceImage.setIcon(new ImageIcon(compressImage(ImageIO.read(new File(path)))));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                send.setEnabled(true);
+                SendButton.setEnabled(true);
             }
         });
     }
 
-    void disconncet() {
+    void disconnect() {
         try {
             socket.close();
         } catch (IOException e) {
@@ -116,12 +116,12 @@ public class Form {
         }
     }
 
-    class forUpdate implements Runnable {
-        private JButton button;
-        private JButton button2;
-        public forUpdate(JButton button, JButton button2) {
-            this.button = button;
-            this.button2 = button2;
+    class NetworkHelper implements Runnable {
+        private JButton SendButton;
+        private JButton CancelButton;
+        public NetworkHelper(JButton SendButton, JButton CancelButton) {
+            this.SendButton = SendButton;
+            this.CancelButton = CancelButton;
         }
         public void run() {
             BufferedImage image = null;
@@ -135,7 +135,7 @@ public class Form {
                     newProgressBarValue(b);
                 }
                 image = new Receiver(socket).receiveImage();
-                jLabel2.setIcon(new ImageIcon(compressImage(image)));
+                resultImage.setIcon(new ImageIcon(compressImage(image)));
             } catch (ConnectException ex) {
                 JPanel myRootPane = new JPanel();
                 JOptionPane.showMessageDialog(myRootPane, "No connection with server", "Error", JOptionPane.DEFAULT_OPTION );
@@ -145,8 +145,8 @@ public class Form {
                 e.printStackTrace();
             }
 
-            button2.setVisible(false);
-            button.setVisible(true);
+            CancelButton.setVisible(false);
+            SendButton.setVisible(true);
         }
     }
     BufferedImage compressImage(BufferedImage originalImage) throws IOException {

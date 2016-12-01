@@ -25,14 +25,14 @@ public class Server {
         serv = new ServerSocket(2500);
         while (true) {
             Socket socket = serv.accept();
-            new Thread(new ForClient(socket)).start();
+            new Thread(new ClientHelper(socket)).start();
         }
     }
-    class ForClient implements Runnable {
+    class ClientHelper implements Runnable {
 
         Socket socket;
 
-        ForClient(Socket socket) {
+        ClientHelper(Socket socket) {
             this.socket = socket;
         }
 
