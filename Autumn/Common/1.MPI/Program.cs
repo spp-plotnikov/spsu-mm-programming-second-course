@@ -1,11 +1,44 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using MPI;
-using System.Diagnostics;
 
 class MPIHello
 {
+    public static int[] blockRows;
+    public static int[] blockEnd; 
+           
+    static void Floyd(int[] curBlock, int procNum, int procRank, int mSize)
+    {   
+        for (int k = 0; k < mSize; k++)
+        {
+            int[] kRow = new int[mSize]; // k'th row for kj 
+
+            // get the proc that work with k'th row 
+            int proc = 0;
+            for (int p = 1; p < procNum; ++p)
+                if ( blockEnd[p - 1] < k && k <= blockEnd[p])
+                        proc = p;
+
+            if (proc == procRank)
+            {
+                int rowNum = (proc > 0) ? k - blockEnd[proc - 1] - 1 : k;
+                for (int j = 0; j < mSize; ++j)
+                    kRow[j] = curBlock[mSize * rowNum + j];   
+            }
+
+            // sending k'th row to all processes for kj
+            Communicator.world.Broadcast(ref kRow, proc);
+            int curBlockEnd = blockRows[procRank] / mSize;
+
+            // do Floid
+            for (int i = 0; i < curBlockEnd; ++i)
+                for (int j = 0; j < mSize; ++j)
+                    if(curBlock[i * mSize + k] + kRow[j] < curBlock[i * mSize + j])
+                        curBlock[i * mSize + j] = curBlock[i * mSize + k] + kRow[j];           
+        }
+    }
+
+
     static void Main(string[] args)
     {
         using (new MPI.Environment(ref args))
@@ -21,116 +54,48 @@ class MPIHello
             // init communication interface
             Intracommunicator comm = Communicator.world;
 
-            // <master> context
-            if (Communicator.world.Rank == 0)
+            // open files and getting matrix
+            Matrix m = new Matrix(inputFilePath);
+             
+            // process number 
+            int procNum = comm.Size;
+
+            int blocksNum = (m.Size / procNum);
+            int blocksOver = (m.Size % procNum);
+
+            // block rows for each process 
+            blockRows = new int[procNum];
+            // right bound of each block 
+            blockEnd = new int[procNum];
+               
+
+            // distribution by blocks
+            for (int p = 0; p < procNum; ++p)
             {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-
-                Matrix matrix = new Matrix(inputFilePath);
-                //matrix.print();
-                
-                int procNum = (comm.Size - 1);
- 
-                int tasksNum = (matrix.Size / procNum);
-                int tasksOver = (matrix.Size % procNum);
-
-                // distribution: block size for each process 
-                int[] blockSize = new int[procNum + 1];
-
-                // sending config to each process
-                for (int p = 1; p <= procNum; ++p)
-                {
-                    TaskConfig conf;
-                    if (p > matrix.Size)
-                    {
-                        blockSize[p] = -1;
-                        conf = new TaskConfig(false);
-                    }
-                    else
-                    {
-                        if (tasksNum == 0)
-                            blockSize[p] = 1;
-                        else
-                            blockSize[p] = (p == Math.Min(procNum, matrix.Size)) ? (tasksNum + tasksOver) : tasksNum;
-                        conf = new TaskConfig(matrix.Size, blockSize[p]);
-                    }
-                        
-                    comm.Send<TaskConfig>(conf, p, 5);
-                }
-
-
-                // start Floyd 
-                for (int k = 0; k < matrix.Size; ++k)
-                {
-                    int blockIterator = 0;
-                    for (int proc = 1; proc <= procNum; ++proc)
-                    { 
-                        Request[] rows = new Request[blockSize[proc]];
-                           
-                        int rowItem = 0;
-                        for (int i = blockIterator; i < blockIterator + blockSize[proc]; ++i)
-                        {                           
-                            Edge ik = new Edge(i, k, matrix.getCell(i, k));   
-                            rows[rowItem] = new Request(ik, matrix.getRow(i));
-                            rowItem++;
-                        }
-                        // sending k'th row (for kj edge) only once for each process    
-                        BlockOfRows req = new BlockOfRows(rows, matrix.getRow(k));
-                        comm.Send<BlockOfRows>(req, proc, 0);
-
-                        blockIterator += blockSize[proc];
-                    }
-
-                    blockIterator = 0;
-                    // recieving and updating 
-                    for (int proc = 1; proc <= procNum; ++proc)
-                    {
-                        Edge[] resp = comm.Receive<Edge[]>(Communicator.anySource, 2);
-                        for (int o = 0; o < resp.Length; ++o)
-                            matrix.updateCell(resp[o].from, resp[o].to, resp[o].value);
-                        blockIterator += blockSize[proc];
-                    }
-
-                }
-
-                matrix.print(outputFilePath);
-                TimeSpan ts = stopWatch.Elapsed;
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-                Console.WriteLine("RunTime " + elapsedTime);//*/
+                int curBlockSize = (p == procNum - 1) ? (blocksNum + blocksOver) : blocksNum ;
+                blockRows[p] = curBlockSize * m.Size; // submatrix blocksize * n
+                blockEnd[p] = (p > 0) ? curBlockSize + blockEnd[p - 1] : curBlockSize - 1;
             }
-            else // <worker> context
-            {
-                // getting config 
-                TaskConfig config = comm.Receive<TaskConfig>(0, 5);
                 
-                // this check need when proc number > matrix size. excess processes will be "sleep" 
-                if (config.Runnable)
-                {
-                    for (int k = 0; k < config.Size; ++k)
-                    {
-                        BlockOfRows req1 = comm.Receive<BlockOfRows>(0, 0);
-                        Request[] req = new Request[req1.msg.Length];
-                        req = req1.msg;
 
-                        // list of updated edges
-                        List<Edge> resp = new List<Edge>();
-                        for (int i = 0; i < config.BlockSize; ++i)
-                        {
-                            for (int j = 0; j < config.Size; ++j)
-                            {
-                                if (req[i].ik.value + req1.row_k[j] < req[i].row_i[j])
-                                {
-                                     Edge updatedEdge = new Edge(req[i].ik.from, j, req[i].ik.value + req1.row_k[j]);
-                                     resp.Add(updatedEdge);
-                                 }
-                             }
-                        }
-                        comm.Send<Edge[]>(resp.ToArray(), 0, 2);
-                    }
-                }
+            // recived block
+            int[] curBlock = new int[blockRows[comm.Rank]];
+            // answer 
+            int[] outMatrix = new int[m.Size * m.Size];
+
+            // scattering to workers 
+            comm.ScatterFromFlattened(m.matrix, blockRows, 0, ref curBlock);
+            Floyd(curBlock, comm.Size, comm.Rank, m.Size);
+
+            // gathering after Floyd
+            comm.GatherFlattened(curBlock, blockRows, 0, ref outMatrix);
+                
+            // output 
+            if (comm.Rank == 0)
+            {
+                Matrix outM = new Matrix(outMatrix, 1000);
+                outM.print(outputFilePath);
+                Console.WriteLine("Success!");
             }
         }
     }
