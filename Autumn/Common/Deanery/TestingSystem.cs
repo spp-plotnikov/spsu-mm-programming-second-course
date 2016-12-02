@@ -69,7 +69,7 @@ namespace Deanery
             {
                 Thread thread = new Thread(() =>
                 {
-                    AddThread(i * 45, i * 45 + 45, system1);
+                    AddThread(i * 45, i * 45 + 45, system1); //Here's the problem
                     numOfFinishedThreads++;
                 });
                 thread.Start();
