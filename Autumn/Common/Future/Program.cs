@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Threading;
 
 namespace Future
 {
@@ -7,14 +7,15 @@ namespace Future
     {
         static void Main(string[] args)
         {
+            Thread.Sleep(2500);
             int[] arr = new int[200];
             for (int i = 0; i < 200; i++)
             {
                 arr[i] = 1;
             }
-            AsyncCalculating asyncCalculating = new AsyncCalculating();
+            AsyncCalculating asyncCalculating = new AsyncCalculating(ArraySumImplementation.FirstSum);
             asyncCalculating.CalculateSum(arr);
-            Console.WriteLine(asyncCalculating.GetSum);
+            Console.WriteLine(asyncCalculating.Sum);
             Console.ReadKey();
         }
     }
