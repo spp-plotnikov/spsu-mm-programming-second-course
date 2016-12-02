@@ -8,15 +8,15 @@ using System.Threading;
 class Consumer
 {
     Thread Thread;
-    List<int> sharedData;
+    List<int> SharedData;
     bool Runnable = false;
     private const int pause = 2000;
 
-    public Consumer(List<int> sharedData)
+    public Consumer(List<int> sharedData, Locker lockFlag)
     {
-        this.sharedData = sharedData;
+        this.SharedData = sharedData;
         this.Runnable = true;
-        this.Thread = new Thread(Run);
+        this.Thread = new Thread(() => Run(lockFlag));
         this.Thread.Start();
     }
 
@@ -26,26 +26,26 @@ class Consumer
         this.Thread.Join();
     }
 
-    public void Run()
+    public void Run(Locker lockFlag)
     {
         while (this.Runnable)
         {
-            Locker.Lock();
+            lockFlag.Lock();
             // Stil running ?
             if (this.Runnable)
             {
-                if (sharedData.Count == 0)
+                if (SharedData.Count == 0)
                 {
                     Console.WriteLine("Consumer: list is empty");
                 }
                 else
                 {
-                    int value = sharedData.Last();
-                    sharedData.Remove(value);
+                    int value = SharedData.Last();
+                    SharedData.Remove(value);
                     Console.WriteLine("Consumer: removed " + value + " from list");
                 }
             }
-            Locker.Release();
+            lockFlag.Release();
             Thread.Sleep(pause);
         }
     }

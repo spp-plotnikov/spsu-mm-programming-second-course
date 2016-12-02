@@ -11,15 +11,15 @@ namespace ProducerConsumer
     class Producer
     {
         Thread Thread;
-        List<int> sharedData;
+        List<int> SharedData;
         bool Runnable = false;
         private const int pause = 1000;
 
-        public Producer(List<int> sharedData)
+        public Producer(List<int> sharedData, Locker lockFlag)
         {
-            this.sharedData = sharedData;
+            this.SharedData = sharedData;
             this.Runnable = true;
-            this.Thread = new Thread(Run);
+            this.Thread = new Thread(() => Run(lockFlag));
             this.Thread.Start();
         }
 
@@ -29,21 +29,19 @@ namespace ProducerConsumer
             this.Thread.Join();
         }
 
-        public void Run()
+        public void Run(Locker lockFlag)
         {
             while (this.Runnable)
             {
-                Locker.Lock();
+                lockFlag.Lock();
                 // Stil running ? 
                 if (this.Runnable)
                 {
-                    // pushing random value to shared data
-                    Random rand = new Random();
-                    int value = rand.Next(10, 100);
-                    this.sharedData.Add(value);
-                    Console.WriteLine("Producer: added value " + value);
+                    // pushing some value to shared data
+                    this.SharedData.Add(24);
+                    Console.WriteLine("Producer: added value 24");
                 }
-                Locker.Release();
+                lockFlag.Release();
                 Thread.Sleep(pause);
             }
 

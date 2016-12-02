@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-public static class Locker
+public class Locker
 {
-    public static int isLocked = 0;
+    private static int isLocked = 0;
 
-    public static void Lock()
+    public Locker() { }
+
+    public void Lock()
     {
-        while (0 != Interlocked.CompareExchange(ref Locker.isLocked, 1, 0)) ;
+        while (0 != Interlocked.CompareExchange(ref Locker.isLocked, 1, 0));
     }
 
-    public static void Release()
+    public void Release()
     {
         Interlocked.Exchange(ref Locker.isLocked, 0);
     }
