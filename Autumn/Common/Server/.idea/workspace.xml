@@ -41,11 +41,10 @@
       <file leaf-file-name="MainWindow.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client/src/MainWindow.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="94">
-              <caret line="126" column="41" selection-start-line="126" selection-start-column="41" selection-end-line="126" selection-end-column="41" />
+            <state relative-caret-position="73">
+              <caret line="100" column="117" selection-start-line="100" selection-start-column="117" selection-end-line="100" selection-end-column="117" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="method#saveButtonHandler#0;class#MainWindow#0" expanded="false" />
                 <element signature="method#setSrcIcon#0;class#MainWindow#0" expanded="false" />
                 <element signature="method#setResIcon#0;class#MainWindow#0" expanded="false" />
               </folding>
@@ -745,12 +744,12 @@
       <workItem from="1479897321720" duration="54773000" />
       <workItem from="1480064857141" duration="6391000" />
       <workItem from="1480611723068" duration="2263000" />
-      <workItem from="1480614550361" duration="7909000" />
+      <workItem from="1480614550361" duration="8935000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="71336000" />
+    <option name="totallyTimeSpent" value="72362000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-2" y="-1" width="1370" height="745" extended-state="0" />
@@ -817,7 +816,6 @@
           <caret line="46" column="24" selection-start-line="46" selection-start-column="24" selection-end-line="46" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#saveButtonHandler#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setSrcIcon#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setResIcon#0;class#MainWindow#0" expanded="false" />
           </folding>
@@ -890,7 +888,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#saveButtonHandler#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setSrcIcon#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setResIcon#0;class#MainWindow#0" expanded="false" />
           </folding>
@@ -963,7 +960,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#saveButtonHandler#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setSrcIcon#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setResIcon#0;class#MainWindow#0" expanded="false" />
           </folding>
@@ -1105,11 +1101,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client/src/MainWindow.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="126" column="41" selection-start-line="126" selection-start-column="41" selection-end-line="126" selection-end-column="41" />
+        <state relative-caret-position="73">
+          <caret line="100" column="117" selection-start-line="100" selection-start-column="117" selection-end-line="100" selection-end-column="117" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#saveButtonHandler#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setSrcIcon#0;class#MainWindow#0" expanded="false" />
             <element signature="method#setResIcon#0;class#MainWindow#0" expanded="false" />
           </folding>

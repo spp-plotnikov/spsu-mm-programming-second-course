@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 class MainWindow {
     private JFrame frame;
@@ -97,6 +98,7 @@ class MainWindow {
     // Saves the image on click
     private void saveButtonHandler() {
         JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("Images (jpg, png, gif, bmp)", "jpg", "png", "gif", "bmp"));
         int option = chooser.showSaveDialog(this.frame.getContentPane());
         if (option == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
@@ -106,6 +108,10 @@ class MainWindow {
                 int i = path.lastIndexOf('.');
                 if (i >= 0)
                     extension = path.substring(i + 1);
+                if (extension == "") {
+                    extension = "png";
+                    path += ".png";
+                }
                 ImageIO.write(resImg, extension, new File(path));
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this.frame.getContentPane(), "Can't save image :(");
@@ -161,6 +167,7 @@ class MainWindow {
         c.gridy = 0;
         chooseButton.addActionListener(actionEvent -> {
             JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileNameExtensionFilter("Images (jpg, png, gif, bmp)", "jpg", "png", "gif", "bmp"));
             int option = chooser.showOpenDialog(pane);
             if (option == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = chooser.getSelectedFile();
