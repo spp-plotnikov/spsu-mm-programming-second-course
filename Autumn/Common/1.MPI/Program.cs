@@ -93,7 +93,7 @@ class MPIHello
             // output 
             if (comm.Rank == 0)
             {
-                Matrix outM = new Matrix(outMatrix, 1000);
+                Matrix outM = new Matrix(outMatrix, m.Size);
                 outM.print(outputFilePath);
                 Console.WriteLine("Success!");
             }
