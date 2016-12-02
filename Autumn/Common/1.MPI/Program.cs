@@ -55,13 +55,13 @@ class MPIHello
             Intracommunicator comm = Communicator.world;
 
             // open files and getting matrix
-            Matrix m = new Matrix(inputFilePath);
+            ManageMatrix m = new ManageMatrix(inputFilePath);
              
             // process number 
             int procNum = comm.Size;
 
-            int blocksNum = (m.Size / procNum);
-            int blocksOver = (m.Size % procNum);
+            int blocksNum = (m.GetSize() / procNum);
+            int blocksOver = (m.GetSize() % procNum);
 
             // block rows for each process 
             blockRows = new int[procNum];
@@ -73,7 +73,7 @@ class MPIHello
             for (int p = 0; p < procNum; ++p)
             {
                 int curBlockSize = (p == procNum - 1) ? (blocksNum + blocksOver) : blocksNum ;
-                blockRows[p] = curBlockSize * m.Size; // submatrix blocksize * n
+                blockRows[p] = curBlockSize * m.GetSize(); // submatrix blocksize * n
                 blockEnd[p] = (p > 0) ? curBlockSize + blockEnd[p - 1] : curBlockSize - 1;
             }
                 
@@ -81,20 +81,20 @@ class MPIHello
             // recived block
             int[] curBlock = new int[blockRows[comm.Rank]];
             // answer 
-            int[] outMatrix = new int[m.Size * m.Size];
+            int[] answMatrix = new int[m.GetSize() * m.GetSize()];
 
             // scattering to workers 
-            comm.ScatterFromFlattened(m.matrix, blockRows, 0, ref curBlock);
-            Floyd(curBlock, comm.Size, comm.Rank, m.Size);
+            comm.ScatterFromFlattened(m.GetMatrix(), blockRows, 0, ref curBlock);
+            Floyd(curBlock, comm.Size, comm.Rank, m.GetSize());
 
             // gathering after Floyd
-            comm.GatherFlattened(curBlock, blockRows, 0, ref outMatrix);
+            comm.GatherFlattened(curBlock, blockRows, 0, ref answMatrix);
                 
             // output 
             if (comm.Rank == 0)
             {
-                Matrix outM = new Matrix(outMatrix, m.Size);
-                outM.print(outputFilePath);
+                ManageMatrix outMatrix = new ManageMatrix(answMatrix, m.GetSize());
+                outMatrix.Print(outputFilePath);
                 Console.WriteLine("Success!");
             }
         }
