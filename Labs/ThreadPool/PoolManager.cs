@@ -10,7 +10,6 @@ namespace ThreadPool
     class PoolManager 
     {
         public int numForPool;
-        List<MyTask> taskList = new List<MyTask>();
         Pool myPool;
         public PoolManager(int p)
         {
@@ -23,8 +22,7 @@ namespace ThreadPool
             int i = 0;
             while (!Console.KeyAvailable)
             {
-                taskList.Add(new MyTask(i));
-                myPool.Enqueue(taskList.Last().StartWork);
+                myPool.Enqueue(new MyTask(i).StartWork);
                 i++;
                 if (i == int.MaxValue) i = 0;
             }

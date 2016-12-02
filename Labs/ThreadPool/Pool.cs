@@ -47,6 +47,7 @@ namespace ThreadPool
         public void Dispose() // освободить ресурсы
         {
             flag = false;
+            Monitor.PulseAll(taskList);
             foreach (var t in threadList)
             {
                 t.Join();
@@ -71,8 +72,7 @@ namespace ThreadPool
                     myAct = taskList[0];
                     taskList.RemoveAt(0);
                 }
-                myAct();
-                
+                myAct();                
             }
         }
     }
