@@ -32,7 +32,7 @@ namespace ThreadPool
                 Thread t = new Thread(WorkInThread);
                 t.Name = "Thread_" + i;
                 threadList.Add(t);
-            }
+            }            
         }
 
         public void Enqueue(Action a) // добавление задачи в поток
@@ -47,7 +47,10 @@ namespace ThreadPool
         public void Dispose() // освободить ресурсы
         {
             flag = false;
-            Monitor.PulseAll(taskList);
+            lock(taskList)
+            {
+                Monitor.PulseAll(taskList);
+            }
             foreach (var t in threadList)
             {
                 t.Join();
