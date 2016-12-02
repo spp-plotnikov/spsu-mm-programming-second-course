@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Deanery
@@ -7,8 +8,8 @@ namespace Deanery
     {
         private SortedList<long, MySortedList<long>> listOfStrudentCredits = new SortedList<long, MySortedList<long>>();
         private MySortedList<long> lockedStudents = new MySortedList<long>();
-        private bool lockedStudentsInTouch = true;
-        private bool listOfStudentCreditsInTouch = true;
+        private Mutex lockedStudentsMutex = new Mutex(false);
+        private Mutex listOfStudentCreditsMutex = new Mutex(false);
         private MySortedList<long> emptyList = new MySortedList<long>();
 
         private bool isStudentInfoAccessible(long studentId)
@@ -16,81 +17,73 @@ namespace Deanery
             return !lockedStudents.Contains(studentId);
         }
 
+        private void TakeStudent(long studentId)
+        {
+            lockedStudentsMutex.WaitOne();
+            while (lockedStudents.Contains(studentId))
+            {
+                lockedStudentsMutex.ReleaseMutex();
+                lockedStudentsMutex.WaitOne();
+            }
+            lockedStudents.Add(studentId);
+            lockedStudentsMutex.ReleaseMutex();
+        }
+
+        private void ReleaseStudent(long studentId)
+        {
+            lockedStudentsMutex.WaitOne();
+            lockedStudents.Remove(studentId);
+            lockedStudentsMutex.ReleaseMutex();
+        }
+
         public void Add(long studentId, long courseId)
         {
-            while (!lockedStudentsInTouch) { } // Waiting for access list of locked students
-            lockedStudentsInTouch = false;
-            while (!isStudentInfoAccessible(studentId))
-            {
-                lockedStudentsInTouch = true;
-                Thread.Sleep(100);
-                while (!lockedStudentsInTouch) { }
-                lockedStudentsInTouch = false;
-            }  // Waiting for student release
-            lockedStudents.Add(studentId);
-            lockedStudentsInTouch = true;
+            TakeStudent(studentId);
+            //Console.WriteLine("qq");
             // There are 2 options: this credit is first for this student, so we need to lock whole listOfStudentCredits
             // Otherwise usual add of courseId
+            listOfStudentCreditsMutex.WaitOne();
             long studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
             if (studentIndex >= 0)
             {
+                listOfStudentCreditsMutex.ReleaseMutex();
                 listOfStrudentCredits[studentId].Add(courseId);
             }
             else
             {
-                while (!listOfStudentCreditsInTouch) { } // Waiting for locking everything
-                listOfStudentCreditsInTouch = false;
                 listOfStrudentCredits.Add(studentId, new MySortedList<long> { courseId }); // ?!?!?!?!?!?!?!?!?!?!?!?!?!?
-                listOfStudentCreditsInTouch = true;
+                listOfStudentCreditsMutex.ReleaseMutex();
             }
-            while (!lockedStudentsInTouch) { } // Waiting for access list of locked students
-            lockedStudentsInTouch = false;
-            lockedStudents.Remove(studentId);
-            lockedStudentsInTouch = true;
+            ReleaseStudent(studentId);
         }
 
         public void Remove(long studentId, long courseId)
         {
-            while (!lockedStudentsInTouch) { } // Waiting for access list of locked students
-            lockedStudentsInTouch = false;
-            while (!isStudentInfoAccessible(studentId))
-            {
-                lockedStudentsInTouch = true;
-                Thread.Sleep(100);
-                while (!lockedStudentsInTouch) { }
-                lockedStudentsInTouch = false;
-            }  // Waiting for student release
-            lockedStudents.Add(studentId);
-            lockedStudentsInTouch = true;
+            TakeStudent(studentId);
             // There are 2 options: this credit is single for this student, so we need to lock whole listOfStudentCredits
             // Otherwise usual remove of courseId
-            int studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
+            listOfStudentCreditsMutex.WaitOne();
+            long studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
             if (studentIndex >= 0)
             {
+                listOfStudentCreditsMutex.ReleaseMutex();
                 listOfStrudentCredits[studentId].Remove(courseId);
             }
             else
             {
-                while (!listOfStudentCreditsInTouch) { } // Waiting for locking everything
-                listOfStudentCreditsInTouch = false;
-                listOfStrudentCredits.RemoveAt(studentIndex); // ?!?!?!?!?!?!?!?!?!?!?!?!?!?
-                listOfStudentCreditsInTouch = true;
+                listOfStrudentCredits.Remove(studentId);
+                listOfStudentCreditsMutex.ReleaseMutex();
             }
-            while (!lockedStudentsInTouch) { } // Waiting for access list of locked students
-            lockedStudentsInTouch = false;
-            lockedStudents.Remove(studentId);
-            lockedStudentsInTouch = true;
+            ReleaseStudent(studentId);
         }
 
         public bool Contains(long studentId, long courseId)
         {
-            while (!lockedStudentsInTouch) { } // Waiting for access list of locked students
-            lockedStudentsInTouch = false;
-            while (!isStudentInfoAccessible(studentId)) { }  // Waiting for student release
-            lockedStudents.Add(studentId);
-            lockedStudentsInTouch = true;
+            TakeStudent(studentId);
             // Just usual Contains
+            listOfStudentCreditsMutex.WaitOne();
             int studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
+            listOfStudentCreditsMutex.ReleaseMutex();
             bool answer;
             if (studentIndex >= 0)
             {
@@ -100,10 +93,7 @@ namespace Deanery
             {
                 answer = false;
             }
-            while (!lockedStudentsInTouch) { } // Waiting for access list of locked students
-            lockedStudentsInTouch = false;
-            lockedStudents.Remove(studentId);
-            lockedStudentsInTouch = true;
+            ReleaseStudent(studentId);
             return answer;
         }
     }
