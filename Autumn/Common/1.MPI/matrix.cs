@@ -1,29 +1,29 @@
 ﻿using System;
 using System.IO;
 
-class Matrix
+class ManageMatrix
 {
-    public int[] matrix;
-    public int Size;
+    private int[] Matrix;
+    private int Size;
 
-    public const int INF = 100000000;
+    private const int inf = 100000000;
 
-    public Matrix(int[] matrix, int Size)
+    public ManageMatrix(int[] matrix, int size)
     {
-        this.Size = Size;
-        this.matrix = new int[Size * Size];        
-        this.matrix = matrix;
+        this.Size = size;
+        this.Matrix = new int[size * size];        
+        this.Matrix = matrix;
     }
 
-    public Matrix(string path)
+    public ManageMatrix(string path)
     {
         StreamReader fileHandler = new StreamReader(path);
 
         this.Size = Int32.Parse(fileHandler.ReadLine());
 
-        this.matrix = new int[this.Size * this.Size];
+        this.Matrix = new int[this.Size * this.Size];
 
-        this.init(INF, 0);
+        this.Init(inf, 0);
 
         string line;
         while ((line = fileHandler.ReadLine()) != null)
@@ -32,21 +32,31 @@ class Matrix
             int i = Int32.Parse(param[0]);
             int j = Int32.Parse(param[1]);
             int w = Int32.Parse(param[2]);
-            this.matrix[i * this.Size + j] = w;
-            this.matrix[j * this.Size + i] = w;
+            this.Matrix[i * this.Size + j] = w;
+            this.Matrix[j * this.Size + i] = w;
         }
         fileHandler.Close();
     }
 
-    private void init(int cell, int diag)
+    private void Init(int cell, int diag)
     {
         for (int i = 0; i < this.Size * this.Size; i++)
-            this.matrix[i] = cell;        
+            this.Matrix[i] = cell;        
         for (int i = 0; i < this.Size; i++)
-            this.matrix[i * this.Size + i] = diag;
+            this.Matrix[i * this.Size + i] = diag;
     }
 
-    public void print(string path = "")
+    public int GetSize()
+    {
+        return this.Size;
+    }
+
+    public int[] GetMatrix()
+    {
+        return this.Matrix;
+    }
+
+    public void Print(string path = "")
     {
         if (path != "")
         {
@@ -55,7 +65,7 @@ class Matrix
             {
                 for (int j = 0; j < this.Size; j++)
                 {
-                    file.Write(this.matrix[i * this.Size + j] + " ");
+                    file.Write(this.Matrix[i * this.Size + j] + " ");
                 }
                 file.WriteLine();
             }
@@ -65,7 +75,7 @@ class Matrix
         for (int i = 0; i < this.Size; ++i)
         {
             for (int j = 0; j < this.Size; ++j)
-                Console.Write(this.matrix[i * this.Size + j] + " ");
+                Console.Write(this.Matrix[i * this.Size + j] + " ");
             Console.WriteLine();
         }
     }
