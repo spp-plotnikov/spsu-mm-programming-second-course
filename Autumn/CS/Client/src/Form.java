@@ -41,7 +41,7 @@ public class Form {
         progressBar.setVisible(false);
 
         ArrayList<String> strings = new ArrayList();
-        Socket socket = null;
+
         try {
             socket = new Socket("localhost", 2500);
             new Receiver(socket).recieveFilters(strings);
@@ -56,38 +56,38 @@ public class Form {
         jComboBox.setBounds(10, 10, 200, 20);
 
 
-        JButton OpenFileButton = new JButton("Open File");
-        container.add(OpenFileButton);
-        OpenFileButton.setBounds(220, 10, 150, 20);
+        JButton openFileButton = new JButton("Open File");
+        container.add(openFileButton);
+        openFileButton.setBounds(220, 10, 150, 20);
 
 
-        JButton CancelButton = new JButton("Cancel");
-        JButton SendButton = new JButton("Send");
-        container.add(SendButton);
-        SendButton.setBounds(380, 10, 150, 20);
-        SendButton.setEnabled(false);
-        SendButton.addActionListener(new ActionListener() {
+        JButton cancelButton = new JButton("Cancel");
+        JButton sendButton = new JButton("Send");
+        container.add(sendButton);
+        sendButton.setBounds(380, 10, 150, 20);
+        sendButton.setEnabled(false);
+        sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 progressBar.setVisible(true);
                 newProgressBarValue(0);
-                SendButton.setVisible(false);
-                CancelButton.setVisible(true);
-                new Thread(new NetworkHelper(SendButton, CancelButton)).start();
+                sendButton.setVisible(false);
+                cancelButton.setVisible(true);
+                new Thread(new NetworkHelper(sendButton, cancelButton)).start();
             }
         });
 
 
-        container.add(CancelButton);
-        CancelButton.setBounds(380, 10, 150, 20);
-        CancelButton.addActionListener(new ActionListener() {
+        container.add(cancelButton);
+        cancelButton.setBounds(380, 10, 150, 20);
+        cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                CancelButton.setVisible(false);
-                SendButton.setVisible(true);
+                cancelButton.setVisible(false);
+                sendButton.setVisible(true);
                 newProgressBarValue(0);
                 disconnect();
             }
         });
-        OpenFileButton.addActionListener(new ActionListener() {
+        openFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 JFileChooser fc = new JFileChooser();
                 fc.setAcceptAllFileFilterUsed(false);
@@ -103,7 +103,7 @@ public class Form {
                         e.printStackTrace();
                     }
                 }
-                SendButton.setEnabled(true);
+                sendButton.setEnabled(true);
             }
         });
     }
@@ -117,11 +117,11 @@ public class Form {
     }
 
     class NetworkHelper implements Runnable {
-        private JButton SendButton;
-        private JButton CancelButton;
-        public NetworkHelper(JButton SendButton, JButton CancelButton) {
-            this.SendButton = SendButton;
-            this.CancelButton = CancelButton;
+        private JButton sendButton;
+        private JButton cancelButton;
+        public NetworkHelper(JButton sendButton, JButton cancelButton) {
+            this.sendButton = sendButton;
+            this.cancelButton = cancelButton;
         }
         public void run() {
             BufferedImage image = null;
@@ -145,8 +145,8 @@ public class Form {
                 e.printStackTrace();
             }
 
-            CancelButton.setVisible(false);
-            SendButton.setVisible(true);
+            cancelButton.setVisible(false);
+            sendButton.setVisible(true);
         }
     }
     BufferedImage compressImage(BufferedImage originalImage) throws IOException {
