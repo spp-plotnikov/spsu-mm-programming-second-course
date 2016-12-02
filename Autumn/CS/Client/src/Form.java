@@ -176,6 +176,7 @@ public class Form {
         container = frame.getContentPane();
         addComponent();
         frame.setSize(820, 500);
+        frame.setResizable(false);
         frame.setVisible(true);
     }
 
