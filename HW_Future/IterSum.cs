@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Future
 {
-    class IterSum
+    class IterSum : IArraySum
     {
         private const int NumOfParts = 40;
 
@@ -20,7 +20,7 @@ namespace Future
             return sum;
         }
 
-        public int ArrSum (int[] arr)
+        public int Sum (int[] arr)
         {
             List<Task<int>> tasks = new List<Task<int>>();
 

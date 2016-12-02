@@ -20,12 +20,12 @@ namespace Future
                     arr[i] = i + 1;
                 }
 
-                IterSum fistSum = new IterSum();
+                IterSum firstSum = new IterSum();
                 RecSum secondSum = new RecSum();
 
                 Console.WriteLine("Expected value is {0}", NumOfElem * (NumOfElem + 1) / 2);
-                Console.WriteLine("First value is {0}", fistSum.ArrSum(arr));
-                Console.WriteLine("Second value is {0}", secondSum.ArrSum(arr));
+                Console.WriteLine("First value is {0}", firstSum.Sum(arr));
+                Console.WriteLine("Second value is {0}", secondSum.Sum(arr));
                 Console.WriteLine();
             }
         }

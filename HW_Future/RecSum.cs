@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Future
 {
-    class RecSum
+    class RecSum : IArraySum
     {
-        public int ArrSum (int[] arr)
+        public int Sum (int[] arr)
         {
             if (arr.Length == 1)
             {
@@ -21,7 +21,7 @@ namespace Future
 
             Task<int> first = Task.Run(() =>
             {
-                return ArrSum(tempArrFirstPart);
+                return Sum(tempArrFirstPart);
             });
 
 
@@ -30,7 +30,7 @@ namespace Future
 
             Task<int> second = Task.Run(() =>
             {
-                return ArrSum(tempArrSecondPart);
+                return Sum(tempArrSecondPart);
             });
 
             Task.WaitAll();
