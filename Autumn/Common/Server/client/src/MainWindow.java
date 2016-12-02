@@ -38,8 +38,8 @@ class MainWindow {
                 public Void doInBackground() {
                     isRunning.set(true);
                     // get components
-                    JButton button = (JButton) frame.getContentPane().getComponent(7);
-                    JProgressBar progressBar = (JProgressBar) frame.getContentPane().getComponent(5);
+                    JButton button = (JButton) frame.getContentPane().getComponent(6);
+                    JProgressBar progressBar = (JProgressBar) frame.getContentPane().getComponent(4);
                     button.setText("Abort");
 
                     // The following code needs to be in try-block, almost evert operation can throw IOException
@@ -47,7 +47,7 @@ class MainWindow {
                         // send it
                         Socket s = new Socket(serverIp, serverPort);
                         OutputStream output = s.getOutputStream();
-                        JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(6);
+                        JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(5);
                         new ImageSender(srcImg, output).send(comboBox.getSelectedIndex());
 
                         // and receive the result
@@ -80,7 +80,7 @@ class MainWindow {
 
                 @Override
                 public void done() {
-                    JButton button = (JButton) frame.getContentPane().getComponent(7);
+                    JButton button = (JButton) frame.getContentPane().getComponent(6);
                     button.setText("Submit");
                     isRunning.set(false);
                 }
@@ -117,13 +117,19 @@ class MainWindow {
     private void createAndShowGUI() {
         frame = new JFrame("Best GUI ever");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setMaximumSize(new Dimension(600, 600));
         Container pane = frame.getContentPane();
         frame.pack();
         frame.setVisible(true);
 
         GridBagConstraints c = new GridBagConstraints();
         pane.setLayout(new GridBagLayout());
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
+
+        // Make it look not that ugly
+        c.weightx = 0.5;
+        c.weighty = 0.5;
+        c.insets = new Insets(3, 3, 3, 3);
 
         // Path edit
         JTextField pathField = new JTextField();
@@ -141,14 +147,13 @@ class MainWindow {
                 path = pathField.getText();
             }
         });
-        c.weightx = 0.5;
         c.ipadx = 300;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         pane.add(pathField, c);
 
-        // Load buttion
+        // Choose button
         JButton chooseButton = new JButton("Choose...");
         c.ipadx = 20;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -168,29 +173,17 @@ class MainWindow {
         // Load button
         JButton loadButton = new JButton("Load");
         loadButton.addActionListener(actionEvent -> loadImage());
-        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 0;
         pane.add(loadButton, c);
 
-        // First image
-        JLabel srcLabel;
-        srcLabel = new JLabel("Please load an image");
+        // Generate border
         Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
-        srcLabel.setBorder(border);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.0;
-        c.gridx = 0;
-        c.gridy = 1;
-        c.ipady = 150;
-        c.gridwidth = 6;
-        pane.add(srcLabel, c);
 
         // Second image
         JLabel resLabel;
         resLabel = new JLabel("Result will be displayed here");
         resLabel.setBorder(border);
-        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 1;
         c.ipadx = 125;
@@ -204,20 +197,20 @@ class MainWindow {
         c.ipadx = 0;
         c.ipady = 10;
         c.gridy = 2;
+        c.weighty = 0;
         pane.add(progressBar, c);
 
         // Filters
         JComboBox comboBox = new JComboBox();
-        c.fill = GridBagConstraints.HORIZONTAL;
         c.ipadx = c.ipady = 0;
         c.gridwidth = 1;
         c.gridx = 0;
         c.gridy = 3;
+        c.weighty = 0.2;
         pane.add(comboBox, c);
 
         // Submit button
         JButton submitButton = new JButton("Submit");
-        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 3;
         submitButton.addActionListener(actionEvent -> this.submitImageButtonHandler());
@@ -225,24 +218,20 @@ class MainWindow {
 
         // Save button
         JButton saveButton = new JButton("Save");
-        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 3;
         saveButton.addActionListener(actionEvent -> this.saveButtonHandler());
         pane.add(saveButton, c);
 
-        // Exit button
-        JButton exitButton = new JButton("Exit");
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.ipady = 0;
-        c.weighty = 1.0;
-        c.anchor = GridBagConstraints.PAGE_END;
-        c.insets = new Insets(10, 0, 0, 0);
-        c.gridx = 1;
-        c.gridwidth = 2;
-        c.gridy = 5;
-        exitButton.addActionListener(actionEvent -> frame.dispose());
-        pane.add(exitButton, c);
+        // First image
+        JLabel srcLabel;
+        srcLabel = new JLabel("Please load an image");
+        srcLabel.setBorder(border);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.ipady = 150;
+        c.gridwidth = 6;
+        pane.add(srcLabel, c);
     }
 
     // This method outputs the source image on the GUI
@@ -253,10 +242,21 @@ class MainWindow {
         Image im = icon.getImage();
         im = im.getScaledInstance(200, 200, java.awt.Image.SCALE_SMOOTH);
         icon = new ImageIcon(im);
-        JLabel label = (JLabel) frame.getContentPane().getComponent(3);
+        Container pane = frame.getContentPane();
+        JLabel label = (JLabel) pane.getComponent(8);
         label.setText("");
         label.setBorder(null);
         label.setIcon(icon);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.ipady = 150;
+        c.gridwidth = 6;
+        c.weighty = 1;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        pane.remove(label);
+        pane.add(label, c);
         frame.setSize(500, 500);
     }
 
@@ -268,7 +268,7 @@ class MainWindow {
         Image im = icon.getImage();
         im = im.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         icon = new ImageIcon(im);
-        JLabel label = (JLabel) frame.getContentPane().getComponent(4);
+        JLabel label = (JLabel) frame.getContentPane().getComponent(3);
         label.setIcon(icon);
         label.setText("");
         label.setBorder(null);
@@ -306,7 +306,7 @@ class MainWindow {
             int size = wrapped.getInt();
 
             // Receive filters
-            JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(6);
+            JComboBox comboBox = (JComboBox) frame.getContentPane().getComponent(5);
             String[] filters = new String[size];
             for (int i = 0; i < size; i++) {
                 filters[i] = inputStream.readUTF();
@@ -328,7 +328,7 @@ class MainWindow {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.frame.setSize(400, 300);
+        this.frame.setSize(420, 300);
         SwingUtilities.invokeLater(() -> recvFilterList());
     }
 }
