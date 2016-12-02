@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Future
 {
-    public interface SumOfElements
+    public interface ISumOfElements
     {
         void CalculateSum(int[] arr);
     }

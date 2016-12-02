@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Future
 {
-    class AsyncCalculating : SumOfElements
+    class AsyncCalculating : ISumOfElements
     {
         private int sumOfElements;
         ManualResetEvent isReady = new ManualResetEvent(false);
@@ -33,7 +33,6 @@ namespace Future
             get
             {
                 isReady.WaitOne();
-                isReady.Reset();
                 return sumOfElements;
             }
         }
