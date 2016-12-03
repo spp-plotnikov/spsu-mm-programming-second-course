@@ -54,7 +54,6 @@ public class Server implements Runnable {
             } catch (IOException e) {
                 if (isStopped())
                     return;
-                e.printStackTrace();
             }
             // ... start the new processing thread
             new Thread(new ImageProcessor(client, filters)).start();

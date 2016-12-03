@@ -39,6 +39,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
+import java.io.IOException;
 
 // Copy-pasted from GNU-classpath
 // Original ConvolveOp implementation
@@ -63,7 +64,7 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
         return new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
     }
 
-    public final WritableRaster filter(Raster src, WritableRaster dest)  {
+    public final WritableRaster filter(Raster src, WritableRaster dest) {
         if (src == dest)
             throw new IllegalArgumentException("src == dest is not allowed.");
         if (kernel.getWidth() > src.getWidth()
@@ -114,7 +115,11 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
 
             if (progress > 1.0) {
                 percents += 1;
-                progressSender.send(percents);
+                try {
+                    progressSender.send(percents);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 progress -= 1.0;
             }
         }
@@ -149,16 +154,15 @@ public class MyConvolveOp implements BufferedImageOp, RasterOp {
             throw new IllegalArgumentException("Source and destination images " +
                     "cannot be the same.");
         if (dst == null)
-            dst = createCompatibleDestImage(src, (ColorModel) src.getColorModel());
+            dst = createCompatibleDestImage(src, src.getColorModel());
 
         // Make sure source image is premultiplied
-        BufferedImage src1 = src;
 
         BufferedImage dst1 = dst;
-        if (src1.getColorModel().getColorSpace().getType() != dst.getColorModel().getColorSpace().getType())
+        if (src.getColorModel().getColorSpace().getType() != dst.getColorModel().getColorSpace().getType())
             dst1 = createCompatibleDestImage(src, src.getColorModel());
 
-        filter(src1.getRaster(), dst1.getRaster());
+        filter(src.getRaster(), dst1.getRaster());
         // Convert between color models if needed
         if (dst1 != dst)
             new ColorConvertOp(hints).filter(dst1, dst);

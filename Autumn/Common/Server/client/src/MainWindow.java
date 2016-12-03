@@ -27,7 +27,6 @@ class MainWindow {
 
     private void submitImageButtonHandler() {
         if (!isRunning.get()) {
-
             if (srcImg == null) {
                 JOptionPane.showMessageDialog(frame, "Please load an image first");
                 return;
@@ -55,12 +54,15 @@ class MainWindow {
                         InputStream input = s.getInputStream();
                         byte[] magicWord = new byte[1];
                         do {
-                            input.read(magicWord);
+                            if (input.read(magicWord) == -1)
+                                throw new IOException("Can't read magicWord");
                             if (magicWord[0] == (byte) 0xFF) // image, not progress update
                                 break;
                             // retrieve the progress
                             byte[] cur = new byte[4];
-                            input.read(cur);
+
+                            if (input.read(cur) == -1)
+                                throw new IOException("Can't read current progress");
                             // and set the progress bar
                             progressBar.setValue(ByteBuffer.wrap(cur).getInt());
                         } while (!isCancelled());
@@ -108,7 +110,7 @@ class MainWindow {
                 int i = path.lastIndexOf('.');
                 if (i >= 0)
                     extension = path.substring(i + 1);
-                if (extension == "") {
+                if (extension.equals("")) {
                     extension = "png";
                     path += ".png";
                 }
@@ -149,7 +151,7 @@ class MainWindow {
             public void insertUpdate(DocumentEvent e) {
                 warn();
             }
-            public void warn() {
+            void warn() {
                 path = pathField.getText();
             }
         });
@@ -208,7 +210,7 @@ class MainWindow {
         pane.add(progressBar, c);
 
         // Filters
-        JComboBox comboBox = new JComboBox();
+        JComboBox comboBox = new JComboBox<String>();
         c.ipadx = c.ipady = 0;
         c.gridwidth = 1;
         c.gridx = 0;
@@ -308,7 +310,8 @@ class MainWindow {
 
             // Read the filters count
             byte len[] = new byte[4];
-            inputStream.read(len);
+            if (inputStream.read(len) == -1)
+                throw new IOException("Can't read filter count");
             ByteBuffer wrapped = ByteBuffer.wrap(len);
             int size = wrapped.getInt();
 
@@ -324,18 +327,18 @@ class MainWindow {
         }
     }
 
-    public void run() {
+    void run() {
         try {
             serverIp = InetAddress.getByName(JOptionPane.showInputDialog("Type the server IPv4", "127.0.0.1"));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this.frame, "Error: Can't parse or connect");
         }
         try {
-            SwingUtilities.invokeAndWait(() -> createAndShowGUI());
+            SwingUtilities.invokeAndWait(this::createAndShowGUI);
         } catch (Exception e) {
             e.printStackTrace();
         }
         this.frame.setSize(420, 300);
-        SwingUtilities.invokeLater(() -> recvFilterList());
+        SwingUtilities.invokeLater(this::recvFilterList);
     }
 }
