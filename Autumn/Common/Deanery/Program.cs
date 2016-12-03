@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace Deanery
 {
@@ -7,10 +6,11 @@ namespace Deanery
     {
         static void Main(string[] args)
         {
+            // Testing on 1000 requests (900 for consisting, 90 - adding, 10 - removing)
             TestingSystem testingSystem = new TestingSystem(new SimpleImplementation(), new NotTrivialImplementation());
             testingSystem.StartTestOfSimple();
-            Thread.Sleep(2000);
             testingSystem.StartTestOfNotTrivial();
+            Console.ReadKey();
         }
     }
 }
