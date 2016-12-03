@@ -7,30 +7,22 @@ using Fibers;
 
 namespace ProcessManager
 {
-    struct ProcessInfo
-    {
-        public uint Id;
-        public int Priority;
-        public ProcessInfo(uint _Id, int _Priority)
-        {
-            this.Id = _Id;
-            this.Priority = _Priority;
-        }
-    }
-
     public static class ProcessManager
     {
- 
-        private static Queue<ProcessInfo> switchQueue = new Queue<ProcessInfo>();  
-        private static uint FP = 0;
+        private static SwitchQueue switchQueue = new SwitchQueue();  // queue of processes 
 
-        public static void Switch(bool fiberFinished)
+        private static FiberItem FP = new FiberItem(); // Fiber Pointer
+
+        private static int curTime = 0; // loop iterator for distribution cpu time by processes 
+
+        private static int primordialSizeOfQueue; // size of queue after end of pushing processes. it need for distribution cpu time
+
+        // Not depends of priority
+        public static void _Switch(bool fiberFinished)
         {
-            if (switchQueue.Count() == 0)
-                return;
             if (fiberFinished)
             {
-                Console.WriteLine("Fiber " + FP + " has been finished");
+                Console.WriteLine("Fiber " + FP.Id + " has been finished");
                 
                 // pop this fiber thats why its finished
                 switchQueue.Dequeue();
@@ -38,59 +30,101 @@ namespace ProcessManager
                 // Still having any process
                 if (switchQueue.Count() > 0)
                 {
-                    FP = switchQueue.Peek().Id;
-                    Fiber.Switch(FP);
+                    FP = switchQueue.Peek();
+                    Fiber.Switch(FP.Id);
                 }
                 else // if no, going to root process 
                 {
                     Console.WriteLine("-----END-----");
+                    switchQueue.Clear();
                     Fiber.Switch(Fiber.PrimaryId);
                 }
             }
             else
             {
                 // pop from top
-                ProcessInfo first = switchQueue.Dequeue();
-
+                FiberItem first = switchQueue.Dequeue();
+                
                 // and pushing back
                 switchQueue.Enqueue(first);
 
                 // new Fiber Pointer
-                FP = switchQueue.Peek().Id;
+                FP = switchQueue.Peek();
 
-                Console.WriteLine("Switch to " + FP);
+                //Console.WriteLine("Switch to " + FP);
 
                 // switch to new fiber
-                Fiber.Switch(FP);
+                Fiber.Switch(FP.Id);
             }
         }
 
+        // With priority 
+        public static void Switch(bool fiberFinished)
+        {
+            // waiting some mcsec for avoid so fast switching 
+            Thread.Sleep(10);
+
+            curTime = (curTime + 1) % (primordialSizeOfQueue * 10); // 10 - lenght of loop
+            if (fiberFinished)
+            {
+                Console.WriteLine("Fiber " + FP.Id + " has been finished");
+
+                // pop this fiber thats why its finished
+                switchQueue.Remove(FP);
+
+                // Still any process
+                if (switchQueue.Count() > 0)
+                {
+                    FP = switchQueue.Last();
+                    Fiber.Switch(FP.Id);
+                }
+                else // if no, going to root process 
+                {
+                    Console.WriteLine("-----END-----");
+                    switchQueue.Clear();
+                    Fiber.Switch(Fiber.PrimaryId);
+                }
+            }
+            else
+            {   
+                // low priority process 
+                if (switchQueue.TryGetIdByCPUtime(curTime))
+                {
+                    FP = switchQueue.GetIdByCPUtime(curTime);
+                    //Console.WriteLine("Switch to " + FP.Id);
+                    Fiber.Switch(FP.Id);
+                }
+                else // high priority process
+                {
+                    FP = switchQueue.Last();
+                    Fiber.Switch(FP.Id);
+                }
+            }
+        }
 
         static void Main()
         {
-            Process process1 = new Process();
-            Action task1 = new Action(process1.Run);
-            Fiber fiber1 = new Fiber(task1);
-
-            Console.WriteLine("Fiber id: " + fiber1.Id + " process priority: " + process1.Priority);
-
             
-            switchQueue.Enqueue(new ProcessInfo(fiber1.Id, process1.Priority));
+            for (int i = 0; i < 10; ++i)
+            {
+                // creation new process
+                Process process = new Process();
+                Fiber fiber1 = new Fiber(new Action(process.Run));
 
+                Console.WriteLine("Fiber id: " + fiber1.Id + " process priority: " + process.Priority);
 
-            Process process2 = new Process();
-            Action task2 = new Action(process2.Run);
-            Fiber fiber2 = new Fiber(task2);
+                // pushing to switcher queue
+                switchQueue.Enqueue(new FiberItem(fiber1.Id, process.Priority, (i + 1) * 5)); // every 5 time switch to low prior  
+            }
 
-            Console.WriteLine("Fiber id: " + fiber2.Id + " process priority: " + process2.Priority);
+            // need for distributon cpu time
+            primordialSizeOfQueue = switchQueue.Count();
 
-            switchQueue.Enqueue(new ProcessInfo(fiber2.Id, process2.Priority));
+            // sorting by priority
+            switchQueue.Sort();
 
-            
-          
-           
+            // strarting switcher
             Switch(false);
-           
 
             Console.ReadLine();
         }
