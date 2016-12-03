@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Deanery
@@ -16,7 +17,7 @@ namespace Deanery
             return !lockedStudents.Contains(studentId);
         }
 
-        private void TakeStudent(long studentId) // If we need to do smth with student
+        private void TakeStudent(long studentId)
         {
             lockedStudentsMutex.WaitOne();
             while (lockedStudents.Contains(studentId))
@@ -28,7 +29,7 @@ namespace Deanery
             lockedStudentsMutex.ReleaseMutex();
         }
 
-        private void ReleaseStudent(long studentId) // If we did smth with student
+        private void ReleaseStudent(long studentId)
         {
             lockedStudentsMutex.WaitOne();
             lockedStudents.Remove(studentId);
@@ -38,6 +39,7 @@ namespace Deanery
         public void Add(long studentId, long courseId)
         {
             TakeStudent(studentId);
+            //Console.WriteLine("qq");
             // There are 2 options: this credit is first for this student, so we need to lock whole listOfStudentCredits
             // Otherwise usual add of courseId
             listOfStudentCreditsMutex.WaitOne();
@@ -49,7 +51,7 @@ namespace Deanery
             }
             else
             {
-                listOfStrudentCredits.Add(studentId, new MySortedList<long> { courseId });
+                listOfStrudentCredits.Add(studentId, new MySortedList<long> { courseId }); // ?!?!?!?!?!?!?!?!?!?!?!?!?!?
                 listOfStudentCreditsMutex.ReleaseMutex();
             }
             ReleaseStudent(studentId);

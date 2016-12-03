@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Deanery
 {
@@ -64,10 +67,9 @@ namespace Deanery
             int numOfFinishedThreads = 0;
             for (int i = 0; i < 2; i++)
             {
-                int temp = i;
                 Thread thread = new Thread(() =>
                 {
-                    AddThread(temp * 45, temp * 45 + 45, system1); // Here's the problem
+                    AddThread(i * 45, i * 45 + 45, system1);
                     numOfFinishedThreads++;
                 });
                 thread.Start();
@@ -75,9 +77,9 @@ namespace Deanery
 
             for (int i = 0; i < 9; i++)
             {
-                int temp = i;
                 Thread thread = new Thread(() =>
                 {
+                    int temp = i;
                     ContainsThread(temp * 90, temp * 90 + 90, system1);
                     numOfFinishedThreads++;
                 });
@@ -86,9 +88,9 @@ namespace Deanery
 
             for (int i = 0; i < 2; i++)
             {
-                int temp = i;
                 Thread thread = new Thread(() =>
                 {
+                    int temp = i;
                     RemoveThread(temp * 5, temp * 5 + 5, system1);
                     numOfFinishedThreads++;
                 });
@@ -99,7 +101,7 @@ namespace Deanery
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-            Console.WriteLine("RunTime of SimpleImplementation " + elapsedTime);
+            Console.WriteLine("RunTime " + elapsedTime);
         }
         // Testing of NotTrivialImplementation
         public void StartTestOfNotTrivial()
@@ -109,9 +111,9 @@ namespace Deanery
             int numOfFinishedThreads = 0;
             for (int i = 0; i < 2; i++)
             {
-                int temp = i;
                 Thread thread = new Thread(() =>
                 {
+                    int temp = i;
                     AddThread(temp * 45, temp * 45 + 45, system2);
                     numOfFinishedThreads++;
                 });
@@ -120,9 +122,9 @@ namespace Deanery
 
             for (int i = 0; i < 9; i++)
             {
-                int temp = i;
                 Thread thread = new Thread(() =>
                 {
+                    int temp = i;
                     ContainsThread(temp * 90, temp * 90 + 90, system2);
                     numOfFinishedThreads++;
                 });
@@ -131,9 +133,9 @@ namespace Deanery
 
             for (int i = 0; i < 2; i++)
             {
-                int temp = i;
                 Thread thread = new Thread(() =>
                 {
+                    int temp = i;
                     RemoveThread(temp * 5, temp * 5 + 5, system2);
                     numOfFinishedThreads++;
                 });
@@ -144,7 +146,7 @@ namespace Deanery
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-            Console.WriteLine("RunTime of NotTrivialImplementation " + elapsedTime);
+            Console.WriteLine("RunTime " + elapsedTime);
         }
     }
 }

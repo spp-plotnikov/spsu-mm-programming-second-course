@@ -2,15 +2,11 @@
 
 namespace Deanery
 {
-    class MySortedList<T> : List<T> // MySortedList ignored the Add of existing item
+    class MySortedList<T> : List<T>
     {
         public new void Add(T item)
         {
-            int index = BinarySearch(item);
-            if (index < 0)
-            {
-                Insert(~index, item);
-            }
+            Insert(~BinarySearch(item), item);
         }
 
         public new bool Remove(T item)
