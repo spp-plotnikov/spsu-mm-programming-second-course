@@ -21,6 +21,7 @@ namespace InstClient.ViewModel
         private SimpleCommand _sendPict;
         private SimpleCommand _saveResult;
         private readonly ClientModel _model;
+        private string _editAbortBtnName;
 
         public event ClientEventHandler ShowMessage;
         public event EventHandler OpenPictRequested;
@@ -35,10 +36,25 @@ namespace InstClient.ViewModel
             model.ProgressChanged += OnProgressChanged;
             OpenPict = new SimpleCommand(HandleOpenPictRequest);
             UpdateFilterList = new SimpleCommand(model.GetFilters);
-            SendPict = new SimpleCommand(EditPict);
+            SendPict = new SimpleCommand(EditAbortPict);
             SaveResult = new SimpleCommand(HandleSavePictRequest);
             IsInitalPictVisible = true;
             IsResultPictVisible = false;
+            EditAbortBtnName = "Send";
+        }
+
+        public string EditAbortBtnName
+        {
+            get
+            {
+                return _editAbortBtnName;
+                
+            }
+            set
+            {
+                _editAbortBtnName = value;
+                OnPropertyChanged();
+            }
         }
 
         public SimpleCommand SaveResult
@@ -217,11 +233,18 @@ namespace InstClient.ViewModel
 
         public void OnPictProcessed(object sender, ClientEventArgs args)
         {
-            ResultPictPath = Directory.GetCurrentDirectory() + "/" + args.Message;
-            ShowMessage?.BeginInvoke(this, new ClientEventArgs("Success! Pict was successfully edited. Click on it to compare."), null, null);
-            IsInitalPictVisible = false;
-            IsResultPictVisible = true;
-            ProcessingProgress = 0;
+            if (args.Message != null)
+            {
+                ResultPictPath = Directory.GetCurrentDirectory() + "/" + args.Message;
+                ShowMessage?.BeginInvoke(this, new ClientEventArgs("Success! Pict was successfully edited. Click on it to compare."), null, null);
+                IsInitalPictVisible = false;
+                IsResultPictVisible = true;
+            }
+            else
+            {
+                ProcessingProgress = 100;
+            }
+            EditAbortBtnName = "Send";
         }
 
         public void OnClosing(object sender, EventArgs args)
@@ -256,24 +279,43 @@ namespace InstClient.ViewModel
             }
             catch (Exception e)
             {
-                OnAnyError(this, new ClientEventArgs(e.ToString()));
+                //OnAnyError(this, new ClientEventArgs(e.ToString()));
             }
         }
 
-        private void EditPict()
+        private void EditAbortPict()
         {
-
-            ResultPictPath = null;
-
-            try
+            if (EditAbortBtnName =="Send")
             {
-                _model.EditPict(new UploadingData(new Pict(InitalPictPath), (string)FiltersCollectionView.CurrentItem));
-            }
-            catch (Exception e)
-            {
+                EditAbortBtnName = "Abort";
+                ProcessingProgress = 0;
 
-                ShowMessage?.BeginInvoke(this, new ClientEventArgs("Error " + e.ToString()), null, null);
+                try
+                {
+                    _model.EditPict(new UploadingData(new Pict(InitalPictPath), (string)FiltersCollectionView.CurrentItem));
+                }
+                catch (Exception e)
+                {
+
+                    ShowMessage?.BeginInvoke(this, new ClientEventArgs("Error " + e.ToString()), null, null);
+                }
             }
+            else
+            {
+                EditAbortBtnName = "Send";
+
+
+                try
+                {
+                    _model.AbortPictEdit();
+                }
+                catch (Exception e)
+                {
+
+                    ShowMessage?.BeginInvoke(this, new ClientEventArgs("Error " + e.ToString()), null, null);
+                }
+            }
+
 
         }
 
@@ -284,7 +326,7 @@ namespace InstClient.ViewModel
 
         private void HandleSavePictRequest()
         {
-            SavePictRequested?.BeginInvoke(this, EventArgs.Empty, null, null);
+            SavePictRequested?.Invoke(this, EventArgs.Empty); //, null, null);
         }
 
     }

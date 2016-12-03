@@ -15,6 +15,9 @@ namespace InstClient.Model
         public event ClientEventHandler PictProcessed;
         public event ClientEventHandler ProgressChanged;
         public List<string> UsedPicts { get; set; }
+        private InstServiceClient _client;
+        private bool _isAborted;
+        private Mutex _abortFinished = new Mutex();
 
         public ClientModel()
         {
@@ -41,17 +44,29 @@ namespace InstClient.Model
         {
             Thread thread = new Thread(() =>
             {
+                _client = null;
                 try
                 {
-                    var handler = new NotificationHandler(this);
-                    var client = new InstServiceClient(new InstanceContext(handler), "NetTcpBinding_IInstService");
-                    var result = client.GetFilters();
-                    client.Close();
+                    _client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)), "NetTcpBinding_IInstService");
+                    var result = _client.GetFilters();
+                    _client.Close();
                     ReceivedFilters?.Invoke(this, new ClientEventArgs(string.Join(" ", result)));
                 }
                 catch (Exception e)
                 {
                     GotAnyError?.Invoke(this, new ClientEventArgs(e.ToString()));
+                }
+                finally
+                {
+                    try
+                    {
+                        _client?.Close();
+                    }
+                    catch (Exception)
+                    {
+                        //ingo
+
+                    }
                 }
             });
             thread.Start();
@@ -59,18 +74,20 @@ namespace InstClient.Model
 
         public void EditPict(object data)
         {
-            Thread thread = new Thread(() =>
+            var thread = new Thread(() =>
             {
+                _client = null;
                 try
                 {
+                    _isAborted = false;
                     Pict pict = ((UploadingData) data).Picture;
                     string filter = ((UploadingData) data).Filter;
                     pict.PathToResult = GetValidName();
 
-                    var client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)),
+                    _client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)),
                         "NetTcpBinding_IInstService");
-                    var result = client.EditPict(pict.PictBytes, filter);
-                    client.Close();
+                    var result = _client.EditPict(pict.PictBytes, filter);
+
 
                     pict.SavePict(result);
                     ProgressChanged?.Invoke(this, new ClientEventArgs("100"));
@@ -78,12 +95,24 @@ namespace InstClient.Model
                 }
                 catch (Exception e)
                 {
-                    GotAnyError?.Invoke(this, new ClientEventArgs(e.ToString()));
+                    if(!_isAborted)
+                        GotAnyError?.Invoke(this, new ClientEventArgs(e.ToString()));
+                    PictProcessed?.Invoke(this, new ClientEventArgs(null));
                 }
-
+                finally
+                {
+                    try
+                    {
+                        _client?.Close();
+                    }
+                    catch (Exception)
+                    {
+                        //ingo
+                    }
+                }
             });
 
-                thread.Start();
+            thread.Start();
         }
 
         private string GetValidName()
@@ -108,6 +137,19 @@ namespace InstClient.Model
                 {
                     count++;
                 }
+            }
+        }
+
+        public void AbortPictEdit()
+        {
+            try
+            {
+                _isAborted = true;
+                _client.Close();
+            }
+            catch (Exception)
+            {
+               //ign
             }
         }
     }

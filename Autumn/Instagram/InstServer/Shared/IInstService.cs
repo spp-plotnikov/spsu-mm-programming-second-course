@@ -17,5 +17,6 @@ namespace Shared
 
         [OperationContract]
         byte[] EditPict(byte[] data, string filter);
+
     }
 }

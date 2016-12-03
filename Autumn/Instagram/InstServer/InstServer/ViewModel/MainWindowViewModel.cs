@@ -26,6 +26,19 @@ namespace InstServer.ViewModel
             _changeServerStatusBtnName = "Launch server";
             _getFilters = new SimpleCommand(GetFiltersFromDialogWindow);
             _changeServerStatus = new RelayCommand(model.OpenService);
+
+            try
+            {
+                StreamReader sr = File.OpenText(Path.GetFullPath("filters.config"));
+                string filters = sr.ReadToEnd();
+                OnConsoleLogChanged(this, new ModelEventArgs("Readed filters: " + filters));
+                _model.CurrentFilters = filters.Split(' ');
+            }
+            catch (Exception)
+            {
+                OnConsoleLogChanged(this, new ModelEventArgs("Can't reach filters.config"));
+            }
+
         }
 
 
@@ -108,6 +121,11 @@ namespace InstServer.ViewModel
                 OnConsoleLogChanged(this, new ModelEventArgs("Readed filters: " + filters));
                 _model.UpdateFilterList(filters.Split(' '));
             }
+        }
+
+        public void InitiateFiltersList(string path)
+        {
+            
         }
 
 

@@ -12,6 +12,7 @@ namespace InstServer.Model
 
         public event ModelEventHandler SendInformToConsole;
         public event EventHandler ServerStatusChanged;
+        public string[] CurrentFilters { get; set; }
 
         public void OpenService(object port)
         {
@@ -19,6 +20,7 @@ namespace InstServer.Model
             _service = new InstService();
             _service.OnClientRequestedFilterList += FiltersRequestHandler;
             _service.OnClientRequestedProcess += ProcessRequestHandler;
+            _service.Filters = CurrentFilters;
 
             Thread thread = new Thread(() =>
             {
@@ -59,6 +61,7 @@ namespace InstServer.Model
 
         public void UpdateFilterList(string[] filters)
         {
+            CurrentFilters = filters;
             _service.Filters = filters;
         }
     }
