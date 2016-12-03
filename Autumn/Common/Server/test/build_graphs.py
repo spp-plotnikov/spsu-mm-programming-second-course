@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 
 import json
-import sys, os, numpy, glob
+import sys, os
 import matplotlib.pyplot as plt
-from collections import defaultdict
 from math import *
 
 with open('results.json') as data_file:    
@@ -23,7 +22,7 @@ for elem in data:
     gry[2].append(elem['avgTime'])
     gry[3].append(elem['medTime'])
 
-# Plotting displacement graphs with matplotlib
+# Plotting
 plt.cla()
 plt.plot(grx[0], gry[0], '-b.', label='Min time')
 plt.plot(grx[1], gry[1], '-r.', label='Max time')
