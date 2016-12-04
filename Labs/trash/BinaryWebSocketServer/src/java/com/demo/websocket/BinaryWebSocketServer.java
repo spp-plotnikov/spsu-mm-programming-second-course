@@ -1,169 +1,137 @@
-//package com.demo.websocket;
-//
-//import java.io.ByteArrayInputStream;
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.nio.ByteBuffer;
-//import java.nio.charset.Charset;
-//import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.HashMap;
-//import java.util.HashSet;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Set;
-//import java.util.concurrent.ConcurrentHashMap;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-//import javax.websocket.OnClose;
-//import javax.websocket.OnMessage;
-//import javax.websocket.OnOpen;
-//import javax.websocket.Session;
-//import javax.websocket.server.ServerEndpoint;
-//import javafx.scene.image.Image;
-//import javafx.scene.image.WritableImage;
-//import java.io.ByteArrayOutputStream;
-//import javax.imageio.ImageIO;
-//import javafx.embed.swing.SwingFXUtils;
-//
-//@ServerEndpoint("/images")
-//public class BinaryWebSocketServer {
-//
-//    private final static List<String> filters = Arrays.asList("Gray", "SobelX", "SobelY");
-//    private static final ConcurrentHashMap<Session, User> users = new ConcurrentHashMap<>();
-//
-//    @OnOpen
-//    public void onOpen(Session session) {
-//
-////        String namesOfFilters = "";
-////        for (int i = 0; i < filters.size() - 1; i++) {
-////            namesOfFilters = filters.get(i) + " ";
-////        }
-////        namesOfFilters += filters.get(filters.size());
-////        try {
-////            session.getBasicRemote().sendBinary(ByteBuffer.wrap(namesOfFilters.getBytes(Charset.forName("UTF-8"))));
-////        } catch (IOException ex) {
-////            Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
-////        }
-////        users.put(session, new User(session));
-//    }
-//
-//    @OnClose
-//    public void onClose(Session session) {
-//        users.remove(session);
-//    }
-//
-//    @OnMessage
-//    public void onMessage(InputStream inputStream, Session session) {
-//        //if(!users.get(session).getFlag){
-//
-//        users.get(session).setFlag(true);
-//        Image img = new Image(inputStream);
-//        int height = (int) img.getHeight();
-//        int width = (int) img.getWidth();
-//
-//        WritableImage dest = new WritableImage(width, height);
-//        users.get(session).setDest(dest);
-//        Filters filter = new Filters(img, dest, height, width);
-//        users.get(session).setFilter(filter);
-//        applyFilter("Gray", session);
-//         
-//    }
-//
-//    //TODO: применение фильтра на сервере
-//    private void applyFilter(final String nameOfFilter, Session session) {
-//        if (users.get(session).getImg() != null) {
-//
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//                    if (users.get(session).getFilter().applyFilter(nameOfFilter)) {
-//
-//                        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-//                        Image img = users.get(session).getImg();
-//                        try {
-//                            ImageIO.write(SwingFXUtils.fromFXImage(img, null), "jpeg", byteOutput);
-//                        } catch (IOException ex) {
-//                            Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-//                        ByteBuffer buf = ByteBuffer.wrap(byteOutput.toByteArray());
-//                        try {
-//                            session.getBasicRemote().sendBinary(buf);
-//                        } catch (IOException ex) {
-//                            Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-//
-//                    }
-//                }
-//            }).start();
-//        }
-//    }
-//}
 package com.demo.websocket;
 
-import java.io.ByteArrayInputStream;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static javafx.embed.swing.SwingFXUtils.toFXImage;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafxbinarywsclient.ImageVO;
-import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-import sun.misc.IOUtils;
-import static sun.nio.cs.Surrogate.is;
 
 @ServerEndpoint("/images")
 public class BinaryWebSocketServer {
 
-    private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<Session>());
+    private final static List<String> FILTERS = Arrays.asList("Gray", "SobelX", "SobelY");
+
+    private final HashMap<Session, User> informationAboutSession = new HashMap<>();
 
     @OnOpen
     public void onOpen(Session session) {
-        sessions.add(session);
+        informationAboutSession.put(session, new User(null, false, session));
+        String namesOfFilters = "";
+        for (int i = 0; i < FILTERS.size() - 1; i++) {
+            namesOfFilters += FILTERS.get(i) + " ";
+        }
+        namesOfFilters += FILTERS.get(FILTERS.size() - 1);
+        try {
+            session.getBasicRemote().sendText(namesOfFilters);
+        } catch (IOException ex) {
+            Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @OnClose
     public void onClose(Session session) {
-        sessions.remove(session);
+        informationAboutSession.remove(session);
     }
 
     @OnMessage
-    public void onMessage(InputStream is, Session session1) throws IOException {
+    public void textMessage(Session session, String msg) {
+        if (msg.equals("cancel")) {
+            informationAboutSession.get(session).getFilter().setFlag(false);
+            informationAboutSession.get(session).setApplyingFilt(false);
+        } else {
+            applyFilter(msg, session);
+        }
+    }
+
+    @OnMessage
+    public void binaryMessage(InputStream inputStream, Session session) throws IOException {
         try {
-            ObjectInputStream oin = new ObjectInputStream(is);
-            ImageVO ts = (ImageVO) oin.readObject();
-            oin.close();
-            int size = session1.getMaxBinaryMessageBufferSize();
-            ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bytesOut);
-            oos.writeObject(ts);
-            oos.flush();
-            byte[] bytes = bytesOut.toByteArray();
-            bytesOut.close();
-            oos.close();
-            ByteBuffer bb = ByteBuffer.wrap(bytes);
-            //bb.flip();
-            
-                session1.getBasicRemote().sendBinary(bb);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
+            ImageVO imageVO;
+            try (ObjectInputStream oin = new ObjectInputStream(inputStream)) {
+                imageVO = (ImageVO) oin.readObject();
+            }
+            WritableImage wimg = new WritableImage(imageVO.image.getIconWidth(), imageVO.image.getIconHeight());
+
+            BufferedImage bufferedImage = toBufferedImage(imageVO.image.getImage());
+            Image fxImage = toFXImage(bufferedImage, wimg);
+            informationAboutSession.get(session).setImage(fxImage);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
+
+    public BufferedImage toBufferedImage(java.awt.Image awtImage) {
+        if (awtImage instanceof BufferedImage) {
+            return (BufferedImage) awtImage;
+        }
+        // Create a buffered image with transparency
+        BufferedImage bimage = new BufferedImage(awtImage.getWidth(null), awtImage.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        // Draw the image on to the buffered image
+        Graphics2D bGr = bimage.createGraphics();
+        bGr.drawImage(awtImage, 0, 0, null);
+        bGr.dispose();
+
+        // Return the buffered image
+        return bimage;
+    }
+
+    private void applyFilter(final String nameOfFilter, Session session) {
+        Image image = informationAboutSession.get(session).getImage();
+        if (image != null && !informationAboutSession.get(session).isApplyingFilt()) {
+            int width = (int) image.getWidth();
+            int height = (int) image.getHeight();
+            informationAboutSession.get(session).setDestImage(width, height);
+            Filters filter = new Filters(informationAboutSession.get(session), height, width);
+
+            informationAboutSession.get(session).setFilter(filter);
+            informationAboutSession.get(session).getFilter().setFlag(true);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    informationAboutSession.get(session).setApplyingFilt(true);
+                    if (informationAboutSession.get(session).getFilter().applyFilter(nameOfFilter)) {
+                        sendImage(informationAboutSession.get(session).getDestImage(), session);
+                        informationAboutSession.get(session).setApplyingFilt(false);
+                    }
+                }
+            }).start();
+        }
+    }
+
+    private void sendImage(WritableImage dest, Session session) {
+        try {
+            ImageVO imageVO = new ImageVO(dest);
+            ObjectOutputStream oos;
+            byte[] bytes;
+            try (ByteArrayOutputStream bytesOut = new ByteArrayOutputStream()) {
+                oos = new ObjectOutputStream(bytesOut);
+                oos.writeObject(imageVO);
+                oos.flush();
+                bytes = bytesOut.toByteArray();
+            }
+            oos.close();
+            ByteBuffer bb = ByteBuffer.wrap(bytes);
+            session.getBasicRemote().sendBinary(bb);
+        } catch (IOException ex) {
+            Logger.getLogger(BinaryWebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }
