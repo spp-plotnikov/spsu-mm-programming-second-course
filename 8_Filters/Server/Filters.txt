@@ -1,0 +1,4 @@
+Transparency
+Negative
+Grayscale
+SepiaTone

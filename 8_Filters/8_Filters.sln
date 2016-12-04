@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{AE0045AF-AC42-4ACC-9B4B-D3370694BCB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contract", "Contract\Contract.csproj", "{1DE33146-0FE7-4A84-84FA-B513C9B7F218}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiltersApp", "Forms\FiltersApp.csproj", "{5782B930-80B3-4F28-9C42-FD4EC1BE19B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE0045AF-AC42-4ACC-9B4B-D3370694BCB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE0045AF-AC42-4ACC-9B4B-D3370694BCB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE0045AF-AC42-4ACC-9B4B-D3370694BCB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE0045AF-AC42-4ACC-9B4B-D3370694BCB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DE33146-0FE7-4A84-84FA-B513C9B7F218}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DE33146-0FE7-4A84-84FA-B513C9B7F218}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DE33146-0FE7-4A84-84FA-B513C9B7F218}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DE33146-0FE7-4A84-84FA-B513C9B7F218}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5782B930-80B3-4F28-9C42-FD4EC1BE19B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5782B930-80B3-4F28-9C42-FD4EC1BE19B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5782B930-80B3-4F28-9C42-FD4EC1BE19B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5782B930-80B3-4F28-9C42-FD4EC1BE19B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
