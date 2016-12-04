@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExamSystem
+namespace ExamSystems
 {
-    class CreditItem //лист системы
+    class CreditItem : ListItem //лист системы
     {
-        public long hash;
+        public int hash;
         public bool passed;
         public long studentID, courseID;
 
@@ -16,7 +16,8 @@ namespace ExamSystem
         {
             this.courseID = courseID;
             this.studentID = studentID;
-            hash = studentID.GetHashCode() + courseID;
+            hash = Convert.ToInt32(studentID.GetHashCode() + courseID);
+            bin = ToBinary(hash);
         }
     }
 }

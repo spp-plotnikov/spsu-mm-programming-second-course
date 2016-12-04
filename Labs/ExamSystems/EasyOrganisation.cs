@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace ExamSystem
+namespace ExamSystems
 {
-    class Org1 : IExamSystem
+    class EasyOrganisation : IExamSystem
     {
         List<CreditItem>[] hashTable = null;
-        int tableSize = 10;
-        int listSize = 5;
+        int tableSize = 8;
+        int listSize = 4;
         Mutex mut = new Mutex();
 
-        public Org1()
-        {            
-            CreateTable();            
+        public EasyOrganisation()
+        {
+            CreateTable();
         }
-        
+
         void CreateTable()
         {
             hashTable = new List<CreditItem>[tableSize];
@@ -27,24 +26,25 @@ namespace ExamSystem
                 hashTable[i] = new List<CreditItem>();
             }
         }
-       
+
         void Resize()//блок всей таблицы
-        {            
+        {
             Console.WriteLine("Resize");
             Thread.Sleep(2000);
             mut.WaitOne();
             List<CreditItem>[] buffer = hashTable;
             tableSize *= 2;
+            listSize *= 2;
             CreateTable();
 
             foreach (var ht in buffer)
             {
-                foreach(var el in ht)
+                foreach (var el in ht)
                 {
                     hashTable[el.hash % tableSize].Add(el);
                 }
             }
-            mut.ReleaseMutex();        
+            mut.ReleaseMutex();
         }
 
         //блок ячейки для всех этих методов
@@ -55,7 +55,7 @@ namespace ExamSystem
             el.passed = true;
             mut.WaitOne();
             hashTable[delta].Add(el);
-            mut.ReleaseMutex();           
+            mut.ReleaseMutex();
             if (hashTable[delta].Count() > listSize)
             {
                 Resize();
@@ -70,7 +70,7 @@ namespace ExamSystem
             mut.WaitOne();
             foreach (var item in hashTable[delta])
             {
-                if(item.studentID == el.studentID)
+                if (item.studentID == el.studentID)
                 {
                     mut.ReleaseMutex();
                     return true;
