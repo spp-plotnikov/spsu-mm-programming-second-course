@@ -29,29 +29,29 @@ public class QsortByRegularSampling {
     }
 
     /*
-     * _mergeSortedArrays[1 and 2] makes 2D array from 1D array using lengths of subarrays
+     * mergeSortedArraysByCount and mergeSortedArraysByLengths make 2D array from 1D array using lengths of subarrays
      *
     */
 
-    private static int[] _mergeSortedArrays1(int[] array, int count) { //count = processesCount = subarrayLength
-        int[][] _array = new int[count][count];
+    private static int[] mergeSortedArraysByCount(int[] array, int count) { //count = processesCount = subarrayLength
+        int[][] doubleArray = new int[count][count];
         for (int i = 0; i < count; i++) {
-            _array[i] = Arrays.copyOfRange(array, i * count, (i + 1) * count);
+            doubleArray[i] = Arrays.copyOfRange(array, i * count, (i + 1) * count);
         }
 
-        return mergeSortedArrays(_array);
+        return mergeSortedArrays(doubleArray);
     }
 
-    private static int[] _mergeSortedArrays2(int[] array, int[] lengths) {
-        int[][] _array = new int[lengths.length][];
+    private static int[] mergeSortedArraysByLengths(int[] array, int[] lengths) {
+        int[][] doubleAarray = new int[lengths.length][];
         int start = 0;
         for (int i = 0; i < lengths.length; i++) {
-            _array[i] = new int[lengths[i]];
-            _array[i] = Arrays.copyOfRange(array, start, start + lengths[i]);
+            doubleAarray[i] = new int[lengths[i]];
+            doubleAarray[i] = Arrays.copyOfRange(array, start, start + lengths[i]);
             start += lengths[i];
         }
 
-        return mergeSortedArrays(_array);
+        return mergeSortedArrays(doubleAarray);
     }
 
     private static int[] mergeSortedArrays(int[][] array) {
@@ -135,18 +135,18 @@ public class QsortByRegularSampling {
          * Sending parts of array to processes, sorting on them
         */
 
-        int[] _arrayLength = new int[]{array.length};
+        int[] arrayLengthA = new int[]{array.length}; //A in arrayLengthA stands for Array!
         MPI.COMM_WORLD.Bcast(
-                _arrayLength,
+                arrayLengthA,
                 0,
                 1,
                 MPI.INT,
                 ROOT_RANK
         );
-        int arrayLength = _arrayLength[0];
+        int arrayLength = arrayLengthA[0];
 
         int[] processBlocksLengths = new int[processesCount];
-        int[] _processBlockLength = new int[1];
+        int[] processBlockLengthA = new int[1];
         if (isRoot(rank)) {
             processBlocksLengths = splitOnAlmostEqualSize(array.length, processesCount); //returns counts
         }
@@ -156,13 +156,13 @@ public class QsortByRegularSampling {
                 0,
                 1,
                 MPI.INT,
-                _processBlockLength,
+                processBlockLengthA,
                 0,
                 1,
                 MPI.INT,
                 ROOT_RANK
         );
-        int processBlockLength = _processBlockLength[0];
+        int processBlockLength = processBlockLengthA[0];
 
         int[] displacements = new int[processesCount];
         int[] processBlock = new int[processBlockLength];
@@ -215,7 +215,7 @@ public class QsortByRegularSampling {
 
         int[] newLeadingSet = new int[processesCount - 1];
         if (isRoot(rank)) {
-            int[] sortedSets = _mergeSortedArrays1(recvSets, processesCount);
+            int[] sortedSets = mergeSortedArraysByCount(recvSets, processesCount);
 
             for (int i = 0; i < processesCount - 1; i++) {
                 int j = i + 1;
@@ -297,11 +297,11 @@ public class QsortByRegularSampling {
          * END
         */
 
-        int[] finalProcessBlockSorted = _mergeSortedArrays2(finalProcessBlock, finalProcessBlockPartsLength);
+        int[] finalProcessBlockSorted = mergeSortedArraysByLengths(finalProcessBlock, finalProcessBlockPartsLength);
         int[] finalProcessBlocksLengths = new int[processesCount];
-        int[] _finalProcessBlockLength = new int[]{finalProcessBlockLength};
+        int[] finalProcessBlockLengthA = new int[]{finalProcessBlockLength};
         MPI.COMM_WORLD.Gather(
-                _finalProcessBlockLength,
+                finalProcessBlockLengthA,
                 0,
                 1,
                 MPI.INT,
