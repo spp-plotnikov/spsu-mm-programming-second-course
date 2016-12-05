@@ -17,24 +17,23 @@ namespace MPIProgram
                 var world = Communicator.world;
                 int p = world.Size;    //процессора
                 int deg = DegreeTwo(p);
-                int n=16;            //число элементов
+                int n;            //число элементов
                 var list = new List<int>();//список со всеми нашими числами
                 int N;                 //изначальное число элементов на один процессор
                 int berEl = 0;           //bearing element
                 var ByteNomber = new int[deg + 1];//двоичное представление номера процессора
 
-                string inputFileName = args[5];
-                string outputFileName = args[6];
+                string inputFileName = args[0];
+                string outputFileName = args[1];
                 var inputFile = new StreamReader(@inputFileName);
-                var outputFile = new StreamWriter(@outputFileName);
                 string read = inputFile.ReadLine();
                 var splitLine = read.Split(' ');
                 inputFile.Close();
                 n = splitLine.Count();
-                int[] arr = new int[n];
-                for (int i = 0; i < n; i++)
-                    arr[i] = int.Parse(splitLine[i]);
-
+                int[] arr = new int[n+1];
+                if (world.Rank == 0)
+                    for (int i = 0; i < n; i++)
+                        arr[i] = int.Parse(splitLine[i]);
 
                 if (n == n / p * p)
                     N = n / p;
@@ -70,22 +69,23 @@ namespace MPIProgram
 
                 if (world.Rank == 0)
                 {
+
                     for (int i = 0; i < p - 1; i++)                   //рассылка на р процессоров
                         for (int j = N * i; j < N * (i + 1); j++)     //участков массивов размером N
                             world.Send<int>(arr[j], i + 1, j - N * i + 2);
-
-                    for (int i = 1; i <= p - 1; i++)      //Рассылка опорного элемента и кол-ва пересылаемых элементов
-                    {
-                        world.Send<int>(berEl, i, 0);
-                        world.Send<int>(N, i, 1);
-                    }
-
+                    
                     int[] b = new int[n];
                     int bLenght = n - N * (p - 1);
                     int bNewLenght = bLenght;
                     for (int i = N * (p - 1); i < n; i++)
                         b[i - N * (p - 1)] = arr[i];
                     qs(ref b, 0, n - N * (p - 1) - 1);
+                    berEl = b[(n - N * (p - 1)) / 2];
+                    for (int i = 1; i <= p - 1; i++)      //Рассылка опорного элемента и кол-ва пересылаемых элементов
+                    {
+                        world.Send<int>(berEl, i, 0);
+                        world.Send<int>(N, i, 1);
+                    }
                     solveByteNomber(ref ByteNomber, world.Rank);   //считаем двоичное представление номера процессора
 
                     //At this moment we have: 1.ByteNomber[], 2.b[] и bLenght, 3.n, p, N, 4.deg
@@ -96,8 +96,7 @@ namespace MPIProgram
                         jumpToSecondProcessor /= 2;
 
                         if (i != 0)
-                            berEl = world.Receive<int>(world.Rank + jumpToSecondProcessor, 0);
-                        ind = findIndexBerEl(berEl, b, bLenght);
+                            berEl = world.Receive<int>(world.Rank + jumpToSecondProcessor, 0);                        ind = findIndexBerEl(berEl, b, bLenght);
                         world.Send<int>(bLenght - ind, world.Rank + jumpToSecondProcessor, 1);
                         for (int j = ind; j < bLenght; j++)
                             world.Send<int>(b[j], world.Rank + jumpToSecondProcessor, j - ind + 2);
@@ -108,11 +107,11 @@ namespace MPIProgram
                         bLenght += bNewLenght;
                         qs(ref b, 0, bLenght - 1);
                     }
-                    string s = "";
-
+                    var outputFile = new StreamWriter(@outputFileName, false);
+                    outputFile.Write("world.Rank=" + world.Rank + ", b[]: ");
                     for (int i = 0; i < bLenght; i++)
-                        s = s + " " + b[i].ToString("G");
-                    outputFile.WriteLine("world.Rank=" + world.Rank + ", b[]: " + s);
+                        outputFile.Write(b[i] + " ");
+                    outputFile.Close();
                     if (world.Rank != p - 1)
                         world.Send<int>(0, world.Rank + 1, 0);
                 }
@@ -167,19 +166,16 @@ namespace MPIProgram
                             qs(ref b, 0, bLenght - 1);
                         }
                     }
-                    string s = "";
                     world.Receive<int>(world.Rank - 1, 0);
-                    
+                    var outputFile = new StreamWriter(@outputFileName, true);
+                    outputFile.Write("world.Rank=" + world.Rank + ", b[]: ");
                     for (int i = 0; i < bLenght; i++)
-                        s = s + " " + b[i].ToString("G");
-                    outputFile.WriteLine("world.Rank=" + world.Rank + ", b[]: " + s);
+                        outputFile.Write(b[i] + " ");
+                    outputFile.Close();
                     if (world.Rank != p - 1)
                         world.Send<int>(0, world.Rank + 1, 0);
                 }
-                outputFile.Close();
             }
-
-            Thread.Sleep(50000);
         }
 
         static void solveByteNomber(ref int[] ByteNomber, int processor)
