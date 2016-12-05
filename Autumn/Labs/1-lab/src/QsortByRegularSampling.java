@@ -7,11 +7,11 @@ import java.util.*;
 
 public class QsortByRegularSampling {
     private static int processesCount;
-    private static int rootRank = 0;
+    private static final int ROOT_RANK = 0;
     private static int rank;
 
     private static Boolean isRoot(int rank) {
-        return rank == rootRank;
+        return rank == ROOT_RANK;
     }
 
     private static int[] splitOnAlmostEqualSize(int length, int count) {
@@ -120,7 +120,7 @@ public class QsortByRegularSampling {
     private static int[] sort(int[] array) {
         /*
          * Sorry for variables' names; Even I will forget what they mean after a short period of time;
-         * That link will help you in trying to find out that these names really mean and what is going on here:
+         * That link will help you in trying to find out what these names really mean and what is going on here:
          * http://www.intuit.ru/studies/courses/1156/190/lecture/4958?page=7
          *
          * In that implementation I've tried to avoid Point-to-Point communication operations such as Send and Receive
@@ -130,7 +130,7 @@ public class QsortByRegularSampling {
 
         /*
          * 1 Phase
-         * Broadcasting array.length (because array only stored on process with rank rootRank)
+         * Broadcasting array.length (because array only stored on process with rank ROOT_RANK)
          * Scattering blocks' length to each process,
          * Sending parts of array to processes, sorting on them
         */
@@ -141,7 +141,7 @@ public class QsortByRegularSampling {
                 0,
                 1,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
         int arrayLength = _arrayLength[0];
 
@@ -160,7 +160,7 @@ public class QsortByRegularSampling {
                 0,
                 1,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
         int processBlockLength = _processBlockLength[0];
 
@@ -182,7 +182,7 @@ public class QsortByRegularSampling {
                 0,
                 processBlockLength,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
 
         Arrays.sort(processBlock);
@@ -195,7 +195,7 @@ public class QsortByRegularSampling {
 
         /*
          * 2 Phase
-         * Gathering sets from each process, putting them into recvSets on rootRank process;
+         * Gathering sets from each process, putting them into recvSets on ROOT_RANK process;
          * Forming newLeadingSet using elements in sorted recvSets;
          * Broadcasting newLeadingSet
         */
@@ -210,7 +210,7 @@ public class QsortByRegularSampling {
                 0,
                 processesCount,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
 
         int[] newLeadingSet = new int[processesCount - 1];
@@ -228,7 +228,7 @@ public class QsortByRegularSampling {
                 0,
                 newLeadingSet.length,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
 
         /*
@@ -291,9 +291,9 @@ public class QsortByRegularSampling {
         /*
          * 4 Phase
          * Sorting finalProcessBlock on each process
-         * Gathering finalProcessBlocksLengths to rootRank process (root needs to know each final process block size)
+         * Gathering finalProcessBlocksLengths to ROOT_RANK process (root needs to know each final process block size)
          * Calculating rdisplacements
-         * Gathering finalProcessBlock to rootRank process into result
+         * Gathering finalProcessBlock to ROOT_RANK process into result
          * END
         */
 
@@ -309,7 +309,7 @@ public class QsortByRegularSampling {
                 0,
                 1,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
 
         for (int i = 1; i < processesCount; i++) {
@@ -331,7 +331,7 @@ public class QsortByRegularSampling {
                 finalProcessBlocksLengths,
                 rdisplacements,
                 MPI.INT,
-                rootRank
+                ROOT_RANK
         );
 
         return result;
