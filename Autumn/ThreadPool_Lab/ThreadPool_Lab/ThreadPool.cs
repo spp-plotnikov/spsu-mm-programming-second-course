@@ -11,13 +11,14 @@ namespace ThreadPool_Lab
     {
         public const int NumOfThreads = 5;
         static private Queue<Action> _actionQueue;
-        static private Mutex _queueMutex;
+        static private object _lock;
         static private bool _notFinished;
         private MyThread[] _threads = new MyThread[NumOfThreads];
+
         public ThreadPool ()
         {
             _actionQueue = new Queue<Action>();
-            _queueMutex = new Mutex();
+            _lock = new object();
             _notFinished = true;
             for (int i = 0; i < NumOfThreads; i++)
             {
@@ -25,16 +26,22 @@ namespace ThreadPool_Lab
             }
         }
 
-        public void Enqueue (Action a)
+        public void Enqueue(Action a)
         {
-            _queueMutex.WaitOne();
-            _actionQueue.Enqueue(a);
-            _queueMutex.ReleaseMutex();
+            lock (_lock)
+            {
+                _actionQueue.Enqueue(a);
+                Monitor.PulseAll(_lock);
+            }
         }
 
         public void Dispose()
         {
-            _notFinished = false;
+            lock (_lock)
+            {
+                _notFinished = false;
+                Monitor.PulseAll(_lock);
+            }
         }
 
         public void Start()
@@ -48,9 +55,10 @@ namespace ThreadPool_Lab
         public bool IsFinished ()
         {
             int lenght;
-            _queueMutex.WaitOne();
-            lenght = _actionQueue.Count();
-            _queueMutex.ReleaseMutex();
+            lock (_lock)
+            {
+                lenght = _actionQueue.Count();
+            }
             return lenght == 0;
         }
 
@@ -69,23 +77,20 @@ namespace ThreadPool_Lab
 
             private void getAction ()
             {
-                Action act = null;
-                bool smtToDo;
-                while (_notFinished)
+                Action act;
+                while (true)
                 {
-                    _queueMutex.WaitOne();
-                    if (_actionQueue.Count != 0)
+                    lock (_lock)
                     {
+                        while (_actionQueue.Count == 0 && _notFinished)
+                            Monitor.Wait(_lock);
+
+                        if (!_notFinished)
+                            return;
+
                         act = _actionQueue.Dequeue();
-                        smtToDo = true;
                     }
-                    else
-                        smtToDo = false;
-                    _queueMutex.ReleaseMutex();
-                    if (smtToDo)
-                    {
-                        act();
-                    }
+                    act();
                 }
             }
         }
