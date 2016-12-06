@@ -22,21 +22,21 @@ namespace ExamSystems
             {
                 buckets[i] = new Bucket(i);
             }
-            buckets[0].next = total;
+            buckets[0].Next = total;
         }
 
         private void AddBucket(int number)
         {
             ListItem preNode = total;
-            ListItem node = preNode.next;
+            ListItem node = preNode.Next;
             Bucket newBuck = new Bucket(number);
 
             while (node != null)
             {
-                if (node.bin.CompareTo(newBuck.bin) < 0)
+                if (node.Bin.CompareTo(newBuck.Bin) < 0)
                 {
                     preNode = node;
-                    node = node.next;
+                    node = node.Next;
                 }
                 else
                 {
@@ -44,16 +44,16 @@ namespace ExamSystems
                 }
             }
 
-            if (preNode.next == null)
+            if (preNode.Next == null)
             {
-                preNode.next = newBuck;
-                buckets[number].next = preNode.next;
+                preNode.Next = newBuck;
+                buckets[number].Next = preNode.Next;
             }
             else
             {
-                preNode.next = newBuck;
-                buckets[number].next = newBuck;
-                newBuck.next = node;
+                preNode.Next = newBuck;
+                buckets[number].Next = newBuck;
+                newBuck.Next = node;
 
             }
         }
@@ -61,20 +61,20 @@ namespace ExamSystems
         private bool Validate(ListItem pred, ListItem curr, int n)
         {
             ListItem node = buckets[n];
-            while (node.bin.CompareTo(pred.bin) <= 0)
+            while (node.Bin.CompareTo(pred.Bin) <= 0)
             {
                 if (node == pred)
-                    return pred.next == curr;
-                node = node.next;
+                    return pred.Next == curr;
+                node = node.Next;
             }
             return false;
         }
 
         public void Add(long studentId, long courseId)
         {
-            CreditItem curSt = new CreditItem(studentId, courseId);
-            int delta = curSt.hash % tableSize;
-            if (buckets[delta].next == null)
+            SystemItem curSt = new SystemItem(studentId, courseId);
+            int delta = curSt.Hash % tableSize;
+            if (buckets[delta].Next == null)
             {
                 AddBucket(delta);
             }
@@ -82,156 +82,156 @@ namespace ExamSystems
             while (true)
             {
                 int len = 0;
-                ListItem preNode = buckets[delta].next;
-                ListItem node = preNode.next;
-                while (node != null && node.bin.CompareTo(curSt.bin) < 0) // считаем, что карзины не удаляются никогда
+                ListItem preNode = buckets[delta].Next;
+                ListItem node = preNode.Next;
+                while (node != null && node.Bin.CompareTo(curSt.Bin) < 0) // считаем, что карзины не удаляются никогда
                 {
                     len++;
                     preNode = node;
-                    node = node.next;
+                    node = node.Next;
                 }
                 if (node == null)
                 {
-                    preNode.mutex.WaitOne();
-                    preNode.next = curSt;
-                    preNode.mutex.ReleaseMutex();
+                    preNode.BucketMutex.WaitOne();
+                    preNode.Next = curSt;
+                    preNode.BucketMutex.ReleaseMutex();
                     return;
 
                 }
-                if (preNode.isBucket && node.isBucket)
+                if (preNode.IsBucket && node.IsBucket)
                 {
-                    preNode.mutex.WaitOne();
-                    curSt.next = node;
-                    preNode.next = curSt;
-                    preNode.mutex.ReleaseMutex();
+                    preNode.BucketMutex.WaitOne();
+                    curSt.Next = node;
+                    preNode.Next = curSt;
+                    preNode.BucketMutex.ReleaseMutex();
                     return;
                 }
                 if (len > listSize)
                 {
                     Resize();
-                    Add(curSt.studentID, curSt.courseID);
+                    Add(curSt.StudentID, curSt.CourseID);
                     return;
                 }
 
-                preNode.mutex.WaitOne();
-                node.mutex.WaitOne();
+                preNode.BucketMutex.WaitOne();
+                node.BucketMutex.WaitOne();
 
                 try
                 {
                     if (!Validate(preNode, node, delta)) continue;
-                    if (node.bin.CompareTo(curSt.bin) == 0) return;
+                    if (node.Bin.CompareTo(curSt.Bin) == 0) return;
                     else
                     {
-                        curSt.next = node;
-                        preNode.next = curSt;
+                        curSt.Next = node;
+                        preNode.Next = curSt;
                         return;
                     }
                 }
                 finally
                 {
-                    preNode.mutex.ReleaseMutex();
-                    node.mutex.ReleaseMutex();
+                    preNode.BucketMutex.ReleaseMutex();
+                    node.BucketMutex.ReleaseMutex();
                 }
             }
         }
 
         public bool Contains(long studentId, long courseId)
         {
-            CreditItem curSt = new CreditItem(studentId, courseId);
-            int delta = curSt.hash % tableSize;
-            Console.WriteLine("{0} {1}", curSt.hash, delta);
+            SystemItem curSt = new SystemItem(studentId, courseId);
+            int delta = curSt.Hash % tableSize;
+           // Console.WriteLine("{0} {1}", curSt.Hash, delta);
 
-            if (buckets[delta].next == null)
+            if (buckets[delta].Next == null)
             {
                 AddBucket(delta);
             }
 
             while (true)
             {
-                ListItem preNode = buckets[delta].next;
-                ListItem node = preNode.next;
-                while (node != null && node.bin.CompareTo(curSt.bin) < 0) // считаем, что карзины не удаляются никогда
+                ListItem preNode = buckets[delta].Next;
+                ListItem node = preNode.Next;
+                while (node != null && node.Bin.CompareTo(curSt.Bin) < 0) // считаем, что карзины не удаляются никогда
                 {
                     preNode = node;
-                    node = node.next;
+                    node = node.Next;
                 }
 
-                if (node == null || preNode.isBucket && node.isBucket)
+                if (node == null || preNode.IsBucket && node.IsBucket)
                 {
                     return false;
                 }
 
-                preNode.mutex.WaitOne();
-                node.mutex.WaitOne();
+                preNode.BucketMutex.WaitOne();
+                node.BucketMutex.WaitOne();
 
                 try
                 {
                     if (!Validate(preNode, node, delta)) continue;
-                    return node.bin.Equals(curSt.bin);
+                    return node.Bin.Equals(curSt.Bin);
                 }
                 finally
                 {
-                    preNode.mutex.ReleaseMutex();
-                    node.mutex.ReleaseMutex();
+                    preNode.BucketMutex.ReleaseMutex();
+                    node.BucketMutex.ReleaseMutex();
                 }
             }
         }
 
         public void Remove(long studentId, long courseId)
         {
-            CreditItem curSt = new CreditItem(studentId, courseId);
-            int delta = curSt.hash % tableSize;
-            if (buckets[delta].next == null)
+            SystemItem curSt = new SystemItem(studentId, courseId);
+            int delta = curSt.Hash % tableSize;
+            if (buckets[delta].Next == null)
             {
                 AddBucket(delta);
             }
 
             while (true)
             {
-                ListItem preNode = buckets[delta].next;
-                ListItem node = preNode.next;
-                while (node != null && node.bin.CompareTo(curSt.bin) < 0) // считаем, что карзины не удаляются никогда
+                ListItem preNode = buckets[delta].Next;
+                ListItem node = preNode.Next;
+                while (node != null && node.Bin.CompareTo(curSt.Bin) < 0) // считаем, что карзины не удаляются никогда
                 {
                     preNode = node;
-                    node = node.next;
+                    node = node.Next;
                 }
-                if (node == null || preNode.isBucket && node.isBucket)
+                if (node == null || preNode.IsBucket && node.IsBucket)
                 {
                     return;
                 }
 
-                preNode.mutex.WaitOne();
-                node.mutex.WaitOne();
+                preNode.BucketMutex.WaitOne();
+                node.BucketMutex.WaitOne();
 
                 try
                 {
                     if (!Validate(preNode, node, delta)) continue;
-                    if (node.bin.CompareTo(curSt.bin) == 0)
+                    if (node.Bin.CompareTo(curSt.Bin) == 0)
                     {
-                        preNode.next = node.next;
+                        preNode.Next = node.Next;
                     }
                     return;
                 }
                 finally
                 {
-                    preNode.mutex.ReleaseMutex();
-                    node.mutex.ReleaseMutex();
+                    preNode.BucketMutex.ReleaseMutex();
+                    node.BucketMutex.ReleaseMutex();
                 }
             }
         }
 
         public void Print()
         {
-            for (var t = total; t != null; t = t.next)
+            for (var t = total; t != null; t = t.Next)
             {
-                Console.Write("{0}: {1} -> ", t.isBucket, t.bin);
+                Console.Write("{0}: {1} -> ", t.IsBucket, t.Bin);
             }
             Console.WriteLine();
         }
 
         private void Resize()
         {
-            Console.WriteLine("Resize.");
+            //Console.WriteLine("Resize.");
             Thread.Sleep(1000);
             int newSize = tableSize * 2;
             Array.Resize(ref buckets, newSize);

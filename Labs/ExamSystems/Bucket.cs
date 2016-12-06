@@ -13,8 +13,8 @@ namespace ExamSystems
         public Bucket(int n)
         {
             this.n = n;
-            bin = ToBinary(n);
-            isBucket = true;
+            Bin = toBinary(n);
+            IsBucket = true;
         }
     }
 }

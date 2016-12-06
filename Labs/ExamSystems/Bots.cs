@@ -9,15 +9,16 @@ namespace ExamSystems
 {
     class Bots : IDisposable
     {
-        //EasyOrganisation organisation = new EasyOrganisation();
-        BucketOrganisation organisation = new BucketOrganisation();
+        IExamSystem organisation;
         bool flag = true;
         List<Thread> hum = new List<Thread>();
         int d = 0; //for random
         Random r = new Random(0);
         int[] iters;
-        public Bots(int number)
+        public Bots(int number, bool easyType)
         {
+            if(easyType) organisation = new BucketOrganisation();
+            else organisation = new EasyOrganisation();
             iters = new int[number];
             for (int i = 0; i < number; i++)
             {                
@@ -39,19 +40,20 @@ namespace ExamSystems
                 //90% всех вызовов – Contains, 9% - Add, 1% - Remove
                 int st = r.Next(0, 10) + d * 3;
                 int c = r.Next(1, 5);
+                bool contains;
                 if (randNum <= 90)
                 {
-                    Console.WriteLine("Bot_" + "{0} find element ({1},{2}): {3}", Thread.CurrentThread.Name, st, c, organisation.Contains(st, c));
-
+                   // Console.WriteLine("Bot_" + "{0} find element ({1},{2}): {3}", Thread.CurrentThread.Name, st, c, organisation.Contains(st, c));
+                    contains = organisation.Contains(st, c);
                 }
                 else if (randNum <= 99)
                 {
-                    Console.WriteLine("{0} add element ({1},{2})", Thread.CurrentThread.Name, st, c);
+                    //Console.WriteLine("{0} add element ({1},{2})", Thread.CurrentThread.Name, st, c);
                     organisation.Add(st, c);
                 }
                 else
                 {
-                    Console.WriteLine("{0} remove element ({1},{2})", Thread.CurrentThread.Name, st, c);
+                    //Console.WriteLine("{0} remove element ({1},{2})", Thread.CurrentThread.Name, st, c);
                     organisation.Remove(st, c);
                 }               
                 Thread.Sleep(0);
@@ -66,7 +68,7 @@ namespace ExamSystems
             {
                 item.Join();
             }
-            Console.WriteLine(iters.Sum());
+            Console.WriteLine(" {0} iterations", iters.Sum());
         }
     }
 }

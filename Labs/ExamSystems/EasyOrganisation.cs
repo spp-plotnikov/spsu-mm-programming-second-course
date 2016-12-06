@@ -8,7 +8,7 @@ namespace ExamSystems
 {
     class EasyOrganisation : IExamSystem
     {
-        List<CreditItem>[] hashTable = null;
+        List<SystemItem>[] hashTable = null;
         int tableSize = 8;
         int listSize = 4;
         Mutex mut = new Mutex();
@@ -20,19 +20,18 @@ namespace ExamSystems
 
         void CreateTable()
         {
-            hashTable = new List<CreditItem>[tableSize];
+            hashTable = new List<SystemItem>[tableSize];
             for (int i = 0; i < tableSize; i++)
             {
-                hashTable[i] = new List<CreditItem>();
+                hashTable[i] = new List<SystemItem>();
             }
         }
 
         void Resize()//блок всей таблицы
         {
-            Console.WriteLine("Resize");
-            Thread.Sleep(2000);
+            //Console.WriteLine("Resize");
             mut.WaitOne();
-            List<CreditItem>[] buffer = hashTable;
+            List<SystemItem>[] buffer = hashTable;
             tableSize *= 2;
             listSize *= 2;
             CreateTable();
@@ -41,7 +40,7 @@ namespace ExamSystems
             {
                 foreach (var el in ht)
                 {
-                    hashTable[el.hash % tableSize].Add(el);
+                    hashTable[el.Hash % tableSize].Add(el);
                 }
             }
             mut.ReleaseMutex();
@@ -50,9 +49,8 @@ namespace ExamSystems
         //блок ячейки для всех этих методов
         public void Add(long studentId, long courseId)
         {
-            CreditItem el = new CreditItem(studentId, courseId);
-            int delta = Convert.ToInt32(el.hash % tableSize);
-            el.passed = true;
+            SystemItem el = new SystemItem(studentId, courseId);
+            int delta = Convert.ToInt32(el.Hash % tableSize);
             mut.WaitOne();
             hashTable[delta].Add(el);
             mut.ReleaseMutex();
@@ -65,12 +63,12 @@ namespace ExamSystems
 
         public bool Contains(long studentId, long courseId)
         {
-            CreditItem el = new CreditItem(studentId, courseId);
-            int delta = Convert.ToInt32(el.hash % tableSize);
+            SystemItem el = new SystemItem(studentId, courseId);
+            int delta = Convert.ToInt32(el.Hash % tableSize);
             mut.WaitOne();
             foreach (var item in hashTable[delta])
             {
-                if (item.studentID == el.studentID)
+                if (item.StudentID == el.StudentID)
                 {
                     mut.ReleaseMutex();
                     return true;
@@ -82,13 +80,13 @@ namespace ExamSystems
 
         public void Remove(long studentId, long courseId)
         {
-            CreditItem el = new CreditItem(studentId, courseId);
-            int delta = Convert.ToInt32(el.hash % tableSize);
+            SystemItem el = new SystemItem(studentId, courseId);
+            int delta = Convert.ToInt32(el.Hash % tableSize);
             mut.WaitOne();
             int count = 0;
             foreach (var item in hashTable[delta])
             {
-                if (item.studentID == el.studentID)
+                if (item.StudentID == el.StudentID)
                 {
                     hashTable[delta].RemoveAt(count);
                     mut.ReleaseMutex();

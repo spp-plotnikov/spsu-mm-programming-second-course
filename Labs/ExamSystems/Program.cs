@@ -13,11 +13,15 @@ namespace ExamSystems
         {
             Console.WriteLine("Input number of bots");
             int n = Convert.ToInt32(Console.ReadLine());
-            Bots hum = new Bots(n);
+            Bots easyBots = new Bots(n, true);
+            Bots bucketBots = new Bots(n, false);
             //Console.WriteLine("Press key to stop");
             //Console.ReadKey();            
             Thread.Sleep(5000); //
-            hum.Dispose();
+            Console.Write("EasyOrganisation:  ");
+            easyBots.Dispose();
+            Console.Write("BucketOrganisation:");
+            bucketBots.Dispose();
             Console.WriteLine("finita");
             Console.ReadKey();     
         }

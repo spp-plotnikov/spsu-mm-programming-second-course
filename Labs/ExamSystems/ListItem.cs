@@ -9,12 +9,12 @@ namespace ExamSystems
 {
     class ListItem
     {
-        public Mutex mutex = new Mutex();
-        public ListItem next = null;
-        public string bin;
-        public bool isBucket = false;
+        public Mutex BucketMutex = new Mutex();
+        public ListItem Next = null;
+        public string Bin;
+        public bool IsBucket = false;
 
-        protected string ToBinary(long number)
+        protected string toBinary(long number)
         {
             long n = number;
             string s = "";

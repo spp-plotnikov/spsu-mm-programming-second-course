@@ -46,7 +46,7 @@
     <Compile Include="Bots.cs" />
     <Compile Include="Bucket.cs" />
     <Compile Include="BucketOrganisation.cs" />
-    <Compile Include="CreditItem.cs" />
+    <Compile Include="SystemItem.cs" />
     <Compile Include="EasyOrganisation.cs" />
     <Compile Include="IExamSystem.cs" />
     <Compile Include="ListItem.cs" />
