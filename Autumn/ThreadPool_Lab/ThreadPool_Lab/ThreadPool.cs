@@ -67,7 +67,7 @@ namespace ThreadPool_Lab
             private Thread _thread;
             public MyThread ()
             {
-                _thread = new Thread(getAction);
+                _thread = new Thread(GetAction);
             }
 
             public void Start ()
@@ -75,7 +75,7 @@ namespace ThreadPool_Lab
                 _thread.Start();
             }
 
-            private void getAction ()
+            private void GetAction ()
             {
                 Action act;
                 while (true)
