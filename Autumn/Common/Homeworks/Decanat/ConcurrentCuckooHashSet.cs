@@ -32,26 +32,26 @@ namespace Decanat
             }
         }
 
-        private long hashOne(KeyValuePair<long, long> tmp)
+        private long HashOne(KeyValuePair<long, long> tmp)
         {
             return ((tmp.Key * 997 + tmp.Value) % 1001) % 103;
         }
 
-        private long hashTwo(KeyValuePair<long, long> tmp)
+        private long HashTwo(KeyValuePair<long, long> tmp)
         {
             return (((tmp.Key + tmp.Value) % 823) % 89);
         }
 
         private void Aquire (KeyValuePair<long, long> tmp)
         {
-            _mutexLocks[0, hashOne(tmp) % _lenLocks].WaitOne();
-            _mutexLocks[1, hashTwo(tmp) % _lenLocks].WaitOne();
+            _mutexLocks[0, HashOne(tmp) % _lenLocks].WaitOne();
+            _mutexLocks[1, HashTwo(tmp) % _lenLocks].WaitOne();
         }
 
         private void Release (KeyValuePair<long, long> tmp)
         {
-            _mutexLocks[0, hashOne(tmp) % _lenLocks].ReleaseMutex();
-            _mutexLocks[1, hashTwo(tmp) % _lenLocks].ReleaseMutex();
+            _mutexLocks[0, HashOne(tmp) % _lenLocks].ReleaseMutex();
+            _mutexLocks[1, HashTwo(tmp) % _lenLocks].ReleaseMutex();
         }
 
         private void Resize()
@@ -85,7 +85,7 @@ namespace Decanat
                     {
                         foreach (KeyValuePair<long, long> oldStory in oldStories[i, j])
                         {
-                            _studentsStories[0, hashOne(oldStory) % _capacity].Add(oldStory);
+                            _studentsStories[0, HashOne(oldStory) % _capacity].Add(oldStory);
                         }
                     }
                 }
@@ -104,14 +104,14 @@ namespace Decanat
             Aquire(toCheck);
             try
             {
-                List<KeyValuePair<long, long>> set = _studentsStories[0, hashOne(toCheck) % _capacity];
+                List<KeyValuePair<long, long>> set = _studentsStories[0, HashOne(toCheck) % _capacity];
                 if (set.Contains(toCheck))
                 {
                     return true;
                 }
                 else
                 {
-                    List<KeyValuePair<long, long>> setNew = _studentsStories[1, hashTwo(toCheck) % _capacity];
+                    List<KeyValuePair<long, long>> setNew = _studentsStories[1, HashTwo(toCheck) % _capacity];
                     if (setNew.Contains(toCheck))
                     {
                         return true;
@@ -130,7 +130,7 @@ namespace Decanat
             Aquire(toRemove);
             try
             {
-                List<KeyValuePair<long, long>> set = _studentsStories[0, hashOne(toRemove) % _capacity];
+                List<KeyValuePair<long, long>> set = _studentsStories[0, HashOne(toRemove) % _capacity];
                 if (set.Contains(toRemove))
                 {
                     set.Remove(toRemove);
@@ -138,7 +138,7 @@ namespace Decanat
                 }
                 else
                 {
-                    List<KeyValuePair<long, long>> setNew = _studentsStories[1, hashTwo(toRemove) % _capacity];
+                    List<KeyValuePair<long, long>> setNew = _studentsStories[1, HashTwo(toRemove) % _capacity];
                     if (setNew.Contains(toRemove))
                     {
                         setNew.Remove(toRemove);
@@ -156,8 +156,8 @@ namespace Decanat
         public bool Add(KeyValuePair<long, long> toAdd)
         {
             Aquire(toAdd);
-            long hashFi = hashOne(toAdd) % _capacity;
-            long hashSe = hashTwo(toAdd) % _capacity;
+            long hashFi = HashOne(toAdd) % _capacity;
+            long hashSe = HashTwo(toAdd) % _capacity;
             int i = -1;
             long h = -1;
             bool mustResize = false;
@@ -227,12 +227,12 @@ namespace Decanat
                 {
                     case 0:
                     {
-                        hj = hashOne(y) % _capacity;
+                        hj = HashOne(y) % _capacity;
                         break;
                     }
                     case 1:
                     {
-                        hj = hashTwo(y) % _capacity;
+                        hj = HashTwo(y) % _capacity;
                         break;
                     }
                 }
