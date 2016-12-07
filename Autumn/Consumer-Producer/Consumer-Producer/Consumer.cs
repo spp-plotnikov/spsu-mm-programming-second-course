@@ -18,16 +18,21 @@ namespace Consumer_Producer
 
         public void StartConsuming()
         {
-            while (_canConsume)
+            Thread thread = new Thread(() =>
             {
-                Conveyor.Get();
-                Thread.Sleep(Pause);
-            }
+                while (_canConsume)
+                {
+                    Conveyor.Get();
+                    Thread.Sleep(Pause);
+                }
+            });
+            thread.Start();
         }
 
         public void StopConsuming()
         {
             _canConsume = false;
+            Conveyor.Stop();
         }
     }
 }

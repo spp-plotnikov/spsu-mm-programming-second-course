@@ -11,52 +11,23 @@ namespace Consumer_Producer
     {
         static void Main(string[] args)
         {
+            var rnd = new Random();
             var cnv = new Conveyor<string>();
-            List<Producer<string>> producers = new List<Producer<string>>();
-            List<Consumer<string>> consumers = new List<Consumer<string>>();
 
-            for (int i = 0; i < 3; i++)
-            {
-                producers.Add(new Producer<string>(200, new Random().Next(), cnv));
-            }
+            List<Producer<string>> producers =
+                Enumerable.Range(0, 5).Select(i => new Producer<string>(200, rnd.Next(), cnv)).ToList();
+            List<Consumer<string>> consumers =
+                Enumerable.Range(0, 10).Select(i => new Consumer<string>(200, cnv)).ToList();
 
             Console.WriteLine("FACTORY IS ON!!! Press any key to stop it");
 
-            for (int i = 0; i < 10; i++)
-            {
-                consumers.Add(new Consumer<string>(500, cnv));
-            }
-
-            foreach (var producer in producers)
-            {
-                Thread thread = new Thread(() =>
-                {
-                    producer.StartProducing();
-                });
-                thread.Start();
-            }
-
-            foreach (var consumer in consumers)
-            {
-                Thread thread = new Thread(() =>
-                {
-                    consumer.StartConsuming();
-                });
-                thread.Start();
-            }
-
+            producers.ForEach(i => i.StartProducing());
+            consumers.ForEach(i => i.StartConsuming());
 
             Console.ReadKey();
 
-            foreach (var producer in producers)
-            {
-                producer.StopProducing();
-            }
-
-            foreach (var consumer in consumers)
-            {
-                consumer.StopConsuming();
-            }
+            producers.ForEach(i => i.StopProducing());
+            consumers.ForEach(i => i.StopConsuming());
         }
     }
 }

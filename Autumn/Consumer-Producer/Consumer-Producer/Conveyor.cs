@@ -19,25 +19,34 @@ namespace Consumer_Producer
         {
             Monitor.Enter(_syncObj);
 
-            while (_conveyor.Count == 0)
+            if (_conveyor.Count == 0)
             {
                 Monitor.Wait(_syncObj);
             }
 
-            T obj;
+            T obj = default(T);
 
             try
             {
-                obj = _conveyor.First();
-                _conveyor.Remove(obj);
-                Console.WriteLine(obj.ToString() + " was removed by {0} thread", Thread.CurrentThread.ManagedThreadId);
+                if (_conveyor.Count > 0)
+                {
+                    obj = _conveyor.First();
+                    _conveyor.Remove(obj);
+                    Console.WriteLine(obj.ToString() + " was removed by {0} thread", Thread.CurrentThread.ManagedThreadId);
+                }
             }
             finally
             {
-                Monitor.PulseAll(_syncObj);
                 Monitor.Exit(_syncObj);
             }
             return obj;
+        }
+
+        void IGetable<T>.Stop()
+        {
+            Monitor.Enter(_syncObj);
+            Monitor.PulseAll(_syncObj);
+            Monitor.Exit(_syncObj);
         }
 
         public void Put(T obj)
@@ -54,6 +63,13 @@ namespace Consumer_Producer
                 Monitor.PulseAll(_syncObj);
                 Monitor.Exit(_syncObj);
             }
+        }
+
+        void IPutable<T>.Stop()
+        {
+            Monitor.Enter(_syncObj);
+            Monitor.PulseAll(_syncObj);
+            Monitor.Exit(_syncObj);
         }
     }
 }

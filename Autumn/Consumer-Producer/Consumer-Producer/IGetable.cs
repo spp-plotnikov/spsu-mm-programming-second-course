@@ -3,5 +3,6 @@
     public interface IGetable<T>
     {
         T Get();
+        void Stop();
     }
 }

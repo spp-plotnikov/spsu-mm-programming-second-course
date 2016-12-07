@@ -3,5 +3,6 @@
     public interface IPutable<T>
     {
         void Put(T obj);
+        void Stop();
     }
 }

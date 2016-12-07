@@ -25,16 +25,21 @@ namespace Consumer_Producer
 
         public void StartProducing()
         {
-            while (_canProduce)
+            Thread thread = new Thread(() =>
             {
-                Conveyor.Put(_item);
-                Thread.Sleep(Pause);
-            }
+                while (_canProduce)
+                {
+                    Conveyor.Put(_item);
+                    Thread.Sleep(Pause);
+                }
+            });
+            thread.Start();
         }
 
         public void StopProducing()
         {
             _canProduce = false;
+            Conveyor.Stop();
         }
 
         private T GetProducingItem(int id)
