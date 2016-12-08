@@ -10,6 +10,7 @@ namespace Server
         {
             var svcHost = new ServiceHost(typeof(Service));
             svcHost.Open();
+            Console.ReadLine();
             svcHost.Close();
         }
     }
