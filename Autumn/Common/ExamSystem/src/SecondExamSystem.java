@@ -6,9 +6,7 @@ import java.util.concurrent.Semaphore;
 public class SecondExamSystem implements ExamSystem {
     private ArrayList<Semaphore> mutexes;
     private volatile int mutexesUsed;
-    private int size;
     int contCount, addCount, remCount;
-    private final static int enlargeNumber = 10000;
     private HashMap<Long, ArrayList<Long>> table;
     private HashMap<Long, Integer> idToMutex;
 
@@ -19,13 +17,6 @@ public class SecondExamSystem implements ExamSystem {
         idToMutex = new HashMap<>();
         table = new HashMap<>();
         mutexes = new ArrayList<>();
-        size = 0;
-        enlarge();
-    }
-
-    private void enlarge() {
-        for (int i = 0; i < enlargeNumber; i++) // 10 will be default size
-            mutexes.add(new Semaphore(1));
     }
 
     public void add(long studentId, long courseId) {
@@ -36,6 +27,7 @@ public class SecondExamSystem implements ExamSystem {
                 mutexIdx = mutexesUsed;
                 idToMutex.put(studentId, mutexIdx);
                 mutexesUsed += 1;
+                mutexes.add(new Semaphore(1));
             } else {
                 mutexIdx = idToMutex.get(studentId);
             }
