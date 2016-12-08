@@ -1,46 +1,13 @@
 import java.util.Random;
 
-class ExamSystemTester implements Runnable {
-    private long[] students;
-    private long[] courses;
-    private ExamSystem es;
-    private Random rnd = new Random(System.currentTimeMillis());
-
-    public ExamSystemTester(ExamSystem es, long[] students, long[] courses) {
-        this.es = es;
-        this.students = students;
-        this.courses = courses;
-    }
-
-    public void run() {
-        for (int i = 0; i < 100; i++) {
-            int j = rnd.nextInt(students.length);
-            int k = rnd.nextInt(courses.length);
-            es.add(students[j], courses[k]);
-        }
-
-        for (int i = 0; i < 1000; i++) {
-            int j = rnd.nextInt(students.length);
-            int k = rnd.nextInt(courses.length);
-            es.contains(students[j], courses[k]);
-        }
-
-        for (int i = 0; i < 10; i++) {
-            int j = rnd.nextInt(students.length);
-            int k = rnd.nextInt(courses.length);
-            es.remove(students[j], courses[k]);
-        }
-    }
-}
 
 public class Main {
-    final static int size = 10000000; // if crashes, it means we have to enlarge it
-    final static int count = 20;
-    final static int studentCount = 500;
-    final static int coursesCount = 25;
+    final static int count = 2000;
+    final static int studentCount = 1000;
+    final static int coursesCount = 50;
 
     public static void main(String[] args) throws Exception {
-        ExamSystem systems[] = { new FirstExamSystem(size), new SecondExamSystem(size) };
+        ExamSystem systems[] = { new FirstExamSystem(), new SecondExamSystem() };
 
         Random rnd = new Random();
         long[] students = new long[studentCount];

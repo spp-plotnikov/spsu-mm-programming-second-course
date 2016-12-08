@@ -5,9 +5,9 @@ public class FirstExamSystem implements ExamSystem {
     private HashMap<Long, ArrayList<Long>> table;
     int contCount, addCount, remCount;
 
-    public FirstExamSystem(int maxSize) {
+    public FirstExamSystem() {
         contCount = addCount = remCount = 0;
-        table = new HashMap<>(maxSize);
+        table = new HashMap<>();
     }
 
     public void add(long studentId, long courseId) {

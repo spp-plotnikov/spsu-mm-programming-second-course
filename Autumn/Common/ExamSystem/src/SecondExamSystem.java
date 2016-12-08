@@ -1,22 +1,31 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
 public class SecondExamSystem implements ExamSystem {
-    private Semaphore[] mutexes;
+    private ArrayList<Semaphore> mutexes;
     private volatile int mutexesUsed;
+    private int size;
+    int contCount, addCount, remCount;
+    private final static int enlargeNumber = 10000;
     private HashMap<Long, ArrayList<Long>> table;
     private HashMap<Long, Integer> idToMutex;
-    int contCount, addCount, remCount;
 
-    public SecondExamSystem(int maxSize) {
+
+    public SecondExamSystem() {
         contCount = addCount = remCount = 0;
         mutexesUsed = 0;
-        idToMutex = new HashMap<>(maxSize);
-        table = new HashMap<>(maxSize);
-        mutexes = new Semaphore[maxSize];
-        for (int i = 0; i < maxSize; i++)
-            mutexes[i] = new Semaphore(1);
+        idToMutex = new HashMap<>();
+        table = new HashMap<>();
+        mutexes = new ArrayList<>();
+        size = 0;
+        enlarge();
+    }
+
+    private void enlarge() {
+        for (int i = 0; i < enlargeNumber; i++) // 10 will be default size
+            mutexes.add(new Semaphore(1));
     }
 
     public void add(long studentId, long courseId) {
@@ -33,7 +42,7 @@ public class SecondExamSystem implements ExamSystem {
         }
 
         try {
-            mutexes[mutexIdx].acquire();
+            mutexes.get(mutexIdx).acquire();
             ArrayList<Long> list = table.get(studentId);
             if (list == null) {
                 ArrayList<Long> newList = new ArrayList<>();
@@ -45,7 +54,7 @@ public class SecondExamSystem implements ExamSystem {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            mutexes[mutexIdx].release();
+            mutexes.get(mutexIdx).release();
         }
     }
 
@@ -62,7 +71,7 @@ public class SecondExamSystem implements ExamSystem {
         }
 
         try {
-            mutexes[mutexIdx].acquire();
+            mutexes.get(mutexIdx).acquire();
             ArrayList<Long> list = table.get(studentId);
             if (list != null) {
                 list.remove(courseId);
@@ -70,7 +79,7 @@ public class SecondExamSystem implements ExamSystem {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            mutexes[mutexIdx].release();
+            mutexes.get(mutexIdx).release();
         }
     }
 
@@ -85,13 +94,13 @@ public class SecondExamSystem implements ExamSystem {
         }
 
         try {
-            mutexes[mutexIdx].acquire();
+            mutexes.get(mutexIdx).acquire();
             ArrayList<Long> list = table.get(studentId);
             return !(list == null || !list.contains(courseId));
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            mutexes[mutexIdx].release();
+            mutexes.get(mutexIdx).release();
         }
 
         return false; // unreachable
