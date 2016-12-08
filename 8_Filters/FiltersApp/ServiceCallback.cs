@@ -5,8 +5,6 @@ using System.Drawing;
 
 namespace Server
 {
-
-
     [CallbackBehavior(UseSynchronizationContext = false)]
     public class MyCallBack : IServiceCallBack
     {
