@@ -43,8 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Benchmark.cs" />
+    <Compile Include="FastStorage.cs" />
+    <Compile Include="IExamSystem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SlowStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
