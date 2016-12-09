@@ -1,6 +1,6 @@
 import java.util.LinkedList;
 
-public class ThreadPool implements IDisposable{
+public class ThreadPool implements IDisposable {
     private final int POOL_SIZE = 4;
     private WorkerThread[] workers;
     private LinkedList<Runnable> taskQueue;
