@@ -15,18 +15,25 @@ class SumImplementation
         int len = array.Length;
         int ans = 0;
         AutoResetEvent done = new AutoResetEvent(false);
+
+        Mutex blockInc = new Mutex();
         for (int i = 0; i < threadNum; ++i)
         {
             int subLen = (i < threadNum - 1) ? (len / threadNum) : (len / threadNum + len % threadNum);
             int subBegin = (array.Length / threadNum) * i;
             int[] subArray = new int[subLen];
             Array.Copy(array, subBegin, subArray, 0, subLen);
+            ThreadPool.SetMinThreads(20, 20);
             ThreadPool.QueueUserWorkItem(state => {
                 int[] curArray = (int[])state;
 
                 int curSum = curArray.Sum();
 
+                blockInc.WaitOne();
+
                 ans += curSum;
+
+                blockInc.ReleaseMutex();
 
                 if (0 == Interlocked.Decrement(ref running))
                     done.Set();

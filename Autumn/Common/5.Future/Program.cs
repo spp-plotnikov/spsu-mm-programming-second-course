@@ -12,13 +12,13 @@ namespace Future
         static void Main(string[] args)
         {
             // example array
-            int[] arr = new int[100];
-            for (int i = 0; i < 50; i++)
+            int[] arr = new int[1000000];
+            for (int i = 0; i < 1000000; i++)
                 arr[i] = 1;
 
             // summing class
-            //AsyncArraySum adder = new AsyncArraySum(SumImplementation.ThreadPoolSum);
-            AsyncArraySum adder = new AsyncArraySum(SumImplementation.RecursiveSum); // more then 1000 - out of memory
+            AsyncArraySum adder = new AsyncArraySum(SumImplementation.ThreadPoolSum);
+            //AsyncArraySum adder = new AsyncArraySum(SumImplementation.RecursiveSum); // more then 1000 - out of memory
 
             // start summing 
 
