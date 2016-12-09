@@ -60,8 +60,8 @@ class MPIHello
             // process number 
             int procNum = comm.Size;
 
-            int blocksNum = (m.GetSize() / procNum);
-            int blocksOver = (m.GetSize() % procNum);
+            int blocksNum = (m.Size / procNum);
+            int blocksOver = (m.Size % procNum);
 
             // block rows for each process 
             blockRows = new int[procNum];
@@ -73,7 +73,7 @@ class MPIHello
             for (int p = 0; p < procNum; ++p)
             {
                 int curBlockSize = (p == procNum - 1) ? (blocksNum + blocksOver) : blocksNum ;
-                blockRows[p] = curBlockSize * m.GetSize(); // submatrix blocksize * n
+                blockRows[p] = curBlockSize * m.Size; // submatrix blocksize * n
                 blockEnd[p] = (p > 0) ? curBlockSize + blockEnd[p - 1] : curBlockSize - 1;
             }
                 
@@ -81,11 +81,11 @@ class MPIHello
             // recived block
             int[] curBlock = new int[blockRows[comm.Rank]];
             // answer 
-            int[] answMatrix = new int[m.GetSize() * m.GetSize()];
+            int[] answMatrix = new int[m.Size * m.Size];
 
             // scattering to workers 
             comm.ScatterFromFlattened(m.GetMatrix(), blockRows, 0, ref curBlock);
-            Floyd(curBlock, comm.Size, comm.Rank, m.GetSize());
+            Floyd(curBlock, comm.Size, comm.Rank, m.Size);
 
             // gathering after Floyd
             comm.GatherFlattened(curBlock, blockRows, 0, ref answMatrix);
@@ -93,7 +93,7 @@ class MPIHello
             // output 
             if (comm.Rank == 0)
             {
-                AdjacencyMatrix outMatrix = new AdjacencyMatrix(answMatrix, m.GetSize());
+                AdjacencyMatrix outMatrix = new AdjacencyMatrix(answMatrix, m.Size);
                 outMatrix.Print(outputFilePath);
                 Console.WriteLine("Success!");
             }

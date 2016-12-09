@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
 
-class Adjacencymatrix
+class AdjacencyMatrix
 {
     private int[] matrix;
     private int size;
 
     private const int inf = 100000000;
 
-    public Adjacencymatrix(int[] matrix, int size)
+    public AdjacencyMatrix(int[] matrix, int size)
     {
         this.size = size;
         this.matrix = new int[size * size];        
         this.matrix = matrix;
     }
 
-    public Adjacencymatrix(string path)
+    public AdjacencyMatrix(string path)
     {
         StreamReader fileHandler = new StreamReader(path);
 
@@ -46,12 +46,15 @@ class Adjacencymatrix
             this.matrix[i * this.size + i] = diag;
     }
 
-    public int Getsize()
+    public int Size
     {
-        return this.size;
+        get 
+        {
+            return this.size;
+        }
     }
 
-    public int[] Getmatrix()
+    public int[] GetMatrix()
     {
         return this.matrix;
     }
