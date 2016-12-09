@@ -66,6 +66,7 @@ namespace ExamSystems
                 if (node == pred)
                     return pred.Next == curr;
                 node = node.Next;
+                if (node == null) break;
             }
             return false;
         }

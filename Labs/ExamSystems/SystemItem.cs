@@ -17,7 +17,7 @@ namespace ExamSystems
             CourseID = courseID;
             StudentID = studentID;
             Hash = Convert.ToInt32(studentID.GetHashCode() + courseID);
-            Bin = toBinary(Hash);
+            Bin = ToBinary(Hash);
         }
     }
 }

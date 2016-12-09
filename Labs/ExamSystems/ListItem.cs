@@ -14,7 +14,7 @@ namespace ExamSystems
         public string Bin;
         public bool IsBucket = false;
 
-        protected string toBinary(long number)
+        protected string ToBinary(long number)
         {
             long n = number;
             string s = "";

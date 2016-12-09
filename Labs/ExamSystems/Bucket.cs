@@ -9,11 +9,11 @@ namespace ExamSystems
 {
     class Bucket : ListItem
     {
-        public int n;
+        public int N;
         public Bucket(int n)
         {
-            this.n = n;
-            Bin = toBinary(n);
+            N = n;
+            Bin = ToBinary(n);
             IsBucket = true;
         }
     }

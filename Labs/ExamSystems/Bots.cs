@@ -15,10 +15,9 @@ namespace ExamSystems
         int d = 0; //for random
         Random r = new Random(0);
         int[] iters;
-        public Bots(int number, bool easyType)
+        public Bots(int number, IExamSystem tableType)
         {
-            if(easyType) organisation = new BucketOrganisation();
-            else organisation = new EasyOrganisation();
+            organisation = tableType;
             iters = new int[number];
             for (int i = 0; i < number; i++)
             {                
