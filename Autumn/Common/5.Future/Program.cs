@@ -12,8 +12,8 @@ namespace Future
         static void Main(string[] args)
         {
             // example array
-            int[] arr = new int[100000000];
-            for (int i = 0; i < 10123210; i++)
+            int[] arr = new int[100];
+            for (int i = 0; i < 50; i++)
                 arr[i] = 1;
 
             // summing class
@@ -21,7 +21,7 @@ namespace Future
             AsyncArraySum adder = new AsyncArraySum(SumImplementation.RecursiveSum); // more then 1000 - out of memory
 
             // start summing 
-            adder.Sum(arr);
+
 
             // for test 
             Console.WriteLine("Waiting main thread tasks");
@@ -29,7 +29,7 @@ namespace Future
             Console.WriteLine("Done main thread tasks, waiting summing...");
 
             // getting sum, if sum was not calc yet - waiting
-            int sum = adder.GetSum();
+            int sum = adder.Sum(arr);
 
             Console.WriteLine("Sum of array: " + sum);
 

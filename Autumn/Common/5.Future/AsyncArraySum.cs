@@ -18,19 +18,17 @@ class AsyncArraySum : ISumOfElements
         this.sum = 0;
     }
 
-    public void Sum(int[] arr)
+    public int Sum(int[] arr)
     {
         this.arr = arr;
         summingThread = new Thread(DoSumming);
         summingThread.Start();
-    }
 
-    public int GetSum()
-    {
         summingThread.Join();
         Console.WriteLine("Array was summed successfully!");
         return this.sum;
     }
+
 
     private void DoSumming()
     {
