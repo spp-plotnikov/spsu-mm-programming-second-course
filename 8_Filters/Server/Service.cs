@@ -3,14 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ServiceModel;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Server
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
+
     public class Service : IService
     {
-        public List<string> filters = new List<string>();
+        private List<string> filters = new List<string>();
         public ExtBitmap ApplyFilter = new ExtBitmap();
         private ConvolutionFilterBase filter;
+
         public Service()
         {
             string line;
@@ -23,9 +28,10 @@ namespace Server
             }
         }
 
-        public void ReadFilters()
+        public List<string> ReadFilters()
         {
-            Client.GetFilters(filters);
+
+            return filters;
         }
 
         public void SendFile(string filterName, Bitmap bytes)
@@ -43,15 +49,25 @@ namespace Server
                     filter = new SoftenFilter();
                     break;
             }
-            ApplyFilter.Cancel = false;           
-            Bitmap result = ApplyFilter.ConvolutionFilter(bytes, filter.Factor, filter.Bias, filter.FilterMatrix);
-            Client.GetImage(result);
-
+            ApplyFilter.Cancel = false;
+            Task<Bitmap> task = Task.Run(() => ApplyFilter.ConvolutionFilter(bytes, filter));
+            while(ApplyFilter.Progress <= 100)
+            {
+                Thread.Sleep(100);
+                Client.GetProgress(ApplyFilter.Progress);
+                if(ApplyFilter.Progress == 100)
+                {
+                    Client.GetProgress(ApplyFilter.Progress);
+                    ApplyFilter.Progress = 0;
+                    break;
+                }
+            }
+            Client.GetImage(task.Result);
         }
         public void SendProgress()
         {
-
             Client.GetProgress(ApplyFilter.Progress);
+          
         }
         public void Cancel()
         {

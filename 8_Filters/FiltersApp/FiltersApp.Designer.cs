@@ -29,14 +29,15 @@
         private void InitializeComponent()
         {
             this.ListOfFilters = new System.Windows.Forms.ComboBox();
-            this.Load = new System.Windows.Forms.Button();
+            this.LoadButton = new System.Windows.Forms.Button();
             this.Source = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.Target = new System.Windows.Forms.PictureBox();
-            this.Start = new System.Windows.Forms.Button();
+            this.StartButton = new System.Windows.Forms.Button();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
             this.CancelButton = new System.Windows.Forms.Button();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.Source)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -46,27 +47,31 @@
             // ListOfFilters
             // 
             this.ListOfFilters.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
+            this.ListOfFilters.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ListOfFilters.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ListOfFilters.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ListOfFilters.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.ListOfFilters.FormattingEnabled = true;
+            this.ListOfFilters.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.ListOfFilters.Location = new System.Drawing.Point(197, 20);
             this.ListOfFilters.Name = "ListOfFilters";
             this.ListOfFilters.Size = new System.Drawing.Size(127, 24);
+            this.ListOfFilters.Sorted = true;
             this.ListOfFilters.TabIndex = 0;
             this.ListOfFilters.SelectedIndexChanged += new System.EventHandler(this.ListOfFilters_SelectedIndexChanged);
             // 
-            // Load
+            // LoadButton
             // 
-            this.Load.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
-            this.Load.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Load.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.Load.Location = new System.Drawing.Point(8, 17);
-            this.Load.Name = "Load";
-            this.Load.Size = new System.Drawing.Size(108, 27);
-            this.Load.TabIndex = 1;
-            this.Load.Text = "Load file";
-            this.Load.UseVisualStyleBackColor = false;
-            this.Load.Click += new System.EventHandler(this.Load_Click);
+            this.LoadButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
+            this.LoadButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LoadButton.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.LoadButton.Location = new System.Drawing.Point(8, 17);
+            this.LoadButton.Name = "LoadButton";
+            this.LoadButton.Size = new System.Drawing.Size(108, 27);
+            this.LoadButton.TabIndex = 1;
+            this.LoadButton.Text = "Load file";
+            this.LoadButton.UseVisualStyleBackColor = false;
+            this.LoadButton.Click += new System.EventHandler(this.Load_Click);
             // 
             // Source
             // 
@@ -108,18 +113,19 @@
             this.Target.TabIndex = 3;
             this.Target.TabStop = false;
             // 
-            // Start
+            // StartButton
             // 
-            this.Start.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
-            this.Start.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Start.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.Start.Location = new System.Drawing.Point(352, 20);
-            this.Start.Name = "Start";
-            this.Start.Size = new System.Drawing.Size(107, 27);
-            this.Start.TabIndex = 6;
-            this.Start.Text = "Start";
-            this.Start.UseVisualStyleBackColor = false;
-            this.Start.Click += new System.EventHandler(this.Start_Click);
+            this.StartButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
+            this.StartButton.Enabled = false;
+            this.StartButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.StartButton.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.StartButton.Location = new System.Drawing.Point(352, 20);
+            this.StartButton.Name = "StartButton";
+            this.StartButton.Size = new System.Drawing.Size(107, 27);
+            this.StartButton.TabIndex = 6;
+            this.StartButton.Text = "Start";
+            this.StartButton.UseVisualStyleBackColor = false;
+            this.StartButton.Click += new System.EventHandler(this.Start_Click);
             // 
             // ProgressBar
             // 
@@ -131,6 +137,7 @@
             // CancelButton
             // 
             this.CancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
+            this.CancelButton.Enabled = false;
             this.CancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.CancelButton.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.CancelButton.Location = new System.Drawing.Point(559, 20);
@@ -150,8 +157,8 @@
             this.ClientSize = new System.Drawing.Size(681, 408);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.ProgressBar);
-            this.Controls.Add(this.Start);
-            this.Controls.Add(this.Load);
+            this.Controls.Add(this.StartButton);
+            this.Controls.Add(this.LoadButton);
             this.Controls.Add(this.ListOfFilters);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
@@ -170,14 +177,15 @@
         #endregion
 
         private System.Windows.Forms.ComboBox ListOfFilters;
-        private System.Windows.Forms.Button Load;
+        private System.Windows.Forms.Button LoadButton;
         private System.Windows.Forms.PictureBox Source;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox Target;
-        private System.Windows.Forms.Button Start;
+        private System.Windows.Forms.Button StartButton;
         private System.Windows.Forms.ProgressBar ProgressBar;
         private System.Windows.Forms.Button CancelButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }
 

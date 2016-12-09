@@ -12,9 +12,10 @@ namespace Forms
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var ctx = new InstanceContext(new MyCallBack());
+            var myCallback = new MyCallback();
+            var ctx = new InstanceContext(myCallback);
             var fabric = new DuplexChannelFactory<IService>(ctx, "WSDualHttpBinding_INotificationServices");
-            Application.Run(new Forms.FiltersApp(fabric.CreateChannel()));
+            Application.Run(new Forms.FiltersApp(fabric.CreateChannel(), myCallback));
         }
 
     }

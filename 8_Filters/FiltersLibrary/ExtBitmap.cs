@@ -17,12 +17,9 @@ namespace ImageConvolutionFilters
     {
         public  int Progress;
         public bool Cancel;
-        private Semaphore semaphore = new Semaphore(1,1);
-        public   Bitmap ConvolutionFilter(Bitmap sourceBitmap, double Factor, double Bias, double[,] FilterMatrix) 
+        public   Bitmap ConvolutionFilter(Bitmap sourceBitmap, ConvolutionFilterBase filter) 
                                        
         {
-            Console.WriteLine("re");
-            semaphore.WaitOne();
             Progress = 0;
             Cancel = false;
             BitmapData sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
@@ -38,8 +35,8 @@ namespace ImageConvolutionFilters
             double green = 0.0;
             double red = 0.0;
 
-            int filterWidth = FilterMatrix.GetLength(1);
-            int filterHeight = FilterMatrix.GetLength(0);
+            int filterWidth = filter.FilterMatrix.GetLength(1);
+            int filterHeight = filter.FilterMatrix.GetLength(0);
 
             int filterOffset = (filterWidth-1) / 2;
             int calcOffset = 0;
@@ -62,10 +59,9 @@ namespace ImageConvolutionFilters
                                  offsetX * 4;
                     if (Cancel)
                     {
-                        //semaphore.Release();
                         break;
                     }
-                    Progress = (int)(((offsetY - filterOffset) * (sourceBitmap.Width - filterOffset) + offsetX - filterOffset) / (double)size * 100);
+                    Progress = (int)(((offsetY - filterOffset) * (sourceBitmap.Width - 2 * filterOffset)) / (double)size * 100);
                     Console.WriteLine(Progress); //make this method slower to see the progress on my form
                     for (int filterY = -filterOffset; 
                         filterY <= filterOffset; filterY++)
@@ -79,22 +75,22 @@ namespace ImageConvolutionFilters
                                          (filterY * sourceData.Stride);
 
                             blue += (double)(pixelBuffer[calcOffset]) * 
-                                    FilterMatrix[filterY + filterOffset, 
+                                    filter.FilterMatrix[filterY + filterOffset, 
                                                         filterX + filterOffset];
 
                             green += (double)(pixelBuffer[calcOffset + 1]) * 
-                                     FilterMatrix[filterY + filterOffset, 
+                                     filter.FilterMatrix[filterY + filterOffset, 
                                                         filterX + filterOffset];
 
                             red += (double)(pixelBuffer[calcOffset + 2]) * 
-                                   FilterMatrix[filterY + filterOffset, 
+                                   filter.FilterMatrix[filterY + filterOffset, 
                                                       filterX + filterOffset];
                         }
                     }
 
-                    blue = Factor * blue + Bias;
-                    green = Factor * green + Bias;
-                    red = Factor * red + Bias;
+                    blue = filter.Factor * blue + filter.Bias;
+                    green = filter.Factor * green + filter.Bias;
+                    red = filter.Factor * red + filter.Bias;
 
                     if (blue > 255)
                     { blue = 255; }
@@ -125,8 +121,9 @@ namespace ImageConvolutionFilters
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
-            semaphore.Release();
+            Progress = 100; //because of actions with double
             return resultBitmap;
+
         }
     }  
 }

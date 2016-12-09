@@ -8,7 +8,7 @@ namespace Server
     public interface IService
     {
         [OperationContract]
-        void ReadFilters();
+        List<string> ReadFilters();
         [OperationContract(IsOneWay = true)]
         void SendFile(string filterName, Bitmap bytes);
         [OperationContract(IsOneWay = true)]
@@ -19,14 +19,12 @@ namespace Server
 
     public interface IServiceCallBack
     {
-        [OperationContract]
-        void GetFilters(List<string> filters);
+      
         [OperationContract]
         void GetImage(Bitmap image);
         [OperationContract]
         void GetProgress(int progress);
-        [OperationContract]
-        void Cancel();
+
     }
 
 }

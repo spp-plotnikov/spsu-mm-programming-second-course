@@ -6,26 +6,19 @@ using System.Drawing;
 namespace Server
 {
     [CallbackBehavior(UseSynchronizationContext = false)]
-    public class MyCallBack : IServiceCallBack
+    public class MyCallback : IServiceCallBack
     {
         public List<string> Filters = new List<string>();
         public byte[] Result = new byte[200000000];
         public int Progress = 0;
+        public bool ImageHere = false;
 
-        public void RequestFilters()
-        {
-            Server.ReadFilters();
-        }
         public void GetFilters(List<string> filters)
         {
             this.Filters = filters;
         }
 
-        public void RequestImage(string filterName, Bitmap source)
-        {
-            byte[] result = new byte[200000000];
-            Server.SendFile(filterName, source);
-        }
+
         public void GetImage(Bitmap image)
         {
             byte[] data;
@@ -37,30 +30,13 @@ namespace Server
                 stream.Read(data, 0, (int)stream.Length);
                 stream.Close();
             }
-            this.Result = data;
+            Result = data;
+            ImageHere = true;
         }
 
-        public void RequestProgress()
-        {
-
-            Server.SendProgress();
-        }
         public void GetProgress(int progress)
         {
-            this.Progress = progress;
+            Progress = progress;
         }
-        public void Cancel()
-        {
-            Server.Cancel();
-        }
-        public IService Server
-        {
-            get
-            {
-                var context = new InstanceContext(this);
-                return new DuplexChannelFactory<IService>(context, "WSDualHttpBinding_INotificationServices").CreateChannel();
-            }
-        }
-
     }
 }
