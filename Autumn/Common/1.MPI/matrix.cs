@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
 
-class ManageMatrix
+class AdjacencyMatrix
 {
     private int[] Matrix;
     private int Size;
 
     private const int inf = 100000000;
 
-    public ManageMatrix(int[] matrix, int size)
+    public AdjacencyMatrix(int[] matrix, int size)
     {
         this.Size = size;
         this.Matrix = new int[size * size];        
         this.Matrix = matrix;
     }
 
-    public ManageMatrix(string path)
+    public AdjacencyMatrix(string path)
     {
         StreamReader fileHandler = new StreamReader(path);
 

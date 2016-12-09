@@ -55,7 +55,7 @@ class MPIHello
             Intracommunicator comm = Communicator.world;
 
             // open files and getting matrix
-            ManageMatrix m = new ManageMatrix(inputFilePath);
+            AdjacencyMatrix m = new AdjacencyMatrix(inputFilePath);
              
             // process number 
             int procNum = comm.Size;
@@ -93,7 +93,7 @@ class MPIHello
             // output 
             if (comm.Rank == 0)
             {
-                ManageMatrix outMatrix = new ManageMatrix(answMatrix, m.GetSize());
+                AdjacencyMatrix outMatrix = new AdjacencyMatrix(answMatrix, m.GetSize());
                 outMatrix.Print(outputFilePath);
                 Console.WriteLine("Success!");
             }
