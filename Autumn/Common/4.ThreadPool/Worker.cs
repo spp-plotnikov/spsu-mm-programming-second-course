@@ -7,52 +7,52 @@ using System.Threading;
 
 class Worker
 {
-    private bool Runneble = false;
-    private Thread Thread;
-    private Queue<Action> TasksQueue;
+    private bool runneble = false;
+    private Thread thread;
+    private Queue<Action> tasksQueue;
 
     public Worker(Queue<Action> tasksQueue)
     {
-        this.Thread = new Thread(Run);
-        this.TasksQueue = tasksQueue;
+        this.thread = new Thread(Run);
+        this.tasksQueue = tasksQueue;
     }
 
     public void Start()
     {
-        this.Thread.Start();
-        this.Runneble = true;
+        this.thread.Start();
+        this.runneble = true;
     }
 
     public void Stop()
     {
-        this.Runneble = false;
+        this.runneble = false;
     }
 
     public void Run()
     {
         // worker loop
-        while (Runneble)
+        while (runneble)
         {
             Action curTask = new Action(() => { });
-            lock (TasksQueue)
+            lock (tasksQueue)
             {
                 // if queue not empty
-                if (TasksQueue.Count() != 0)
+                if (tasksQueue.Count() != 0)
                 {
-                    curTask = TasksQueue.Dequeue();
+                    curTask = tasksQueue.Dequeue();
                     Console.WriteLine("" + Thread.CurrentThread.ManagedThreadId + " worker is working now");
                     // signal to first in queue of threads
-                    Monitor.Pulse(TasksQueue);
+                    Monitor.Pulse(tasksQueue);
                 }
                 else
                 {
                     // wait signal
                     Console.WriteLine("" + Thread.CurrentThread.ManagedThreadId + " is waiting now...");
-                    Monitor.Wait(TasksQueue);
+                    Monitor.Wait(tasksQueue);
                 }
             }
             // if already stoped 
-            if (!Runneble)
+            if (!runneble)
                 return;
             curTask();
         }
