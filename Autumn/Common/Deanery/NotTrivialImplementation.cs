@@ -10,7 +10,7 @@ namespace Deanery
         private Mutex lockedStudentsMutex = new Mutex(false);
         private Mutex listOfStudentCreditsMutex = new Mutex(false);
         private MySortedList<long> emptyList = new MySortedList<long>();
-
+        
         private bool isStudentInfoAccessible(long studentId)
         {
             return !lockedStudents.Contains(studentId);
@@ -41,11 +41,12 @@ namespace Deanery
             // There are 2 options: this credit is first for this student, so we need to lock whole listOfStudentCredits
             // Otherwise usual add of courseId
             listOfStudentCreditsMutex.WaitOne();
-            long studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
-            if (studentIndex >= 0)
+            MySortedList<long> tempList;
+            bool success = listOfStrudentCredits.TryGetValue(studentId, out tempList);
+            if (success)
             {
                 listOfStudentCreditsMutex.ReleaseMutex();
-                listOfStrudentCredits[studentId].Add(courseId);
+                tempList.Add(courseId);
             }
             else
             {
@@ -61,11 +62,12 @@ namespace Deanery
             // There are 2 options: this credit is single for this student, so we need to lock whole listOfStudentCredits
             // Otherwise usual remove of courseId
             listOfStudentCreditsMutex.WaitOne();
-            long studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
-            if (studentIndex >= 0)
+            MySortedList<long> tempList;
+            bool success = listOfStrudentCredits.TryGetValue(studentId, out tempList);
+            if (success && tempList.Count > 1)
             {
                 listOfStudentCreditsMutex.ReleaseMutex();
-                listOfStrudentCredits[studentId].Remove(courseId);
+                tempList.Remove(courseId);
             }
             else
             {
@@ -80,12 +82,13 @@ namespace Deanery
             TakeStudent(studentId);
             // Just usual Contains
             listOfStudentCreditsMutex.WaitOne();
-            int studentIndex = listOfStrudentCredits.IndexOfKey(studentId);
-            listOfStudentCreditsMutex.ReleaseMutex();
+            MySortedList<long> tempList;
+            bool success = listOfStrudentCredits.TryGetValue(studentId, out tempList);
             bool answer;
-            if (studentIndex >= 0)
+            listOfStudentCreditsMutex.ReleaseMutex();
+            if (success)
             {
-                answer = listOfStrudentCredits[studentId].Contains(courseId);
+                answer = tempList.Contains(courseId);
             }
             else
             {
