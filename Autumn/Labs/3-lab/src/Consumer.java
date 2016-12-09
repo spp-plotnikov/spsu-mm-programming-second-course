@@ -3,6 +3,7 @@ import java.util.LinkedList;
 public class Consumer implements Runnable {
     private static LinkedList<Integer> buffer;
     private volatile Boolean consumerIsRunning = true;
+
     Consumer(LinkedList<Integer> buffer) {
         this.buffer = buffer;
     }
