@@ -1,27 +1,27 @@
 ﻿using System;
 using System.IO;
 
-class AdjacencyMatrix
+class Adjacencymatrix
 {
-    private int[] Matrix;
-    private int Size;
+    private int[] matrix;
+    private int size;
 
     private const int inf = 100000000;
 
-    public AdjacencyMatrix(int[] matrix, int size)
+    public Adjacencymatrix(int[] matrix, int size)
     {
-        this.Size = size;
-        this.Matrix = new int[size * size];        
-        this.Matrix = matrix;
+        this.size = size;
+        this.matrix = new int[size * size];        
+        this.matrix = matrix;
     }
 
-    public AdjacencyMatrix(string path)
+    public Adjacencymatrix(string path)
     {
         StreamReader fileHandler = new StreamReader(path);
 
-        this.Size = Int32.Parse(fileHandler.ReadLine());
+        this.size = Int32.Parse(fileHandler.ReadLine());
 
-        this.Matrix = new int[this.Size * this.Size];
+        this.matrix = new int[this.size * this.size];
 
         this.Init(inf, 0);
 
@@ -32,28 +32,28 @@ class AdjacencyMatrix
             int i = Int32.Parse(param[0]);
             int j = Int32.Parse(param[1]);
             int w = Int32.Parse(param[2]);
-            this.Matrix[i * this.Size + j] = w;
-            this.Matrix[j * this.Size + i] = w;
+            this.matrix[i * this.size + j] = w;
+            this.matrix[j * this.size + i] = w;
         }
         fileHandler.Close();
     }
 
     private void Init(int cell, int diag)
     {
-        for (int i = 0; i < this.Size * this.Size; i++)
-            this.Matrix[i] = cell;        
-        for (int i = 0; i < this.Size; i++)
-            this.Matrix[i * this.Size + i] = diag;
+        for (int i = 0; i < this.size * this.size; i++)
+            this.matrix[i] = cell;        
+        for (int i = 0; i < this.size; i++)
+            this.matrix[i * this.size + i] = diag;
     }
 
-    public int GetSize()
+    public int Getsize()
     {
-        return this.Size;
+        return this.size;
     }
 
-    public int[] GetMatrix()
+    public int[] Getmatrix()
     {
-        return this.Matrix;
+        return this.matrix;
     }
 
     public void Print(string path = "")
@@ -61,21 +61,21 @@ class AdjacencyMatrix
         if (path != "")
         {
             System.IO.StreamWriter file = new System.IO.StreamWriter(path);
-            for (int i = 0; i < this.Size; i++)
+            for (int i = 0; i < this.size; i++)
             {
-                for (int j = 0; j < this.Size; j++)
+                for (int j = 0; j < this.size; j++)
                 {
-                    file.Write(this.Matrix[i * this.Size + j] + " ");
+                    file.Write(this.matrix[i * this.size + j] + " ");
                 }
                 file.WriteLine();
             }
             file.Close();
             return;
         }
-        for (int i = 0; i < this.Size; ++i)
+        for (int i = 0; i < this.size; ++i)
         {
-            for (int j = 0; j < this.Size; ++j)
-                Console.Write(this.Matrix[i * this.Size + j] + " ");
+            for (int j = 0; j < this.size; ++j)
+                Console.Write(this.matrix[i * this.size + j] + " ");
             Console.WriteLine();
         }
     }
