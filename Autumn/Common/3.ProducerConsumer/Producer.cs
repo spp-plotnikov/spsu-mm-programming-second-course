@@ -11,13 +11,13 @@ namespace ProducerConsumer
     class Producer
     {
         private Thread thread;
-        private List<int> SharedData;
+        private List<int> sharedData;
         private bool runnable = false;
         private const int pause = 1000;
 
         public Producer(List<int> sharedData, Locker lockFlag)
         {
-            this.SharedData = sharedData;
+            this.sharedData = sharedData;
             this.runnable = true;
             this.thread = new Thread(() => Run(lockFlag));
             this.thread.Start();
@@ -38,7 +38,7 @@ namespace ProducerConsumer
                 if (this.runnable)
                 {
                     // pushing some value to shared data
-                    this.SharedData.Add(24);
+                    this.sharedData.Add(24);
                     Console.WriteLine("Producer: added value 24");
                 }
                 lockFlag.Release();
