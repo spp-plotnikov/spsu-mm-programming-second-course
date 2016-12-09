@@ -15,7 +15,7 @@ namespace ExamStorage
 
         // using monitor for concurency access
         // when row already blocked other threads wait  for release 
-        private void lockRow(long rowId)
+        private void LockRow(long rowId)
         {
             while (true)
             { 
@@ -36,7 +36,7 @@ namespace ExamStorage
         }
 
         // after end of work with row release lock
-        private void unlockRow(long rowId)
+        private void UnlockRow(long rowId)
         {
             lock (lockedRows)
             {
@@ -48,7 +48,7 @@ namespace ExamStorage
         public void Add(long studentId, long courseId)
         {
             // block item 
-            lockRow(studentId);
+            LockRow(studentId);
 
             // lock all table 
             lockTable.WaitOne();
@@ -63,7 +63,7 @@ namespace ExamStorage
                 table[studentId].Add(courseId);
 
                 // unblock cur item
-                unlockRow(studentId);
+                UnlockRow(studentId);
 
                 return;
             }
@@ -76,12 +76,12 @@ namespace ExamStorage
             lockTable.ReleaseMutex();
 
             // unlock item
-            unlockRow(studentId);
+            UnlockRow(studentId);
         }
 
         public void Remove(long studentId, long courseId)
         {
-            lockRow(studentId);
+            LockRow(studentId);
 
             lockTable.WaitOne();
 
@@ -89,19 +89,19 @@ namespace ExamStorage
             {
                 lockTable.ReleaseMutex();
                 table[studentId].Remove(courseId);
-                unlockRow(studentId);
+                UnlockRow(studentId);
                 return;
             }
 
             lockTable.ReleaseMutex();
 
-            unlockRow(studentId);
+            UnlockRow(studentId);
         }
 
         public bool Contains(long studentId, long courseId)
         {
             SortedSet<long> tmp = new SortedSet<long>();
-            lockRow(studentId);
+            LockRow(studentId);
 
             // lock table and take needed branch
             lockTable.WaitOne();
@@ -113,7 +113,7 @@ namespace ExamStorage
 
             bool exist = tmp.Contains(courseId);
 
-            unlockRow(studentId);
+            UnlockRow(studentId);
             return exist;
         }
 
