@@ -109,12 +109,12 @@ namespace ProcessManager
             {
                 // creation new process
                 Process process = new Process();
-                Fiber fiber1 = new Fiber(new Action(process.Run));
+                Fiber fiber = new Fiber(new Action(process.Run));
 
-                Console.WriteLine("Fiber id: " + fiber1.Id + " process priority: " + process.Priority);
+                Console.WriteLine("Fiber id: " + fiber.Id + " process priority: " + process.Priority);
 
                 // pushing to switcher queue
-                switchQueue.Enqueue(new FiberItem(fiber1.Id, process.Priority, (i + 1) * 5)); // every 5 time switch to low prior  
+                switchQueue.Enqueue(new FiberItem(fiber.Id, process.Priority, (i + 1) * 5)); // every 5 time switch to low prior  
             }
 
             // need for distributon cpu time
