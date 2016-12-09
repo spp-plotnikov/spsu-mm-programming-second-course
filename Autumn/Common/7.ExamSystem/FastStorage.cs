@@ -17,16 +17,20 @@ namespace ExamStorage
         // when row already blocked other threads wait  for release 
         private void lockRow(long rowId)
         {
-            lock (lockedRows)
-            {
-                if (lockedRows.Contains(rowId))
+            while (true)
+            { 
+                lock (lockedRows)
                 {
-                    Monitor.Wait(lockedRows);
-                }
-                else
-                {
-                    lockedRows.Add(rowId);
-                    Monitor.Pulse(lockedRows);
+                    if (lockedRows.Contains(rowId))
+                    {
+                        Monitor.Wait(lockedRows);
+                    }
+                    else
+                    {
+                        lockedRows.Add(rowId);
+                        Monitor.Pulse(lockedRows);
+                        break;
+                    }
                 }
             }
         }
