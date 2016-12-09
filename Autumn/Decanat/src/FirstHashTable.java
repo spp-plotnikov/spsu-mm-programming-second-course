@@ -2,9 +2,10 @@ import java.util.*;
 
 public class FirstHashTable implements IExamSystem {
     private Map<Long, List<Long>> hashMap;
-
-    FirstHashTable() {
-        hashMap = new HashMap();
+    private int countStudents;
+    FirstHashTable(int countStudents) {
+        this.countStudents = countStudents;
+        hashMap = new HashMap(countStudents);
     }
 
     public void Add(long studentId, long courseId) {
@@ -41,17 +42,6 @@ public class FirstHashTable implements IExamSystem {
             } else {
                 return false;
             }
-        }
-    }
-
-    public void print() {
-        for (Long id : hashMap.keySet() ) {
-            List<Long> list = hashMap.get(id);
-            System.out.print(id + ": ");
-            for (Long courseId : list) {
-                System.out.print(courseId + " ");
-            }
-            System.out.println();
         }
     }
 }
