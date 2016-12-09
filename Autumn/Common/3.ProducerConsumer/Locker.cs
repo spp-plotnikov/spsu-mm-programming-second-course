@@ -6,17 +6,17 @@ using System.Threading;
 
 public class Locker
 {
-    private static int isLocked = 0;
+    private int isLocked = 0;
 
     public Locker() { }
 
     public void Lock()
     {
-        while (0 != Interlocked.CompareExchange(ref Locker.isLocked, 1, 0));
+        while (0 != Interlocked.CompareExchange(ref isLocked, 1, 0));
     }
 
     public void Release()
     {
-        Interlocked.Exchange(ref Locker.isLocked, 0);
+        Interlocked.Exchange(ref isLocked, 0);
     }
 }
