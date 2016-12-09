@@ -7,6 +7,4 @@ using System.Threading.Tasks;
 public interface ISumOfElements
 {
     void Sum(int[] arr);
-
-    int GetSum();
 }
