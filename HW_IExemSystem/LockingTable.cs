@@ -9,39 +9,52 @@ namespace ForUniversity
 {
     class LockingTable : IExamSystem
     {
-        List<KeyValuePair<long, long>> _table;
+        private Dictionary<long, List<long>> _table = new Dictionary<long, List<long>>();
+        private Mutex _lock = new Mutex();
         
-        public LockingTable()
-        {
-            _table = new List<KeyValuePair<long, long>>();
-        }
-
         public void Add(long studentId, long courseId)
         {
-            lock (_table)
+            _lock.WaitOne();
+
+            if (_table.ContainsKey(studentId))
             {
-                KeyValuePair<long, long> temp = new KeyValuePair<long, long>(studentId, courseId);               
-                _table.Add(temp);
+                if (!_table[studentId].Contains(courseId))
+                {
+                    _table[studentId].Add(courseId);
+                }
+                _lock.ReleaseMutex();
+                return;
             }
+
+            _table.Add(studentId, new List<long> { courseId });
+            _lock.ReleaseMutex();
         }
 
         public void Remove(long studentId, long courseId)
         {
-            lock (_table)
+
+            _lock.WaitOne();
+
+            if (_table.ContainsKey(studentId))
             {
-                KeyValuePair<long, long> temp = new KeyValuePair<long, long>(studentId, courseId);
-                _table.Remove(temp);
+                _table[studentId].Remove(courseId);
+                _lock.ReleaseMutex();
+                return;
             }
+            _lock.ReleaseMutex();
         }
 
         public bool Contains(long studentId, long courseId)
         {
-            lock (_table)
+            _lock.WaitOne();
+            if (_table.ContainsKey(studentId))
             {
-                KeyValuePair<long, long> temp = new KeyValuePair<long, long>(studentId, courseId);
-                return _table.Contains(temp);
+                bool res = _table[studentId].Contains(courseId);
+                _lock.ReleaseMutex();
+                return res;
             }
+            _lock.ReleaseMutex();
+            return false;
         }
-
     }
 }

@@ -43,8 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentCuckooHash1.cs" />
     <Compile Include="IExamSystem.cs" />
-    <Compile Include="LockingPartOfTable.cs" />
     <Compile Include="LockingTable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
