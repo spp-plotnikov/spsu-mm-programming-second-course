@@ -10,7 +10,7 @@ namespace Server
         [OperationContract]
         List<string> ReadFilters();
         [OperationContract(IsOneWay = true)]
-        void SendFile(string filterName, Bitmap bytes);
+        void SendFile(string filterName, byte[] bytes);
         [OperationContract(IsOneWay = true)]
         void SendProgress();
         [OperationContract(IsOneWay = true)]
@@ -21,7 +21,7 @@ namespace Server
     {
       
         [OperationContract]
-        void GetImage(Bitmap image);
+        void GetImage(byte[] bytes, bool flag);
         [OperationContract]
         void GetProgress(int progress);
 

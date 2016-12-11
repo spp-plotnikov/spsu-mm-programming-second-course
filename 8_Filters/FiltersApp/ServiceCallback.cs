@@ -19,19 +19,10 @@ namespace Server
         }
 
 
-        public void GetImage(Bitmap image)
+        public void GetImage(byte[] image, bool flag)
         {
-            byte[] data;
-            using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
-            {
-                image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-                stream.Position = 0;
-                data = new byte[stream.Length];
-                stream.Read(data, 0, (int)stream.Length);
-                stream.Close();
-            }
-            Result = data;
-            ImageHere = true;
+            Result = image;
+            ImageHere = flag;
         }
 
         public void GetProgress(int progress)

@@ -123,7 +123,6 @@ namespace ImageConvolutionFilters
             resultBitmap.UnlockBits(resultData);
             Progress = 100; //because of actions with double
             return resultBitmap;
-
         }
     }  
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,9 +35,9 @@ namespace Server
             return filters;
         }
 
-        public void SendFile(string filterName, Bitmap bytes)
+        public void SendFile(string filterName, byte[] bytes)
         {
-          
+
             switch (filterName)
             {
                 case "Blur":
@@ -50,24 +51,43 @@ namespace Server
                     break;
             }
             ApplyFilter.Cancel = false;
-            Task<Bitmap> task = Task.Run(() => ApplyFilter.ConvolutionFilter(bytes, filter));
-            while(ApplyFilter.Progress <= 100)
+            Bitmap result = new Bitmap(1, 1);
+            using (var ms = new MemoryStream(bytes))
             {
-                Thread.Sleep(100);
-                Client.GetProgress(ApplyFilter.Progress);
-                if(ApplyFilter.Progress == 100)
+                var image = Image.FromStream(ms);
+                Task<Bitmap> task = Task.Run(() => ApplyFilter.ConvolutionFilter((Bitmap)image, filter));
+                while (ApplyFilter.Progress <= 100)
                 {
+                    Thread.Sleep(100);
                     Client.GetProgress(ApplyFilter.Progress);
-                    ApplyFilter.Progress = 0;
-                    break;
+                    if (ApplyFilter.Progress == 100)
+                    {
+                        Client.GetProgress(ApplyFilter.Progress);
+                        ApplyFilter.Progress = 0;
+                        break;
+                    }
                 }
+                result = task.Result;
             }
-            Client.GetImage(task.Result);
+
+            byte[] data;
+            using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
+            {
+                var image = result;
+                image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                stream.Position = 0;
+                data = new byte[stream.Length];
+                stream.Read(data, 0, (int)stream.Length);
+                stream.Close();
+                Client.GetImage(data, !ApplyFilter.Cancel);
+            }
         }
+        
+
         public void SendProgress()
         {
             Client.GetProgress(ApplyFilter.Progress);
-          
+       
         }
         public void Cancel()
         {

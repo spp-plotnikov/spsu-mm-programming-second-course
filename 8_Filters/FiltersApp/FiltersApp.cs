@@ -43,7 +43,7 @@ namespace Forms
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 StreamReader streamReader = new StreamReader(ofd.FileName);
-                Bitmap sourceBitmap = (Bitmap)Bitmap.FromStream(streamReader.BaseStream);
+                Bitmap sourceBitmap = (Bitmap)Image.FromStream(streamReader.BaseStream);
                 streamReader.Close();
                 Source.BackgroundImage = sourceBitmap;
              }
@@ -72,6 +72,7 @@ namespace Forms
 
             while (!callback.ImageHere && !cancel)
             {
+                Thread.Sleep(1000);
                 ProgressBar.Value = callback.Progress;
                 Application.DoEvents();
             }
@@ -83,23 +84,34 @@ namespace Forms
                     Target.BackgroundImage = image;
                 }
             }
+            callback.ImageHere = false;
             StartButton.Enabled = true;
             ListOfFilters.Enabled = true;
             LoadButton.Enabled = true;
-            CancelButton.Enabled = true;
+            CancelButton.Enabled = false;
             ProgressBar.Value = 0;
             callback.Progress = 0;
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            callback.ImageHere = false;
-            server.SendFile(currentFilter, (Bitmap)Source.BackgroundImage);
+            byte[] data;
+            using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
+            {
+                var image = Source.BackgroundImage;
+                image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                stream.Position = 0;
+                data = new byte[stream.Length];
+                stream.Read(data, 0, (int)stream.Length);
+                stream.Close();
+            }
+            server.SendFile(currentFilter, data);
         }
         private void CancelButton_Click(object sender, EventArgs e)
         {
             cancel = true;
             server.Cancel();
+            
         }
     }
 }
