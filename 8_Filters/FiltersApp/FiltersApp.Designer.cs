@@ -165,7 +165,7 @@
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
             this.Name = "FiltersApp";
             this.Text = "Filters App";
-            this.TransparencyKey = System.Drawing.Color.Black;
+            this.TransparencyKey = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             ((System.ComponentModel.ISupportInitialize)(this.Source)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
