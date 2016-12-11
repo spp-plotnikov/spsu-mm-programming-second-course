@@ -43,9 +43,16 @@ namespace Forms
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 StreamReader streamReader = new StreamReader(ofd.FileName);
-                Bitmap sourceBitmap = (Bitmap)Image.FromStream(streamReader.BaseStream);
-                streamReader.Close();
-                Source.BackgroundImage = sourceBitmap;
+                if (streamReader.BaseStream.Length > 1024 * 1024 * 10)
+                {
+                    MessageBox.Show("Size of file must be less than 10MB", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    Bitmap sourceBitmap = (Bitmap)Image.FromStream(streamReader.BaseStream);
+                    streamReader.Close();
+                    Source.BackgroundImage = sourceBitmap;
+                }
              }
         }
 

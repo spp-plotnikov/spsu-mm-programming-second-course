@@ -9,7 +9,7 @@ namespace Server
     public class MyCallback : IServiceCallBack
     {
         public List<string> Filters = new List<string>();
-        public byte[] Result = new byte[200000000];
+        public byte[] Result = new byte[1024 * 1024 * 10];
         public int Progress = 0;
         public bool ImageHere = false;
 
