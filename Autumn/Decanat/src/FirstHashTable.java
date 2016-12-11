@@ -8,7 +8,7 @@ public class FirstHashTable implements IExamSystem {
         hashMap = new HashMap(countStudents);
     }
 
-    public void Add(long studentId, long courseId) {
+    public void add(long studentId, long courseId) {
         synchronized (hashMap) {
             if (hashMap.containsKey(studentId)) {
                 List<Long> list = hashMap.get(studentId);
@@ -23,7 +23,7 @@ public class FirstHashTable implements IExamSystem {
         }
     }
 
-    public void Remove(long studentId, long courseId) {
+    public void remove(long studentId, long courseId) {
         synchronized (hashMap) {
             if (hashMap.containsKey(studentId)) {
                 List<Long> list = hashMap.get(studentId);
@@ -34,7 +34,7 @@ public class FirstHashTable implements IExamSystem {
         }
     }
 
-    public boolean Contains(long studentId, long courseId) {
+    public boolean contains(long studentId, long courseId) {
         synchronized (hashMap) {
             if (hashMap.containsKey(studentId)) {
                 List<Long> list = hashMap.get(studentId);

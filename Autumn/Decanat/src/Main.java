@@ -1,3 +1,5 @@
+import sun.awt.Mutex;
+
 import java.util.Random;
 
 public class Main {
@@ -12,8 +14,9 @@ public class Main {
         System.out.println("Count adding " + countAdd);
         System.out.println("Count checking " + countContains);
         System.out.println("Count removing " + countRemove);
+        Mutex mutex = new Mutex();
         FirstHashTable firstHashTable = new FirstHashTable(countAdd);
-        SecondHashTable secondHashTable = new SecondHashTable(countAdd);
+        SecondHashTable secondHashTable = new SecondHashTable(countAdd, mutex);
         random = new Random();
         long[] students = new long[countAdd];
         long[] courses = new long[countAdd];
@@ -33,10 +36,10 @@ public class Main {
         }
         System.out.println("work time first realization: " + (System.currentTimeMillis() - startTime) / 1000.0);
 
-
         startTime = System.currentTimeMillis();
         Thread[] threadsTwo = new Thread[countThread];
         for (int i = 0; i < countThread; i++) {
+
             threadsTwo[i] = new Thread(new Tester(students, courses, secondHashTable));
             threadsTwo[i].start();
         }
@@ -44,15 +47,12 @@ public class Main {
             threadsTwo[i].join();
         }
         System.out.println("work time second realization: " + (System.currentTimeMillis() - startTime) / 1000.0);
-
-
     }
 
     public static class Tester implements Runnable {
         long[] students;
         long[] courses;
         IExamSystem hashTable;
-
 
         public Tester(long students[], long courses[], IExamSystem hashTable) {
             random = new Random();
@@ -63,17 +63,16 @@ public class Main {
 
         public void run() {
             for (int i = 0; i < countAdd; i++) {
-                hashTable.Add(students[i], courses[i]);
+                hashTable.add(students[i], courses[i]);
             }
 
             for (int i = 0; i < countContains; i++) {
-                hashTable.Contains(random.nextLong(), random.nextLong());
+                hashTable.contains(random.nextLong(), random.nextLong());
             }
 
             for (int i = 0; i < countRemove; i++) {
-                hashTable.Remove(students[i], courses[i]);
+                hashTable.remove(students[i], courses[i]);
             }
-
         }
     }
 

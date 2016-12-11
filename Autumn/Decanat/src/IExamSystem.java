@@ -1,5 +1,5 @@
 public interface IExamSystem {
-    public void Add(long studentId, long courseId);
-    public void Remove(long studentId, long courseId);
-    public boolean Contains(long studentId, long courseId);
+    public void add(long studentId, long courseId);
+    public void remove(long studentId, long courseId);
+    public boolean contains(long studentId, long courseId);
 }

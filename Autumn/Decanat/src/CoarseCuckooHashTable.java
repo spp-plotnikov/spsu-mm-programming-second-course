@@ -3,7 +3,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-public class CoarseCuckooHashTable<K,V> implements Mapp<K,V> {
+public class CoarseCuckooHashTable<K,V> {
     protected Entry<K,V>[][] table;
     protected Lock lock;
     protected int size;
@@ -17,19 +17,19 @@ public class CoarseCuckooHashTable<K,V> implements Mapp<K,V> {
         size = capacity;
         random = new Random();
     }
-    private final int hash0(K key) {
+    private final int fistHashFunc(K key) {
         return Math.abs(key.hashCode() % size);
     }
-    private final int hash1(K key) {
+    private final int secondHashFunc(K key) {
         random.setSeed(key.hashCode());
         return random.nextInt(size);
     }
     public boolean containsKey(K key) {
         lock.lock();
         try {
-            if (table[0][hash0(key)] != null && key.equals(table[0][hash0(key)].key)) {
+            if (table[0][fistHashFunc(key)] != null && key.equals(table[0][fistHashFunc(key)].key)) {
                 return true;
-            } else if (table[1][hash1(key)] != null && key.equals(table[1][hash1(key)].key)) {
+            } else if (table[1][secondHashFunc(key)] != null && key.equals(table[1][secondHashFunc(key)].key)) {
                 return true;
             }
             return false;
@@ -42,23 +42,23 @@ public class CoarseCuckooHashTable<K,V> implements Mapp<K,V> {
         lock.lock();
         try {
             if (containsKey(key)) {
-                if (key.equals(table[0][hash0(key)].key)) {
-                    V result = table[0][hash0(key)].value;
-                    table[0][hash0(key)].value = value;
+                if (key.equals(table[0][fistHashFunc(key)].key)) {
+                    V result = table[0][fistHashFunc(key)].value;
+                    table[0][fistHashFunc(key)].value = value;
                     return result;
-                } else if (key.equals(table[1][hash1(key)].key)) {
-                    V result = table[1][hash1(key)].value;
-                    table[1][hash1(key)].value = value;
+                } else if (key.equals(table[1][secondHashFunc(key)].key)) {
+                    V result = table[1][secondHashFunc(key)].value;
+                    table[1][secondHashFunc(key)].value = value;
                     return result;
                 }
             }
             Entry<K,V> e = new Entry<K, V>(key.hashCode(),key,value);
             for (int i = 0; i < LIMIT; i++) {
-                e = swap(0, hash0(key), e);
+                e = swap(0, fistHashFunc(key), e);
                 if (e == null) {
                     return null;
                 }
-                e = swap(1, hash1(key), e);
+                e = swap(1, secondHashFunc(key), e);
                 if (e == null) {
                     return null;
                 }
@@ -69,18 +69,17 @@ public class CoarseCuckooHashTable<K,V> implements Mapp<K,V> {
         }
     }
 
-    @Override
     public V get(K key) {
         lock.lock();
         V result = null;
-        int i0 = hash0(key);
-        int i1 = hash1(key);
+        int firstHash = fistHashFunc(key);
+        int secondHash = secondHashFunc(key);
         try {
-            if (table[0][i0] != null) {
-                result = table[0][i0].value;
+            if (table[0][firstHash] != null) {
+                result = table[0][firstHash].value;
                 return result;
-            } else if (table[1][i1] != null) {
-                result = table[1][i1].value;
+            } else if (table[1][secondHash] != null) {
+                result = table[1][secondHash].value;
                 return result;
             }
             return result;
@@ -92,16 +91,16 @@ public class CoarseCuckooHashTable<K,V> implements Mapp<K,V> {
     public V remove(K key) {
         lock.lock();
         V result = null;
-        int i0 = hash0(key);
-        int i1 = hash1(key);
+        int firstHash = fistHashFunc(key);
+        int secondHash = secondHashFunc(key);
         try {
-            if (key.equals(table[0][i0])) {
-                result = table[0][i0].value;
-                table[0][i0] = null;
+            if (key.equals(table[0][firstHash])) {
+                result = table[0][firstHash].value;
+                table[0][firstHash] = null;
                 return result;
-            } else if (key.equals(table[1][i1])) {
-                result = table[1][i1].value;
-                table[1][i1] = null;
+            } else if (key.equals(table[1][secondHash])) {
+                result = table[1][secondHash].value;
+                table[1][secondHash] = null;
                 return result;
             }
             return result;

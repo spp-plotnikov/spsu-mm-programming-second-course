@@ -1,30 +1,42 @@
+import sun.awt.Mutex;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class SecondHashTable implements IExamSystem {
-    private Mapp<Long, List<Long>> hashMap;
+    private CoarseCuckooHashTable<Long, List<Long>> hashMap;
     private int countStudents;
+    Mutex mutex;
 
-    SecondHashTable(int countStudents) {
+    SecondHashTable(int countStudents, Mutex mutex) {
         this.countStudents = countStudents;
+        this.mutex = mutex;
         hashMap = new CoarseCuckooHashTable(countStudents);
     }
 
-    public void Add(long studentId, long courseId) {
+    public void add(long studentId, long courseId) {
         List<Long> list = hashMap.get(studentId);
         if (list != null) {
             if (!list.contains(courseId)) {
                 list.add(courseId);
             }
         } else {
-            list = new LinkedList();
-            list.add(courseId);
-            hashMap.put(studentId, list);
+            mutex.lock();
+            list = hashMap.get(studentId);
+            if (list == null) {
+                list = new LinkedList();
+                list.add(courseId);
+                hashMap.put(studentId, list);
+            } else {
+                if (!list.contains(courseId)) {
+                    list.add(courseId);
+                }
+            }
+            mutex.unlock();
         }
     }
 
-
-    public void Remove(long studentId, long courseId) {
+    public void remove(long studentId, long courseId) {
         List<Long> list = hashMap.get(studentId);
         if (list != null) {
             if (list.contains(courseId)) {
@@ -33,7 +45,7 @@ public class SecondHashTable implements IExamSystem {
         }
     }
 
-    public boolean Contains(long studentId, long courseId) {
+    public boolean contains(long studentId, long courseId) {
         List<Long> list = hashMap.get(studentId);
         if (list != null) {
             return list.contains(courseId);
