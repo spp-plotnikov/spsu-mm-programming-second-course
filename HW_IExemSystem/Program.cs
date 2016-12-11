@@ -13,7 +13,7 @@ namespace ForUniversity
             Test test = new Test();
             IExamSystem firstSystem = new LockingTable();
             test.StatTest(firstSystem);
-            IExamSystem secondSystem = new ConcurrentCuckooHash(100);
+            IExamSystem secondSystem = new LockingPartOfTable(100);
             test.StatTest(secondSystem);
         }
     }
