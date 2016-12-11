@@ -10,20 +10,22 @@ public class CoarseCuckooHashTable<K,V> {
     protected static final int LIMIT = 32;
     private Random random;
 
-
     public CoarseCuckooHashTable(int capacity) {
         lock = new ReentrantLock();
         table = (Entry<K, V>[][]) new Entry[2][capacity];
         size = capacity;
         random = new Random();
     }
+
     private final int fistHashFunc(K key) {
         return Math.abs(key.hashCode() % size);
     }
+
     private final int secondHashFunc(K key) {
         random.setSeed(key.hashCode());
         return random.nextInt(size);
     }
+
     public boolean containsKey(K key) {
         lock.lock();
         try {
