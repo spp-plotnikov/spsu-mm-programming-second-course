@@ -9,20 +9,18 @@ namespace ForUniversity
 {
     class LockingTable : IExamSystem
     {
-        List<long[]> _table;
+        List<KeyValuePair<long, long>> _table;
         
         public LockingTable()
         {
-            _table = new List<long[]>();
+            _table = new List<KeyValuePair<long, long>>();
         }
 
         public void Add(long studentId, long courseId)
         {
             lock (_table)
             {
-                long[] temp = new long[2];
-                temp[0] = studentId;
-                temp[1] = courseId;
+                KeyValuePair<long, long> temp = new KeyValuePair<long, long>(studentId, courseId);               
                 _table.Add(temp);
             }
         }
@@ -31,9 +29,7 @@ namespace ForUniversity
         {
             lock (_table)
             {
-                long[] temp = new long[2];
-                temp[0] = studentId;
-                temp[1] = courseId;
+                KeyValuePair<long, long> temp = new KeyValuePair<long, long>(studentId, courseId);
                 _table.Remove(temp);
             }
         }
@@ -42,9 +38,7 @@ namespace ForUniversity
         {
             lock (_table)
             {
-                long[] temp = new long[2];
-                temp[0] = studentId;
-                temp[1] = courseId;
+                KeyValuePair<long, long> temp = new KeyValuePair<long, long>(studentId, courseId);
                 return _table.Contains(temp);
             }
         }

@@ -82,15 +82,12 @@ namespace ForUniversity
         public bool Contains(long studentId, long courseId)
         {
             LockStudent(studentId);
-            _lock.WaitOne();
             if (_table.ContainsKey(studentId))
             {
-                _lock.ReleaseMutex();
                 bool res = _table[studentId].Contains(courseId);
                 UnlockStudent(studentId);
                 return res;
             }
-            _lock.ReleaseMutex();
             UnlockStudent(studentId);
             return false;
         }
