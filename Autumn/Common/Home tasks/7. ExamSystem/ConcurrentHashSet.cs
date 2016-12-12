@@ -61,7 +61,7 @@ namespace ExamSystem
             secondMutex[secondHash(tmp) % numLocks].ReleaseMutex();
         }
 
-        private void Resize()
+        private void resize()
         {
             int oldCapacity = capacity;
             for (int i = 0; i < firstMutex.Length; i++)
@@ -221,12 +221,12 @@ namespace ExamSystem
 
             if (isResize)
             {
-                Resize();
+                resize();
                 Add(exam);
             }
             else if (!Relocate(res, hash))
             {
-                Resize();
+                resize();
             }
             return true;
         }

@@ -10,8 +10,6 @@ namespace ExamSystem
 {
     class Program
     {
-
-
         static void Main(string[] args)
         {
             Checker checker = new Checker();
