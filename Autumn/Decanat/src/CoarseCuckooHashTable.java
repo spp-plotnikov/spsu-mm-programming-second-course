@@ -65,9 +65,25 @@ public class CoarseCuckooHashTable<K,V> {
                     return null;
                 }
             }
-            return null;
+            resize();
+            return put(key, value);
         } finally {
             lock.unlock();
+        }
+    }
+
+    private void resize() {
+        int oldSize = size;
+        Entry<K,V>[][] oldTable = table;
+        size *= 2;
+        table = (Entry<K, V>[][]) new Entry[2][size];
+        for (int i = 0; i < oldSize; i++) {
+            if (oldTable[0][i] != null) {
+                put(oldTable[0][i].key, oldTable[0][i].value);
+            }
+            if(oldTable[1][i] != null) {
+                put(oldTable[1][i].key, oldTable[1][i].value);
+            }
         }
     }
 
