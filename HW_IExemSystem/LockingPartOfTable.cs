@@ -14,7 +14,7 @@ namespace ForUniversity
         private Mutex _lock = new Mutex();
         private int _copacity;
         private long _numOfRecords;
-        private int _mod = 112; //num of locking elem.
+        private int _mod = 1024; //num of locking elem.
 
         public LockingPartOfTable ()
         {
