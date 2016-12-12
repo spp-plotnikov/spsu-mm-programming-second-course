@@ -30,13 +30,8 @@ namespace Filters
         {
             get
             {
-                Monitor.Enter(pixelCounter);
                 if (numOfPixels == 0) { return 0; }
-                {
-                   int progress = (int)((double)pixelCounter / numOfPixels * 100);
-                }
-                Monitor.Exit(pixelCounter);
-                return progress;
+                return (int)((double)pixelCounter / numOfPixels * 100);
             }
         }
 

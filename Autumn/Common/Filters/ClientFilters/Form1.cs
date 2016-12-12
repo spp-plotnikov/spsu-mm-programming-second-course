@@ -16,7 +16,7 @@ namespace ClientFilters
         private string path;
         private Bitmap curImage;
         private Filtering.ServiceClient host;
-
+        
         public Form1()
         {
             InitializeComponent();
@@ -42,22 +42,70 @@ namespace ClientFilters
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
-            byte[] toSend = ConnectionMethods.ImageToByteArray(curImage);
-            host.SetByteArray(toSend.Length);
-            ConnectionMethods.sendByteArrayUsingChunks(toSend, host);
-            host.SetFilter(comboBox1.SelectedValue.ToString());
-            host.DoFilter();
-            byte[] result1 = ConnectionMethods.receiveByteArrayUsingChunks(host);
-            
-            pictureBox3.Image = ConnectionMethods.byteArrayToBitmap(result1);
+            backgroundWorker1.DoWork += SendNGetImage;
+            if (!backgroundWorker1.IsBusy && comboBox1.Items.Count > 0 && curImage != null)
+                backgroundWorker1.RunWorkerAsync();
         }
-
+        
         private void button3_Click(object sender, EventArgs e)
         {
             BindingSource filters = new BindingSource();
             filters.DataSource = host.Filters();
             comboBox1.DataSource = filters;            
+        }
+
+        private void SendNGetImage(object sender, DoWorkEventArgs e)
+        {
+            byte[] toSend = ConnectionMethods.ImageToByteArray(curImage);
+            host.SetByteArray(toSend.Length);
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                host.SetFilter(comboBox1.SelectedValue.ToString());
+            });
+            backgroundWorker2.DoWork += UpdatingProgressBar;
+            if (!backgroundWorker2.IsBusy)
+                backgroundWorker2.RunWorkerAsync();
+            ConnectionMethods.sendByteArrayUsingChunks(toSend, host);
+            host.DoFilter();
+            byte[] result1 = ConnectionMethods.receiveByteArrayUsingChunks(host);
+            pictureBox3.Image = ConnectionMethods.byteArrayToBitmap(result1);
+        }
+
+        private void UpdatingProgressBar(object sender, DoWorkEventArgs e)
+        {
+            progressBar1.Maximum = 100;
+            progressBar1.Minimum = 0;
+            while (backgroundWorker1.IsBusy)
+            {
+                this.Invoke((MethodInvoker)delegate ()
+                {
+                    int progress = host.GetProgress();
+                    if (progress == 0)
+                    {
+                        label7.Text = "sending";
+                    }
+                    if (progress <= 100)
+                    {
+                        progressBar1.Value = progress;
+                        label7.Text = "filtering";
+                    }
+                    if (progress == 100)
+                    {
+                        label7.Text = "recieving";
+                    }
+                });
+                Thread.Sleep(1000);
+            }
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                progressBar1.Value = 0;
+                label7.Text = "done";
+            });
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            label7.Text = "cancelled";
         }
     }
 }

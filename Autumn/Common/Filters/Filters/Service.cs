@@ -8,7 +8,6 @@ using System.Text;
 
 namespace Filters
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service1" in both code and config file together.
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
                  ConcurrencyMode = ConcurrencyMode.Multiple,
                  UseSynchronizationContext = true)]
@@ -20,6 +19,7 @@ namespace Filters
         private long curBytePosition;
         private byte[] toSend;
         private long sizeOfChunk = 2048;
+        bool cancelled = false;
 
         public long SizeOfResult
         {
@@ -33,20 +33,20 @@ namespace Filters
         {
             return FilterImplementation.FilterNames;
         }
-
-
-
+        
         public int GetProgress()
         {
-            return byteArray[255];
+            return chosenFilter.Progress;
         }
 
         public void DoFilter()
         {
+            if (cancelled) { return; }
             curBytePosition = 0;
             srcImage = ConnectionMethods.byteArrayToBitmap(byteArray);
             Bitmap result = chosenFilter.DoFilter(srcImage);
             toSend = ConnectionMethods.ImageToByteArray(result);
+            if (cancelled) { toSend = new byte[1]; }
         }
 
         public void SetFilter(string filterName)
@@ -74,6 +74,7 @@ namespace Filters
 
         public byte[] GetChunk()
         {
+            if (cancelled) { return new byte[1]; }
             if (curBytePosition + sizeOfChunk > toSend.Length)
             {
                 byte[] buffer = new byte[toSend.Length - curBytePosition];
@@ -95,6 +96,9 @@ namespace Filters
             return chosenFilter.DoFilter(srcImage);
         }
 
-        
+        public void Cancel()
+        {
+            cancelled = true;
+        }
     }
 }

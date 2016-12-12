@@ -19,6 +19,9 @@ namespace Filters
         }
 
         [OperationContract]
+        void Cancel();
+
+        [OperationContract]
         List<string> Filters();
 
         [OperationContract]
@@ -38,9 +41,7 @@ namespace Filters
 
         [OperationContract]
         byte[] GetChunk();
-
-        [OperationContract]
-        Bitmap GetResultBitmap();
+        
         // TODO: Add your service operations here
     }
 
