@@ -14,10 +14,11 @@ namespace ForUniversity
         private Mutex _lock = new Mutex();
         private int _copacity;
         private long _numOfRecords;
+        private int _mod = 112; //num of locking elem.
 
-        public LockingPartOfTable (int size)
+        public LockingPartOfTable ()
         {
-            _copacity = size;
+            _copacity = _mod;
             _table = new List<KeyValuePair<long, long>>[_copacity];
             for (int i = 0; i < _copacity; i++)
             {
@@ -62,17 +63,15 @@ namespace ForUniversity
 
         private void Resize(long studentId, int oldCopacity)
         {
-         //   Console.WriteLine(studentId);
-            for (int i = 0; i < 2 * _copacity; i++)
+            for (int i = 0; i < _mod; i++)
             {
-               // Console.WriteLine(i);
                 if (i != studentId)
                     LockStudent(i);
             }
 
             if (_copacity != oldCopacity)
             {
-                for (int i = 0; i < 2 * _copacity; i++)
+                for (int i = 0; i < _mod; i++)
                 {
                     if (i != studentId)
                         UnlockStudent(i);
@@ -96,7 +95,7 @@ namespace ForUniversity
                     _table[hash].Add(record[j]);
                 }
             }
-            for (int i = 0; i <  _copacity; i++)
+            for (int i = 0; i <  _mod; i++)
             {
                 if (i != studentId)
                     UnlockStudent(i);
@@ -106,7 +105,7 @@ namespace ForUniversity
 
         public void Add(long studentId, long courseId)
         {
-            int hash = GetHash(studentId, courseId) % _copacity;
+            int hash = GetHash(studentId, courseId) % _mod;
 
             LockStudent(hash);
 
@@ -122,6 +121,7 @@ namespace ForUniversity
                 }
                 Interlocked.Increment(ref _numOfRecords);
                 _table[hash].Add(new KeyValuePair<long, long>(studentId, courseId));
+                hash = GetHash(studentId, courseId) % _mod;
                 UnlockStudent(hash);
                 return;
             }
@@ -129,14 +129,17 @@ namespace ForUniversity
             if (!_table[hash].Contains(new KeyValuePair<long, long>(studentId, courseId)))
             {
                 _table[hash].Add(new KeyValuePair<long, long>(studentId, courseId));
+                hash = GetHash(studentId, courseId) % _mod;
                 UnlockStudent(hash);
+                return;
             }
+            hash = GetHash(studentId, courseId) % _mod;
             UnlockStudent(hash);
         }
 
         public void Remove(long studentId, long courseId)
         {
-            int hash = GetHash(studentId, courseId) % _copacity;
+            int hash = GetHash(studentId, courseId) % _mod;
             
             LockStudent(hash);
 
@@ -145,15 +148,22 @@ namespace ForUniversity
             if (_table[hash].Contains(new KeyValuePair<long, long>(studentId, courseId)))
             {
                 _table[hash].Remove(new KeyValuePair<long, long>(studentId, courseId));
+
+                hash = GetHash(studentId, courseId) % _mod;
+
                 UnlockStudent(hash);
                 return;
             }
+
+            hash = GetHash(studentId, courseId) % _mod;
+
             UnlockStudent(hash);
         }
 
         public bool Contains(long studentId, long courseId)
         {
-            int hash = GetHash(studentId, courseId) % _copacity;
+          //  Console.WriteLine("here");
+            int hash = GetHash(studentId, courseId) % _mod;
 
             LockStudent(hash);
 
@@ -162,9 +172,11 @@ namespace ForUniversity
             if (_table[hash].Contains(new KeyValuePair<long, long>(studentId, courseId)))
             {
                 bool res = _table[hash].Contains(new KeyValuePair<long, long>(studentId, courseId));
+                hash = GetHash(studentId, courseId) % _mod;
                 UnlockStudent(hash);
                 return res;
             }
+            hash = GetHash(studentId, courseId) % _mod;
             UnlockStudent(hash);
             return false;
         }
