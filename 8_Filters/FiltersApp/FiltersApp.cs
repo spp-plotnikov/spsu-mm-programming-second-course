@@ -12,6 +12,8 @@ namespace Forms
 {
     public partial class FiltersApp : Form
     {
+
+        private ProgressBarForm progressBarForm;
         private IService server;
         private bool cancel = false;
         private string currentFilter;
@@ -53,7 +55,8 @@ namespace Forms
                     streamReader.Close();
                     Source.BackgroundImage = sourceBitmap;
                 }
-             }
+            }
+            ListOfFilters.Enabled = true;
         }
 
 
@@ -67,22 +70,67 @@ namespace Forms
 
         private void Start_Click(object sender, EventArgs e)
         {
-            backgroundWorker = new BackgroundWorker();
-            backgroundWorker.DoWork += new DoWorkEventHandler(BackgroundWorker_DoWork);
-            backgroundWorker.RunWorkerAsync();
-
-            CancelButton.Enabled = true;
+            if (backgroundWorker.IsBusy != true)
+            {
+                progressBarForm = new ProgressBarForm();
+                progressBarForm.Canceled += new EventHandler<EventArgs>(CancelButton_Click);
+                progressBarForm.Show();
+                this.Hide();
+                backgroundWorker.RunWorkerAsync();
+            }
             StartButton.Enabled = false;
             ListOfFilters.Enabled = false;
             LoadButton.Enabled = false;
             cancel = false;
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            byte[] data;
+            using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
+            {
+                var image = Source.BackgroundImage;
+                image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                stream.Position = 0;
+                data = new byte[stream.Length];
+                stream.Read(data, 0, (int)stream.Length);
+                stream.Close();
+            }
+            server.SendFile(currentFilter, data);
 
             while (!callback.ImageHere && !cancel)
             {
-                Thread.Sleep(1000);
-                ProgressBar.Value = callback.Progress;
-                Application.DoEvents();
+                if (worker.CancellationPending == true)
+                {
+                    e.Cancel = true;
+                    break;
+                }
+                else
+                {
+                    if (!cancel)
+                    {
+                        worker.ReportProgress(callback.Progress);
+                    }
+                    Thread.Sleep(1000);
+                }
             }
+           
+        }
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
+            server.Cancel();
+            cancel = true;
+            backgroundWorker.CancelAsync();
+            progressBarForm.Close();
+            this.Show();
+        }
+
+        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+            progressBarForm.Close();
+            this.Show();
             if (!cancel)
             {
                 using (var ms = new MemoryStream(callback.Result))
@@ -95,30 +143,16 @@ namespace Forms
             StartButton.Enabled = true;
             ListOfFilters.Enabled = true;
             LoadButton.Enabled = true;
-            CancelButton.Enabled = false;
-            ProgressBar.Value = 0;
             callback.Progress = 0;
+
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+
+        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            byte[] data;
-            using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
-            {
-                var image = Source.BackgroundImage;
-                image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-                stream.Position = 0;
-                data = new byte[stream.Length];
-                stream.Read(data, 0, (int)stream.Length);
-                stream.Close();
-            }
-            server.SendFile(currentFilter, data);
-        }
-        private void CancelButton_Click(object sender, EventArgs e)
-        {
-            cancel = true;
-            server.Cancel();
-            
+            progressBarForm.Message = "In progress, please wait... " + e.ProgressPercentage.ToString() + "%";
+            if(progressBarForm.ProgressValue <= e.ProgressPercentage)
+                progressBarForm.ProgressValue = e.ProgressPercentage;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Server
         private List<string> filters = new List<string>();
         public ExtBitmap ApplyFilter = new ExtBitmap();
         private ConvolutionFilterBase filter;
+        public int Progress;
 
         public Service()
         {
@@ -28,10 +29,9 @@ namespace Server
                 Console.WriteLine(line);
             }
         }
-
+        
         public List<string> ReadFilters()
         {
-
             return filters;
         }
 
@@ -56,13 +56,15 @@ namespace Server
             {
                 var image = Image.FromStream(ms);
                 Task<Bitmap> task = Task.Run(() => ApplyFilter.ConvolutionFilter((Bitmap)image, filter));
-                while (ApplyFilter.Progress <= 100)
+                while (ApplyFilter.Progress <= 100 && !ApplyFilter.Cancel)
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(1000);
                     Client.GetProgress(ApplyFilter.Progress);
+                    Progress = ApplyFilter.Progress;
                     if (ApplyFilter.Progress == 100)
                     {
                         Client.GetProgress(ApplyFilter.Progress);
+                        Progress = ApplyFilter.Progress;
                         ApplyFilter.Progress = 0;
                         break;
                     }
@@ -80,15 +82,10 @@ namespace Server
                 stream.Read(data, 0, (int)stream.Length);
                 stream.Close();
                 Client.GetImage(data, !ApplyFilter.Cancel);
+            
             }
         }
         
-
-        public void SendProgress()
-        {
-            Client.GetProgress(ApplyFilter.Progress);
-       
-        }
         public void Cancel()
         {
             ApplyFilter.Cancel = true;
@@ -101,6 +98,5 @@ namespace Server
                 <IServiceCallBack>();
             }
         }
-
     }
 }

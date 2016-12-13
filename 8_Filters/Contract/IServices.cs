@@ -12,14 +12,11 @@ namespace Server
         [OperationContract(IsOneWay = true)]
         void SendFile(string filterName, byte[] bytes);
         [OperationContract(IsOneWay = true)]
-        void SendProgress();
-        [OperationContract(IsOneWay = true)]
         void Cancel();
     }
 
     public interface IServiceCallBack
     {
-      
         [OperationContract]
         void GetImage(byte[] bytes, bool flag);
         [OperationContract]

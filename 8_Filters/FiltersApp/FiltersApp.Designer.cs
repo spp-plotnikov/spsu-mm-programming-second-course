@@ -35,8 +35,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.Target = new System.Windows.Forms.PictureBox();
             this.StartButton = new System.Windows.Forms.Button();
-            this.ProgressBar = new System.Windows.Forms.ProgressBar();
-            this.CancelButton = new System.Windows.Forms.Button();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.Source)).BeginInit();
             this.panel2.SuspendLayout();
@@ -49,6 +47,7 @@
             this.ListOfFilters.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
             this.ListOfFilters.Cursor = System.Windows.Forms.Cursors.Default;
             this.ListOfFilters.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ListOfFilters.Enabled = false;
             this.ListOfFilters.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ListOfFilters.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.ListOfFilters.FormattingEnabled = true;
@@ -127,26 +126,13 @@
             this.StartButton.UseVisualStyleBackColor = false;
             this.StartButton.Click += new System.EventHandler(this.Start_Click);
             // 
-            // ProgressBar
+            // backgroundWorker
             // 
-            this.ProgressBar.Location = new System.Drawing.Point(34, 373);
-            this.ProgressBar.Name = "ProgressBar";
-            this.ProgressBar.Size = new System.Drawing.Size(589, 23);
-            this.ProgressBar.TabIndex = 7;
-            // 
-            // CancelButton
-            // 
-            this.CancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
-            this.CancelButton.Enabled = false;
-            this.CancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.CancelButton.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.CancelButton.Location = new System.Drawing.Point(559, 20);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(107, 27);
-            this.CancelButton.TabIndex = 8;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = false;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            this.backgroundWorker.WorkerReportsProgress = true;
+            this.backgroundWorker.WorkerSupportsCancellation = true;
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker_DoWork);
+            this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
             // FiltersApp
             // 
@@ -154,9 +140,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(204)))), ((int)(((byte)(255)))));
-            this.ClientSize = new System.Drawing.Size(681, 408);
-            this.Controls.Add(this.CancelButton);
-            this.Controls.Add(this.ProgressBar);
+            this.ClientSize = new System.Drawing.Size(678, 376);
             this.Controls.Add(this.StartButton);
             this.Controls.Add(this.LoadButton);
             this.Controls.Add(this.ListOfFilters);
@@ -164,6 +148,7 @@
             this.Controls.Add(this.panel2);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(134)))), ((int)(((byte)(142)))), ((int)(((byte)(179)))));
             this.Name = "FiltersApp";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Filters App";
             this.TransparencyKey = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             ((System.ComponentModel.ISupportInitialize)(this.Source)).EndInit();
@@ -183,8 +168,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox Target;
         private System.Windows.Forms.Button StartButton;
-        private System.Windows.Forms.ProgressBar ProgressBar;
-        private System.Windows.Forms.Button CancelButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }

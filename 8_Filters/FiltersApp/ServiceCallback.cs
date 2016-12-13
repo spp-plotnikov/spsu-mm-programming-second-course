@@ -18,16 +18,15 @@ namespace Server
             this.Filters = filters;
         }
 
-
         public void GetImage(byte[] image, bool flag)
         {
             Result = image;
             ImageHere = flag;
         }
 
-        public void GetProgress(int progress)
+        public  void GetProgress(int progress)
         {
-            Progress = progress;
-        }
+            Progress = progress;        }
+
     }
 }

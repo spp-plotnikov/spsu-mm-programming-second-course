@@ -121,7 +121,8 @@ namespace ImageConvolutionFilters
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
-            Progress = 100; //because of actions with double
+            if(!Cancel)
+                Progress = 100; //because of actions with double
             return resultBitmap;
         }
     }  
