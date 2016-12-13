@@ -12,17 +12,17 @@ namespace Lab_5_Future
         public int Sum(int[] arr)
         {
             int size = arr.Count();
-            if (taskNum > size)
+            if(taskNum > size)
             {
                 taskNum = size;
             }
             int numElemInThread = size / taskNum;
 
             List<Task<int>> tasks = new List<Task<int>>();
-            for (int i = 0; i < taskNum - 1; i++)
+            for(int i = 0; i < taskNum - 1; i++)
             {
                 int[] tmpArr = new int[numElemInThread];
-                for (int j = 0; j < numElemInThread; j++)
+                for(int j = 0; j < numElemInThread; j++)
                 {
                     tmpArr[j] = arr[i * numElemInThread + j];
                 }
@@ -33,7 +33,7 @@ namespace Lab_5_Future
             }
 
             int[] lastArr = new int[numElemInThread + size % taskNum];
-            for (int j = 0; j < numElemInThread + size % taskNum; j++)
+            for(int j = 0; j < numElemInThread + size % taskNum; j++)
             {
                 lastArr[j] = arr[numElemInThread * (taskNum - 1) + j];
             }
@@ -44,7 +44,7 @@ namespace Lab_5_Future
             Task.WaitAll(tasks.ToArray());
 
             int result = 0;
-            foreach (var task in tasks)
+            foreach(var task in tasks)
             {
                 result += task.Result;
             }

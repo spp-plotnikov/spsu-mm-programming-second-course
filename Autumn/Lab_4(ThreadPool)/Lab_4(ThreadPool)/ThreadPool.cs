@@ -7,46 +7,36 @@ namespace Lab_4_ThreadPool
     public class ThreadPool : IDisposable
     {
         public const int NumOfThreads = 6;
-        bool poolAlive;
-        bool exitIfNoWork;
+        bool isPoolAlive;
         Queue<Action> actionQueue;
         Thread[] threads = new Thread[NumOfThreads];
 
         public ThreadPool()
         {
-            poolAlive = true;
-            exitIfNoWork = true;
+            isPoolAlive = true;
             actionQueue = new Queue<Action>();
 
-            for (int curThread = 0; curThread < NumOfThreads; curThread++)
-                threads[curThread] = new Thread(threadAct);
+            for(int curThread = 0; curThread < NumOfThreads; curThread++)
+            {
+                threads[curThread] = new Thread(ThreadAct);
+            }
         }
 
-        void threadAct()
+        void ThreadAct()
         {
             Action act = null;
-            while (poolAlive)
+            while(isPoolAlive)
             {
-                if (actionQueue.Count != 0)
+                if(actionQueue.Count != 0)
                 {
                     Monitor.Enter(actionQueue);
                     act = actionQueue.Dequeue();
                     Monitor.Exit(actionQueue);
                     act();
                 }
-                else if (exitIfNoWork)
+                else
                 {
-                    poolAlive = false;
-                    Console.WriteLine("Queue is empty.");
-                    Console.WriteLine("completion of the current threads");
-
-                    foreach (Thread thread in threads)
-                        if (Thread.CurrentThread != thread)
-                        {
-                            thread.Join();
-                        }
-
-                    Console.WriteLine("Work is completed.");
+                    Thread.Sleep(100); // pause between checks
                 }
             }
         }
@@ -60,7 +50,7 @@ namespace Lab_4_ThreadPool
 
         public void Start()
         {
-            foreach (Thread thread in threads)
+            foreach(Thread thread in threads)
             {
                 thread.Start();
             }
@@ -68,15 +58,17 @@ namespace Lab_4_ThreadPool
 
         public void Dispose()
         {
-            if (poolAlive)
+            if(isPoolAlive)
             {
-                poolAlive = false;
+                isPoolAlive = false;
                 Console.WriteLine("Interrupted by user");
                 Console.WriteLine("completion of the current threads");
 
-                foreach (Thread thread in threads)
+                foreach(Thread thread in threads)
+                {
                     thread.Join();
-                Console.WriteLine("Work ended prematurely.");
+                }
+                Console.WriteLine("Work ended.");
                 Console.ReadKey();
             }
         }

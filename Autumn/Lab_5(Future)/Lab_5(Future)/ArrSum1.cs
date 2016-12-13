@@ -12,11 +12,11 @@ namespace Lab_5_Future
         {
             int size = array.Count();
 
-            if (size == 1)
+            if(size == 1)
                 return array[0];
 
             List<Task<int>> tasks = new List<Task<int>>();
-            for (int i = 0; i < 2; i++)
+            for(int i = 0; i < 2; i++)
             {
                 int[] arrInThread = new int[size / 2 + i * (size % 2)];
                 Array.Copy(array, i * (size / 2), arrInThread, 0, size / 2 + i * (size % 2));
@@ -28,7 +28,7 @@ namespace Lab_5_Future
             Task.WaitAll(tasks.ToArray());
 
             int result = 0;
-            foreach (var task in tasks)
+            foreach(var task in tasks)
             {
                 result += task.Result;
             }

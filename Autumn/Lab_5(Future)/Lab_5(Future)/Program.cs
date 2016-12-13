@@ -12,7 +12,7 @@ namespace Lab_5_Future
         {
             int arrsize = 10000;
             int[] arr = new int[arrsize];
-            for (int i = 0; i < arrsize; i++)
+            for(int i = 0; i < arrsize; i++)
             {
                 arr[i] = i;
             }
