@@ -34,6 +34,7 @@ namespace Lab_3_PandC
                     Console.Write("{0} ", i);
                 }
                 Console.WriteLine();
+                Monitor.PulseAll(buf);
                 Monitor.Exit(buf);
 
                 Thread.Sleep(100);  //pause between add/del

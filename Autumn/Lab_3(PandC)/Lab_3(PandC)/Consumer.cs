@@ -40,10 +40,9 @@ namespace Lab_3_PandC
                 }
                 else
                 {
+                    Monitor.Wait(buf);
                     Monitor.Exit(buf);
-                    Thread.Sleep(10);
                 }
-
             }
         }
 
