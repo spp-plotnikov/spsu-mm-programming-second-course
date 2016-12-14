@@ -13,7 +13,9 @@ namespace Lab_5_Future
             int size = array.Count();
 
             if(size == 1)
+            {
                 return array[0];
+            }
 
             List<Task<int>> tasks = new List<Task<int>>();
             for(int i = 0; i < 2; i++)
