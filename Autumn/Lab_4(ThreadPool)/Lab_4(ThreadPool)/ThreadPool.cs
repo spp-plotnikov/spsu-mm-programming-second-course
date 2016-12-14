@@ -6,7 +6,7 @@ namespace Lab_4_ThreadPool
 {
     public class ThreadPool : IDisposable
     {
-        public const int NumOfThreads = 6;
+        public const int NumOfThreads = 4;
         bool isPoolAlive;
         Queue<Action> actionQueue;
         Thread[] threads = new Thread[NumOfThreads];
@@ -19,58 +19,62 @@ namespace Lab_4_ThreadPool
             for(int curThread = 0; curThread < NumOfThreads; curThread++)
             {
                 threads[curThread] = new Thread(ThreadAct);
+                threads[curThread].Name = curThread.ToString();
+            }
+        }
+
+        public void Start()
+        {
+            foreach(var thread in threads)
+            {
+                thread.Start();
             }
         }
 
         void ThreadAct()
         {
-            Action act = null;
             while(isPoolAlive)
             {
+                Monitor.Enter(actionQueue);
                 if(actionQueue.Count != 0)
                 {
-                    Monitor.Enter(actionQueue);
-                    act = actionQueue.Dequeue();
+                    Action act = actionQueue.Dequeue();
                     Monitor.Exit(actionQueue);
                     act();
                 }
                 else
                 {
-                    Thread.Sleep(100); // pause between checks
+                    Console.WriteLine("Im waiting  {0}", Thread.CurrentThread.Name);
+                    Monitor.Wait(actionQueue);
+                    Console.WriteLine("I get pulse {0}", Thread.CurrentThread.Name);
+                    Monitor.Exit(actionQueue);
                 }
             }
+            Console.WriteLine("Im dead now {0}",Thread.CurrentThread.Name);
         }
 
         public void Enqueue(Action a)
         {
             Monitor.Enter(actionQueue);
             actionQueue.Enqueue(a);
+            Monitor.Pulse(actionQueue);
             Monitor.Exit(actionQueue);
-        }
-
-        public void Start()
-        {
-            foreach(Thread thread in threads)
-            {
-                thread.Start();
-            }
         }
 
         public void Dispose()
         {
-            if(isPoolAlive)
-            {
-                isPoolAlive = false;
-                Console.WriteLine("Interrupted by user");
-                Console.WriteLine("completion of the current threads");
+            Console.WriteLine("Kill them all now!");
+            isPoolAlive = false;
 
-                foreach(Thread thread in threads)
-                {
-                    thread.Join();
-                }
-                Console.WriteLine("Work ended.");
-                Console.ReadKey();
+            Monitor.Enter(actionQueue);
+            Monitor.PulseAll(actionQueue);
+            Monitor.Exit(actionQueue);
+
+            foreach(var thread in threads)
+            {
+                thread.Join();
             }
+            Console.ReadKey();
         }
     }
 }
