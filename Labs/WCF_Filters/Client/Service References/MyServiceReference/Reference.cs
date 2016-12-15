@@ -32,6 +32,12 @@ namespace Client.MyServiceReference {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IService/StopWork")]
         System.Threading.Tasks.Task StopWorkAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IService/ProgressPerSecond")]
+        void ProgressPerSecond();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IService/ProgressPerSecond")]
+        System.Threading.Tasks.Task ProgressPerSecondAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -94,6 +100,14 @@ namespace Client.MyServiceReference {
         
         public System.Threading.Tasks.Task StopWorkAsync() {
             return base.Channel.StopWorkAsync();
+        }
+        
+        public void ProgressPerSecond() {
+            base.Channel.ProgressPerSecond();
+        }
+        
+        public System.Threading.Tasks.Task ProgressPerSecondAsync() {
+            return base.Channel.ProgressPerSecondAsync();
         }
     }
 }

@@ -17,13 +17,11 @@ namespace Client
         Bitmap imageBitmap;
         MyServiceReference.ServiceClient client;
         string filter;
-        // MyCallback callback;
         float prog = 0;
-        bool workFlag = true;
+        bool workFlag = false;
 
         public ClientInterface()
         {
-            //callback = new MyCallback();
             var instanceContext = new InstanceContext(this);
             client = new MyServiceReference.ServiceClient(instanceContext, "WSDualHttpBinding_IService");
             InitializeComponent();
@@ -58,7 +56,9 @@ namespace Client
         }
 
         private void SendPictureButton_Click(object sender, EventArgs e)
-        {           
+        {
+            if (workFlag) return;
+            workFlag = true;        
             string filt = radioButtonList[0].Text;
             foreach (var but in radioButtonList)
             {
@@ -78,24 +78,29 @@ namespace Client
             BackgroundWorker backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += new DoWorkEventHandler(StartWork);
             backgroundWorker.RunWorkerAsync();
-
-            while (workFlag)
-            {
-                percent.Text = prog.ToString() + "%";
-                if (prog == 100.0) break;
-            }
         }
 
         private void CancelWorkButton_Click(object sender, EventArgs e)
         {
+            if (!workFlag) return;
             client.StopWork();
             workFlag = false;
+            backgroundWorker.CancelAsync();            
         }               
 
         private void StartWork(object sender, DoWorkEventArgs e)
         {
+            BackgroundWorker here = sender as BackgroundWorker;
             client.GetPicture(imageBitmap, filter);
-            workFlag = false;          
+            while(workFlag)
+            {
+                if (here.CancellationPending == true)
+                {
+                    e.Cancel = true;
+                    workFlag = false;
+                }                
+            }
+
         }
 
         public void SendResult(byte[] res)
@@ -103,6 +108,7 @@ namespace Client
             if (res == null) newPictureBox.Image = imageBitmap;
             else newPictureBox.Image = ToBitMap(res);
             percent.Text = "Done";
+            workFlag = false;
         }
         private Bitmap ToBitMap(byte[] array)
         {            
@@ -124,5 +130,7 @@ namespace Client
             percent.Text = prog.ToString() + "%";
             if (prog == 100) percent.Text = "Waiting for a picture...";
         }
+
+       
     }
 }

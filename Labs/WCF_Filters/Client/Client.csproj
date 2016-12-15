@@ -54,7 +54,6 @@
     <Compile Include="ClientInterface.Designer.cs">
       <DependentUpon>ClientInterface.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyCallback.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\MyServiceReference\Reference.cs">

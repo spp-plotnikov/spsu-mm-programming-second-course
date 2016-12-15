@@ -13,7 +13,7 @@ namespace Contract
         float pictSize;
         byte[] result;
         Bitmap map;
-        bool stop = false;
+        public bool Stop = false;
 
         public Filters(Bitmap map)
         {
@@ -25,7 +25,7 @@ namespace Contract
 
         public byte[] GreyFilter()
         {
-            stop = false;
+            Stop = false;
             for (int i = 0; i < map.Width; i++)
                 for (int j = 0; j < map.Height; j++)
                 {
@@ -38,14 +38,14 @@ namespace Contract
                     result[i * map.Height * 3 + j * 3] = grey;
                     result[i * map.Height * 3 + j * 3 + 1] = grey;
                     result[i * map.Height * 3 + j * 3 + 2] = grey;
-                    if (stop) return null;
+                    if (Stop) return null;
                 }
             return result;
         }
 
         public byte[] InvertFilter()
         {
-            stop = false;
+            Stop = false;
             for (int i = 0; i < map.Width; i++)
                 for (int j = 0; j < map.Height; j++)
                 {
@@ -60,14 +60,14 @@ namespace Contract
                     result[i * map.Height * 3 + j * 3] = (byte)red;
                     result[i * map.Height * 3 + j * 3 + 1] = (byte)green;
                     result[i * map.Height * 3 + j * 3 + 2] = (byte)blue;
-                    if (stop) return null;
+                    if (Stop) return null;
                 }
             return result;
         }
 
         public byte[] SepiaFilter()
         {
-            stop = false;
+            Stop = false;
             for (int i = 0; i < map.Width; i++)
                 for (int j = 0; j < map.Height; j++)
                 {
@@ -83,14 +83,9 @@ namespace Contract
                     result[i * map.Height * 3 + j * 3 + 1] = (byte)green;
                     result[i * map.Height * 3 + j * 3 + 2] = (byte)blue;
                     progress++;
-                    if (stop) return null;
+                    if (Stop) return null;
                 }           
            return result;
-        }
-
-        public void Stop()
-        {
-            stop = true;
         }
 
         public float Progress()

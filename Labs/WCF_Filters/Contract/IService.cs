@@ -19,6 +19,6 @@ namespace Contract
         void GetPicture(Bitmap map, string filter);
 
         [OperationContract(IsOneWay = true)]
-        void StopWork();
+        void StopWork();       
     }
 }

@@ -27,6 +27,11 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
+  <xs:element name="ProgressPerSecond">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="SendResult">
     <xs:complexType>
       <xs:sequence>
