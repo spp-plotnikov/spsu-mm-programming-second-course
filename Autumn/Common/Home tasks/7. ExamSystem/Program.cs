@@ -12,15 +12,19 @@ namespace ExamSystem
     {
         static void Main(string[] args)
         {
-            Checker checker = new Checker();
+            for (int i = 0; i < 1000; i++)
+            {
+                Checker checker = new Checker();
 
-            ExamSystemFirst sysFirst = new ExamSystemFirst();
-            string timeFirst = checker.GetTime(sysFirst);
-            Console.WriteLine("Runtime first system = " + timeFirst);
+                ExamSystemFirst sysFirst = new ExamSystemFirst();
+             //   string timeFirst = checker.GetTime(sysFirst);
+              //  Console.WriteLine("Runtime first system = " + timeFirst);
 
-            ExamSystemSecond sysSecond = new ExamSystemSecond();
-            string timeSecond = checker.GetTime(sysSecond);
-            Console.WriteLine("Runtime second system = " + timeSecond);
+                ExamSystemSecond sysSecond = new ExamSystemSecond();
+                string timeSecond = checker.GetTime(sysSecond);
+                Console.WriteLine("Runtime second system = " + timeSecond);
+            }
+            Console.WriteLine("Done");
             Console.ReadLine();
         }
     }

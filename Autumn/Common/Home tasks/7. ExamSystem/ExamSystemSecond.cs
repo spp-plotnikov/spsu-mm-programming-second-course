@@ -9,7 +9,7 @@ namespace ExamSystem
     class ExamSystemSecond : IExamSystem
     {
         private ConcurrentHashSet exams;
-        private bool isPrinting = true;
+        private bool isPrinting = false;
 
         public ExamSystemSecond()
         {

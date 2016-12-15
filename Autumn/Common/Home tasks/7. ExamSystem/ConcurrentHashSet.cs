@@ -8,9 +8,9 @@ namespace ExamSystem
 {
     class ConcurrentHashSet
     {
-        private readonly int probeSize = 150;
-        private readonly int threshOld = 100;
-        private readonly int numLocks = 10;
+        private readonly int probeSize = 4;
+        private readonly int threshOld = 2;
+        private readonly int numLocks = 25;
         private readonly int limit = 25;
         private volatile int capacity;
         private volatile List<Tuple<long, long>>[] firstExams;
@@ -246,6 +246,11 @@ namespace ExamSystem
                 {
                     iSet = secondExams[hi];
                 }
+                if (iSet.Count == 0)
+                {
+                    return true;
+                }
+
                 Tuple<long, long> y = iSet.ElementAt(0);
                 switch (i)
                 {

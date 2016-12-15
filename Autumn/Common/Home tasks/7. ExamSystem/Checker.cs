@@ -10,8 +10,8 @@ namespace ExamSystem
 {
     class Checker
     {
-        private readonly int numTeachers = 10; 
-        private readonly int numExams = 100;
+        private readonly int numTeachers = 10;
+        private readonly int numExams = 1000;
         private List<Tuple<long, long>> exams = new List<Tuple<long, long>>();
         private Random rnd = new Random();
 

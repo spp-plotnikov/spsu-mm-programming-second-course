@@ -9,7 +9,7 @@ namespace ExamSystem
     class ExamSystemFirst : IExamSystem
     {
         private HashSet<Tuple<long, long>> hashTable;
-        private bool isPrinting = true;
+        private bool isPrinting = false;
 
         public ExamSystemFirst()
         {

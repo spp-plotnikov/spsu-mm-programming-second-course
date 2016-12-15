@@ -8,9 +8,9 @@ namespace ExamSystem
 {
     class Teacher
     {
-        private readonly int numAdd = 9;
-        private readonly int numRemove = 1;
-        private readonly int numContains = 90;
+        private readonly int numAdd = 10;
+        private readonly int numRemove = 10;
+        private readonly int numContains = 0;
         private List<Tuple<long, long>> exams;
         private List<Tuple<long, long>> added;
         private Random rnd;
