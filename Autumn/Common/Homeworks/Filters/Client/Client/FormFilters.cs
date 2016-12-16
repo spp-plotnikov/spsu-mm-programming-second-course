@@ -1,0 +1,147 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+using Server;
+
+namespace Client
+{
+    public partial class FormFilters : Form
+    {
+        int newValue = 0;
+        Thread thread, thread1;
+        string AddressRead;
+        delegate void Proc();
+        bool IsProcess = true;
+        Bitmap Image;
+        IService filter;
+
+        public FormFilters(IService server)
+        {
+            filter = server;
+            InitializeComponent();
+            GetFilters();
+        }
+
+        private void GetFilters()
+        {
+            foreach (string fi in filter.GetFilters())
+            {
+                FiltersList.Items.Add(fi);
+            }
+        }
+        private void ResetThreads()
+        {
+            progressBar1.Value = newValue = 0;
+            filter.SetProgress();
+            if ((filter.CheckIsAlive()) && (thread != null) && (thread1 != null))
+            {
+                filter.ChangeIsAlive(false);
+                IsProcess = false;
+            }
+        }
+
+        private void LoadImage(string AddressRead)
+        {
+            try
+            {
+                Image = new Bitmap(AddressRead);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Ошибка при считывании");
+                return;
+            }
+
+            pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox.Image = Image;
+        }
+
+        private void Load_Button_Click(object sender, EventArgs e)
+        {
+            ResetThreads();
+
+            FileDialog.Filter = "Изображения |*.bmp";
+            FileDialog.FileName = "";
+            FileDialog.ShowDialog();
+
+            AddressRead = FileDialog.FileName;
+
+            thread = new Thread(delegate() { LoadImage(AddressRead); });
+            thread.IsBackground = true;
+            thread.Start();
+        }
+
+        private void Filter_Button_Click(object sender, EventArgs e)
+        {
+            ResetThreads();
+            Image = new Bitmap(pictureBox.Image);
+
+            int index = FiltersList.SelectedIndex + 1;
+            if ((index == 0) || (Image == null))
+            {
+                MessageBox.Show("ERROR! PLease, try again!!!");
+                return;
+            }
+
+            int Max = progressBar1.Maximum;
+            int Width = Image.Width;
+
+            thread = new Thread(delegate() { filter.Filter(Image, index); });
+            thread.IsBackground = true;
+            thread.Start();
+
+            thread1 = new Thread(delegate() { Process(Max, Width); });
+            thread1.IsBackground = true;
+            thread1.Start();
+
+            IsProcess = true;
+        }
+
+
+        private void Process(int Max, int Width)
+        {
+            newValue = 0;
+            filter.SetProgress();
+            try
+            {
+                do
+                {
+                    newValue = Max * filter.GetProgress() / Width;
+
+                    if (this.InvokeRequired)
+                    {
+                        this.Invoke(new Proc(delegate() { progressBar1.Value = newValue; }));
+                    }
+                    else
+                        progressBar1.Value = newValue;
+                }
+                while (filter.CheckIsAlive());
+                if (IsProcess)
+                {
+                    if (this.InvokeRequired)
+                    {
+                        //this.Invoke(new Proc(delegate() { pictureBox.Image = filter.GetImage(); }));
+                        this.Invoke(new Proc(delegate() { progressBar1.Value = Max; }));
+                    }
+                    else
+                    {
+                        pictureBox.Image = filter.GetImage();
+                        progressBar1.Value = Max;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return;
+            }
+        }
+    }
+}
