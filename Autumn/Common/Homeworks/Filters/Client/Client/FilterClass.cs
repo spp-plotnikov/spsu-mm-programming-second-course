@@ -7,9 +7,9 @@ using System.Threading;
 using System.Data;
 using System.Drawing;
 
-namespace Server
+namespace Client
 {
-    public class Service : IService
+    class FilterClass
     {
         public bool IsAlive = false;
         public int Progress = 0;

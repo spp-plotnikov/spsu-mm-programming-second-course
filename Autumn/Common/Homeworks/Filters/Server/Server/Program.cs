@@ -15,8 +15,7 @@ namespace Server
         static void Main(string[] args)
         {
             WebServiceHost host = new WebServiceHost(typeof(Service), new Uri("net.tcp://localhost:11000/"));
-            host.AddDefaultEndpoints();
-
+            host.AddDefaultEndpoints(); 
             host.Open();
             Console.WriteLine("Сервис открыт");
 

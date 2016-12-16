@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FilterClass.cs" />
     <Compile Include="FormFilters.cs">
       <SubType>Form</SubType>
     </Compile>

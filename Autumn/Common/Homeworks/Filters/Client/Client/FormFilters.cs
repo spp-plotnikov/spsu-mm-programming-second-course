@@ -22,7 +22,8 @@ namespace Client
         bool IsProcess = true;
         Bitmap Image;
         IService filter;
-
+        bool check = false;
+       // FilterClass filter = new FilterClass();
         public FormFilters(IService server)
         {
             filter = server;
@@ -82,6 +83,7 @@ namespace Client
         private void Filter_Button_Click(object sender, EventArgs e)
         {
             ResetThreads();
+            //check = false;
             Image = new Bitmap(pictureBox.Image);
 
             int index = FiltersList.SelectedIndex + 1;
@@ -105,7 +107,18 @@ namespace Client
             IsProcess = true;
         }
 
-
+        private Bitmap ToBitMap(byte[] array)
+        {
+            Bitmap res = new Bitmap(Image.Width, Image.Height);
+            for (int i = 0; i < Image.Width; i++)
+                for (int j = 0; j < Image.Height; j++)
+                {
+                    res.SetPixel(i, j, Color.FromArgb(array[i * Image.Height * 3 + j * 3],
+                                                      array[i * Image.Height * 3 + j * 3 + 1],
+                                                      array[i * Image.Height * 3 + j * 3 + 2]));
+                }
+            return res;
+        }
         private void Process(int Max, int Width)
         {
             newValue = 0;
@@ -124,24 +137,34 @@ namespace Client
                         progressBar1.Value = newValue;
                 }
                 while (filter.CheckIsAlive());
-                if (IsProcess)
-                {
-                    if (this.InvokeRequired)
+
+                //if (check)
+               // {
+                    if (IsProcess)
                     {
-                        //this.Invoke(new Proc(delegate() { pictureBox.Image = filter.GetImage(); }));
-                        this.Invoke(new Proc(delegate() { progressBar1.Value = Max; }));
+                        if (this.InvokeRequired)
+                        {
+                            this.Invoke(new Proc(delegate() { pictureBox.Image = ToBitMap(filter.GetImage()); }));
+                            this.Invoke(new Proc(delegate() { progressBar1.Value = Max; }));
+                        }
+                        else
+                        {
+                            pictureBox.Image = ToBitMap(filter.GetImage());
+                            progressBar1.Value = Max;
+                        }
                     }
-                    else
-                    {
-                        pictureBox.Image = filter.GetImage();
-                        progressBar1.Value = Max;
-                    }
-                }
+               // }
             }
             catch (Exception)
             {
                 return;
             }
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
+            filter.ChangeIsAlive(false);
+            check = true;
         }
     }
 }

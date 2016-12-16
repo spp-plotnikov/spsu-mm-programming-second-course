@@ -29,7 +29,7 @@ namespace Server
         int GetProgress();
 
         [OperationContract]
-        Bitmap GetImage();
+        byte[] GetImage();
 
         [OperationContract]
         void Filter(Bitmap image, int index);

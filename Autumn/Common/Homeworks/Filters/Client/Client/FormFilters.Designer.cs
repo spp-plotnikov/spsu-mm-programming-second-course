@@ -35,6 +35,7 @@
             this.FiltersList = new System.Windows.Forms.ComboBox();
             this.FileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFile = new System.Windows.Forms.SaveFileDialog();
+            this.Cancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,11 +95,23 @@
             // 
             this.FileDialog.FileName = "openFileDialog1";
             // 
+            // Cancel
+            // 
+            this.Cancel.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Cancel.Location = new System.Drawing.Point(900, 541);
+            this.Cancel.Name = "Cancel";
+            this.Cancel.Size = new System.Drawing.Size(306, 85);
+            this.Cancel.TabIndex = 5;
+            this.Cancel.Text = "Отмена";
+            this.Cancel.UseVisualStyleBackColor = true;
+            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
+            // 
             // FormFilters
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1248, 788);
+            this.Controls.Add(this.Cancel);
             this.Controls.Add(this.FiltersList);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.Filter_Button);
@@ -121,6 +134,7 @@
         private System.Windows.Forms.OpenFileDialog FileDialog;
         private System.Windows.Forms.SaveFileDialog saveFile;
         public System.Windows.Forms.Button Filter_Button;
+        private System.Windows.Forms.Button Cancel;
     }
 }
 
