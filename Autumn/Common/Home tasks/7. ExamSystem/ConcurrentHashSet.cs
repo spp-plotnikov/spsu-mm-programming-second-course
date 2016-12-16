@@ -35,33 +35,33 @@ namespace ExamSystem
             }
         }
 
-        private long firstHash(Tuple<long, long> exam)
+        private long FirstHash(Tuple<long, long> exam)
         {
             long first = exam.Item1.GetHashCode();
             long second = exam.Item2.GetHashCode();
             return ((first * 239 + second) % 2003) % 179;
         }
 
-        private long secondHash(Tuple<long, long> exam)
+        private long SecondHash(Tuple<long, long> exam)
         {
             long first = exam.Item1.GetHashCode();
             long second = exam.Item2.GetHashCode();
             return ((first * 577 + second) % 1003) % 91;
         }
 
-        private void aquire(Tuple<long, long> tmp)
+        private void Aquire(Tuple<long, long> tmp)
         {
-            firstMutex[firstHash(tmp) % numLocks].WaitOne();
-            secondMutex[secondHash(tmp) % numLocks].WaitOne();
+            firstMutex[FirstHash(tmp) % numLocks].WaitOne();
+            secondMutex[SecondHash(tmp) % numLocks].WaitOne();
         }
 
-        private void release(Tuple<long, long> tmp)
+        private void Release(Tuple<long, long> tmp)
         {
-            firstMutex[firstHash(tmp) % numLocks].ReleaseMutex();
-            secondMutex[secondHash(tmp) % numLocks].ReleaseMutex();
+            firstMutex[FirstHash(tmp) % numLocks].ReleaseMutex();
+            secondMutex[SecondHash(tmp) % numLocks].ReleaseMutex();
         }
 
-        private void resize()
+        private void Resize()
         {
             int oldCapacity = capacity;
             for (int i = 0; i < firstMutex.Length; i++)
@@ -94,12 +94,12 @@ namespace ExamSystem
                 {
                     foreach (Tuple<long, long> oldExam in firstOldStories[j])
                     {
-                        firstExams[firstHash(oldExam) % capacity].Add(oldExam);
+                        firstExams[FirstHash(oldExam) % capacity].Add(oldExam);
                     }
 
                     foreach (Tuple<long, long> oldExam in secondOldStories[j])
                     {
-                        firstExams[firstHash(oldExam) % capacity].Add(oldExam);
+                        firstExams[FirstHash(oldExam) % capacity].Add(oldExam);
                     }
                 }
                 
@@ -115,17 +115,17 @@ namespace ExamSystem
 
         public bool Contains(Tuple<long, long> exam)
         {
-            aquire(exam);
+            Aquire(exam);
             try
             {
-                List<Tuple<long, long>> firstSet = firstExams[firstHash(exam) % capacity];
+                List<Tuple<long, long>> firstSet = firstExams[FirstHash(exam) % capacity];
                 if (firstSet.Contains(exam))
                 {
                     return true;
                 }
                 else
                 {
-                    List<Tuple<long, long>> secondSet = secondExams[secondHash(exam) % capacity];
+                    List<Tuple<long, long>> secondSet = secondExams[SecondHash(exam) % capacity];
                     if (secondSet.Contains(exam))
                     {
                         return true;
@@ -135,16 +135,16 @@ namespace ExamSystem
             }
             finally
             {
-                release(exam);
+                Release(exam);
             }
         }
 
         public bool Remove(Tuple<long, long> exam)
         {
-            aquire(exam);
+            Aquire(exam);
             try
             {
-                List<Tuple<long, long>> firstSet = firstExams[firstHash(exam) % capacity];
+                List<Tuple<long, long>> firstSet = firstExams[FirstHash(exam) % capacity];
                 if (firstSet.Contains(exam))
                 {
                     firstSet.Remove(exam);
@@ -152,7 +152,7 @@ namespace ExamSystem
                 }
                 else
                 {
-                    List<Tuple<long, long>> secondSet = secondExams[secondHash(exam) % capacity];
+                    List<Tuple<long, long>> secondSet = secondExams[SecondHash(exam) % capacity];
                     if (secondSet.Contains(exam))
                     {
                         secondSet.Remove(exam);
@@ -163,16 +163,16 @@ namespace ExamSystem
             }
             finally
             {
-                release(exam);
+                Release(exam);
             }
         }
 
         public bool Add(Tuple<long, long> exam)
         {
-            aquire(exam);
+            Aquire(exam);
 
-            long hashFirst = firstHash(exam) % capacity;
-            long hashSecond = secondHash(exam) % capacity;
+            long hashFirst = FirstHash(exam) % capacity;
+            long hashSecond = SecondHash(exam) % capacity;
 
             int res = -1;
             long hash = -1;
@@ -216,17 +216,17 @@ namespace ExamSystem
             }
             finally
             {
-                release(exam);
+                Release(exam);
             }
 
             if (isResize)
             {
-                resize();
+                Resize();
                 Add(exam);
             }
             else if (!Relocate(res, hash))
             {
-                resize();
+                Resize();
             }
             return true;
         }
@@ -246,26 +246,46 @@ namespace ExamSystem
                 {
                     iSet = secondExams[hi];
                 }
+
+                if (i == 0)
+                {
+                    firstMutex[hi % numLocks].WaitOne();
+                }
+                else
+                {
+                    secondMutex[hi % numLocks].WaitOne();
+                }
+
                 if (iSet.Count == 0)
                 {
                     return true;
                 }
 
                 Tuple<long, long> y = iSet.ElementAt(0);
+
+                if (i == 0)
+                {
+                    firstMutex[hi % numLocks].ReleaseMutex();
+                }
+                else
+                {
+                    secondMutex[hi % numLocks].ReleaseMutex();
+                }
+
+                Aquire(y);
                 switch (i)
                 {
                     case 0:
                         {
-                            hj = firstHash(y) % capacity;
+                            hj = FirstHash(y) % capacity;
                             break;
                         }
                     case 1:
                         {
-                            hj = secondHash(y) % capacity;
+                            hj = SecondHash(y) % capacity;
                             break;
                         }
                 }
-                aquire(y);
                 List<Tuple<long, long>> jSet;
                 if (j == 0)
                 {
@@ -308,7 +328,7 @@ namespace ExamSystem
                 }
                 finally
                 {
-                    release(y);
+                    Release(y);
                 }
             }
             return false;
