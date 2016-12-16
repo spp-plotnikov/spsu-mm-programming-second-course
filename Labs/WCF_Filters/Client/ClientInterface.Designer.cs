@@ -136,7 +136,7 @@
             this.Controls.Add(this.SendPictureButton);
             this.Controls.Add(this.AddPictureButton);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "ClientInterface";
             this.Text = "Client";

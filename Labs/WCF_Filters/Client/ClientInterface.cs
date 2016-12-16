@@ -26,6 +26,7 @@ namespace Client
             client = new MyServiceReference.ServiceClient(instanceContext, "WSDualHttpBinding_IService");
             InitializeComponent();
             CreateFilterList();
+            CancelWorkButton.Enabled = false;
         }
 
         private void CreateFilterList()
@@ -43,6 +44,7 @@ namespace Client
                 y += 25;
                 j++;
             }
+            radioButtonList[0].Checked = true;
         }
         private void AddPictureButton_Click(object sender, EventArgs e)
         {
@@ -78,6 +80,9 @@ namespace Client
             BackgroundWorker backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += new DoWorkEventHandler(StartWork);
             backgroundWorker.RunWorkerAsync();
+            SendPictureButton.Enabled = false;
+            CancelWorkButton.Enabled = true;
+
         }
 
         private void CancelWorkButton_Click(object sender, EventArgs e)
@@ -92,6 +97,7 @@ namespace Client
         {
             BackgroundWorker here = sender as BackgroundWorker;
             client.GetPicture(imageBitmap, filter);
+
             while(workFlag)
             {
                 if (here.CancellationPending == true)
@@ -100,18 +106,28 @@ namespace Client
                     workFlag = false;
                 }                
             }
-
         }
 
         public void SendResult(byte[] res)
         {
-            if (res == null) newPictureBox.Image = imageBitmap;
-            else newPictureBox.Image = ToBitMap(res);
-            percent.Text = "Done";
+            if (res == null)
+            {
+                progressBar.Value = 0;
+                percent.Text = "Canceled";
+
+            }
+            else
+            {
+                newPictureBox.Image = ToBitMap(res);
+                percent.Text = "Done";
+            }
+            SendPictureButton.Enabled = true;
+            CancelWorkButton.Enabled = false;
             workFlag = false;
         }
+
         private Bitmap ToBitMap(byte[] array)
-        {            
+        {
             Bitmap res = new Bitmap(imageBitmap.Width, imageBitmap.Height);
             for (int i = 0; i < imageBitmap.Width; i++)
                 for (int j = 0; j < imageBitmap.Height; j++)
@@ -129,8 +145,6 @@ namespace Client
             prog = progr;
             percent.Text = prog.ToString() + "%";
             if (prog == 100) percent.Text = "Waiting for a picture...";
-        }
-
-       
+        }       
     }
 }

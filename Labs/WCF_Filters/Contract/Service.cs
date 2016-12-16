@@ -25,7 +25,7 @@ namespace Contract
         {
             callback = OperationContext.Current.GetCallbackChannel<ICallbackService>();
 
-            StreamReader file = new StreamReader(@"..\..\..\Host\FilterList.txt");
+            StreamReader file = new StreamReader(@"FilterList.txt");
             string line;
             while ((line = file.ReadLine()) != null)
             {
