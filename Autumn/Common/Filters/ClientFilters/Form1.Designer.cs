@@ -33,13 +33,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.OpenImage = new System.Windows.Forms.Button();
+            this.SendImage = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.button3 = new System.Windows.Forms.Button();
+            this.UpdateList = new System.Windows.Forms.Button();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.label5 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
@@ -96,25 +96,25 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "Filter:";
             // 
-            // button1
+            // OpenImage
             // 
-            this.button1.Location = new System.Drawing.Point(496, 247);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(79, 26);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Open image";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.OpenImage.Location = new System.Drawing.Point(496, 247);
+            this.OpenImage.Name = "OpenImage";
+            this.OpenImage.Size = new System.Drawing.Size(79, 26);
+            this.OpenImage.TabIndex = 7;
+            this.OpenImage.Text = "Open image";
+            this.OpenImage.UseVisualStyleBackColor = true;
+            this.OpenImage.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
+            // SendImage
             // 
-            this.button2.Location = new System.Drawing.Point(496, 311);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(79, 26);
-            this.button2.TabIndex = 8;
-            this.button2.Text = "Send image";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.SendImage.Location = new System.Drawing.Point(496, 311);
+            this.SendImage.Name = "SendImage";
+            this.SendImage.Size = new System.Drawing.Size(79, 26);
+            this.SendImage.TabIndex = 8;
+            this.SendImage.Text = "Send image";
+            this.SendImage.UseVisualStyleBackColor = true;
+            this.SendImage.Click += new System.EventHandler(this.button2_Click);
             // 
             // openFileDialog1
             // 
@@ -146,15 +146,15 @@
             this.pictureBox3.TabIndex = 11;
             this.pictureBox3.TabStop = false;
             // 
-            // button3
+            // UpdateList
             // 
-            this.button3.Location = new System.Drawing.Point(496, 279);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(79, 26);
-            this.button3.TabIndex = 12;
-            this.button3.Text = "Update list";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.UpdateList.Location = new System.Drawing.Point(496, 279);
+            this.UpdateList.Name = "UpdateList";
+            this.UpdateList.Size = new System.Drawing.Size(79, 26);
+            this.UpdateList.TabIndex = 12;
+            this.UpdateList.Text = "Update list";
+            this.UpdateList.UseVisualStyleBackColor = true;
+            this.UpdateList.Click += new System.EventHandler(this.button3_Click);
             // 
             // progressBar1
             // 
@@ -187,6 +187,11 @@
             this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.SendNGetImage);
             // 
+            // backgroundWorker2
+            // 
+            this.backgroundWorker2.WorkerSupportsCancellation = true;
+            this.backgroundWorker2.DoWork += new System.ComponentModel.DoWorkEventHandler(this.UpdatingProgressBar);
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -214,12 +219,12 @@
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.UpdateList);
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.SendImage);
+            this.Controls.Add(this.OpenImage);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label2);
@@ -240,13 +245,13 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button OpenImage;
+        private System.Windows.Forms.Button SendImage;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button UpdateList;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button4;

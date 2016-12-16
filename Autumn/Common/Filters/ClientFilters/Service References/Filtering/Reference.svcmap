@@ -26,7 +26,6 @@
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="3515b8d2-988a-413b-b180-e0fb1bbb90cd" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/Filters/Service1/mex" />
     <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="5d81b338-98f9-42a7-a916-6e1d13fc9ff1" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/Filters/Service1/mex" />
     <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="ab5e6cbb-f39e-4e33-8c0b-a62307364d9d" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/Filters/Service1/mex" />
-    <MetadataFile FileName="System.Drawing.xsd" MetadataType="Schema" ID="df420648-82d9-4ff6-b2d1-52a701e2f584" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/Filters/Service1/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

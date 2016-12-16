@@ -18,6 +18,12 @@ namespace Filters
             get;
         }
 
+        long SizeOfSrcArray
+        {
+            [OperationContract]
+            set;
+        }
+
         [OperationContract]
         void Cancel();
 
@@ -34,14 +40,12 @@ namespace Filters
         void DoFilter();
 
         [OperationContract]
-        bool SendChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk);
+        byte[] SendChunk();
+
 
         [OperationContract]
-        void SetByteArray(long arrayLength);
+        bool ReceiveChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk);
 
-        [OperationContract]
-        byte[] GetChunk();
-        
         // TODO: Add your service operations here
     }
 

@@ -94,9 +94,6 @@
     <None Include="Service References\Filtering\service1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\Filtering\System.Drawing.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -15,23 +15,41 @@ namespace Filters
     {
         private Filter chosenFilter;
         private Bitmap srcImage;
-        private byte[] byteArray;
+        private byte[] recievedArray;
         private long curBytePosition;
-        private byte[] toSend;
+        private byte[] sendArray;
         private long sizeOfChunk = 2048;
-        bool cancelled = false;
-
+        private bool cancelled = false;
+        
         public long SizeOfResult
         {
             get
             {
-                return toSend.Length;
+                return sendArray.Length;
             }
+        }
+
+        public long SizeOfSrcArray
+        {
+            set
+            {
+                recievedArray = new byte[value];
+            }
+        }
+
+        public void Cancel()
+        {
+            cancelled = true;
         }
 
         public List<string> Filters()
         {
-            return FilterImplementation.FilterNames;
+            List<string> result = new List<string>();
+            foreach (Filter filter in FiltersWImplementation.filterList)
+            {
+                result.Add(filter.Name);
+            }
+            return result;
         }
         
         public int GetProgress()
@@ -41,24 +59,23 @@ namespace Filters
 
         public void DoFilter()
         {
-            if (cancelled) { return; }
+            cancelled = false;
             curBytePosition = 0;
-            srcImage = ConnectionMethods.byteArrayToBitmap(byteArray);
+            srcImage = ConnectionMethods.byteArrayToBitmap(recievedArray);
             Bitmap result = chosenFilter.DoFilter(srcImage);
-            toSend = ConnectionMethods.ImageToByteArray(result);
-            if (cancelled) { toSend = new byte[1]; }
+            sendArray = ConnectionMethods.ImageToByteArray(result);
         }
 
         public void SetFilter(string filterName)
         {
-            chosenFilter = FilterImplementation.FilterList.Find(x => x.Name == filterName);
+            chosenFilter = FiltersWImplementation.ListOfFilters.Find(x => x.Name == filterName);
         }
 
-        public bool SendChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk)
+        public bool ReceiveChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk) // Server recieve chunk from Client
         {
             try
             {
-                Array.Copy(chunk, 0, byteArray, fstBytePosition, sizeOfChunk);
+                Array.Copy(chunk, 0, recievedArray, fstBytePosition, sizeOfChunk);
                 return true;
             }
             catch
@@ -66,39 +83,23 @@ namespace Filters
                 return false;
             }
         }
-
-        public void SetByteArray(long arrayLength)
+        
+        public byte[] SendChunk()
         {
-            this.byteArray = new byte[arrayLength];
-        }
-
-        public byte[] GetChunk()
-        {
-            if (cancelled) { return new byte[1]; }
-            if (curBytePosition + sizeOfChunk > toSend.Length)
+            if (curBytePosition + sizeOfChunk > sendArray.Length)
             {
-                byte[] buffer = new byte[toSend.Length - curBytePosition];
-                Array.Copy(toSend, curBytePosition, buffer, 0, toSend.Length - curBytePosition);
+                byte[] buffer = new byte[sendArray.Length - curBytePosition];
+                Array.Copy(sendArray, curBytePosition, buffer, 0, sendArray.Length - curBytePosition);
                 curBytePosition += sizeOfChunk;
                 return buffer;
             }     
             else
             {
                 byte[] buffer = new byte[sizeOfChunk];
-                Array.Copy(toSend, curBytePosition, buffer, 0, sizeOfChunk);
+                Array.Copy(sendArray, curBytePosition, buffer, 0, sizeOfChunk);
                 curBytePosition += sizeOfChunk;
                 return buffer;
             }
-        }
-
-        public Bitmap GetResultBitmap()
-        {
-            return chosenFilter.DoFilter(srcImage);
-        }
-
-        public void Cancel()
-        {
-            cancelled = true;
-        }
+        }                   
     }
 }

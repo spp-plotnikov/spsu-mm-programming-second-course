@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-  <xs:import namespace="http://schemas.datacontract.org/2004/07/System.Drawing" />
   <xs:element name="get_SizeOfResult">
     <xs:complexType>
       <xs:sequence />
@@ -12,6 +11,28 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="get_SizeOfResultResult" type="xs:long" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="set_SizeOfSrcArray">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="value" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="set_SizeOfSrcArrayResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Cancel">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelResponse">
+    <xs:complexType>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
   <xs:element name="Filters">
@@ -62,6 +83,18 @@
   </xs:element>
   <xs:element name="SendChunk">
     <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SendChunkResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="SendChunkResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReceiveChunk">
+    <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="chunk" nillable="true" type="xs:base64Binary" />
         <xs:element minOccurs="0" name="fstBytePosition" type="xs:long" />
@@ -69,46 +102,10 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SendChunkResponse">
+  <xs:element name="ReceiveChunkResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="SendChunkResult" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetByteArray">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="arrayLength" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetByteArrayResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetChunk">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetChunkResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GetChunkResult" nillable="true" type="xs:base64Binary" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetResultBitmap">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetResultBitmapResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/System.Drawing" minOccurs="0" name="GetResultBitmapResult" nillable="true" type="q2:Bitmap" />
+        <xs:element minOccurs="0" name="ReceiveChunkResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

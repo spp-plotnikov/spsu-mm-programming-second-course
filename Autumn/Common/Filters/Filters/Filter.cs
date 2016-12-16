@@ -14,11 +14,9 @@ namespace Filters
     public class Filter
     {
         private string filterName;
-        public delegate Bitmap Mapping(Bitmap srcImage, ref long pixelCounter);
+        public delegate Bitmap Mapping(Bitmap srcImage, ref double progress);
         private Mapping mapping;
-        private long pixelCounter;
-        private long numOfPixels;
-        private int progress;
+        private double progress;
         
         public Filter(string filterName, Mapping filter)
         {
@@ -30,8 +28,7 @@ namespace Filters
         {
             get
             {
-                if (numOfPixels == 0) { return 0; }
-                return (int)((double)pixelCounter / numOfPixels * 100);
+                return (int)(progress * 100);
             }
         }
 
@@ -45,9 +42,7 @@ namespace Filters
 
         public Bitmap DoFilter(Bitmap srcImage)
         {
-            numOfPixels = srcImage.Height * srcImage.Width;
-            pixelCounter = 0;
-            return mapping(srcImage, ref pixelCounter);
+            return mapping(srcImage, ref progress);
         }
     }
 }

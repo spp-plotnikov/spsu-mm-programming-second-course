@@ -21,6 +21,18 @@ namespace ClientFilters.Filtering {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/get_SizeOfResult", ReplyAction="http://tempuri.org/IService/get_SizeOfResultResponse")]
         System.Threading.Tasks.Task<long> get_SizeOfResultAsync();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/set_SizeOfSrcArray", ReplyAction="http://tempuri.org/IService/set_SizeOfSrcArrayResponse")]
+        void set_SizeOfSrcArray(long value);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/set_SizeOfSrcArray", ReplyAction="http://tempuri.org/IService/set_SizeOfSrcArrayResponse")]
+        System.Threading.Tasks.Task set_SizeOfSrcArrayAsync(long value);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/Cancel", ReplyAction="http://tempuri.org/IService/CancelResponse")]
+        void Cancel();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/Cancel", ReplyAction="http://tempuri.org/IService/CancelResponse")]
+        System.Threading.Tasks.Task CancelAsync();
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/Filters", ReplyAction="http://tempuri.org/IService/FiltersResponse")]
         string[] Filters();
         
@@ -46,28 +58,16 @@ namespace ClientFilters.Filtering {
         System.Threading.Tasks.Task DoFilterAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/SendChunk", ReplyAction="http://tempuri.org/IService/SendChunkResponse")]
-        bool SendChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk);
+        byte[] SendChunk();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/SendChunk", ReplyAction="http://tempuri.org/IService/SendChunkResponse")]
-        System.Threading.Tasks.Task<bool> SendChunkAsync(byte[] chunk, long fstBytePosition, long sizeOfChunk);
+        System.Threading.Tasks.Task<byte[]> SendChunkAsync();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/SetByteArray", ReplyAction="http://tempuri.org/IService/SetByteArrayResponse")]
-        void SetByteArray(long arrayLength);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/ReceiveChunk", ReplyAction="http://tempuri.org/IService/ReceiveChunkResponse")]
+        bool ReceiveChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/SetByteArray", ReplyAction="http://tempuri.org/IService/SetByteArrayResponse")]
-        System.Threading.Tasks.Task SetByteArrayAsync(long arrayLength);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/GetChunk", ReplyAction="http://tempuri.org/IService/GetChunkResponse")]
-        byte[] GetChunk();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/GetChunk", ReplyAction="http://tempuri.org/IService/GetChunkResponse")]
-        System.Threading.Tasks.Task<byte[]> GetChunkAsync();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/GetResultBitmap", ReplyAction="http://tempuri.org/IService/GetResultBitmapResponse")]
-        System.Drawing.Bitmap GetResultBitmap();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/GetResultBitmap", ReplyAction="http://tempuri.org/IService/GetResultBitmapResponse")]
-        System.Threading.Tasks.Task<System.Drawing.Bitmap> GetResultBitmapAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/ReceiveChunk", ReplyAction="http://tempuri.org/IService/ReceiveChunkResponse")]
+        System.Threading.Tasks.Task<bool> ReceiveChunkAsync(byte[] chunk, long fstBytePosition, long sizeOfChunk);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -105,6 +105,22 @@ namespace ClientFilters.Filtering {
             return base.Channel.get_SizeOfResultAsync();
         }
         
+        public void set_SizeOfSrcArray(long value) {
+            base.Channel.set_SizeOfSrcArray(value);
+        }
+        
+        public System.Threading.Tasks.Task set_SizeOfSrcArrayAsync(long value) {
+            return base.Channel.set_SizeOfSrcArrayAsync(value);
+        }
+        
+        public void Cancel() {
+            base.Channel.Cancel();
+        }
+        
+        public System.Threading.Tasks.Task CancelAsync() {
+            return base.Channel.CancelAsync();
+        }
+        
         public string[] Filters() {
             return base.Channel.Filters();
         }
@@ -137,36 +153,20 @@ namespace ClientFilters.Filtering {
             return base.Channel.DoFilterAsync();
         }
         
-        public bool SendChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk) {
-            return base.Channel.SendChunk(chunk, fstBytePosition, sizeOfChunk);
+        public byte[] SendChunk() {
+            return base.Channel.SendChunk();
         }
         
-        public System.Threading.Tasks.Task<bool> SendChunkAsync(byte[] chunk, long fstBytePosition, long sizeOfChunk) {
-            return base.Channel.SendChunkAsync(chunk, fstBytePosition, sizeOfChunk);
+        public System.Threading.Tasks.Task<byte[]> SendChunkAsync() {
+            return base.Channel.SendChunkAsync();
         }
         
-        public void SetByteArray(long arrayLength) {
-            base.Channel.SetByteArray(arrayLength);
+        public bool ReceiveChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk) {
+            return base.Channel.ReceiveChunk(chunk, fstBytePosition, sizeOfChunk);
         }
         
-        public System.Threading.Tasks.Task SetByteArrayAsync(long arrayLength) {
-            return base.Channel.SetByteArrayAsync(arrayLength);
-        }
-        
-        public byte[] GetChunk() {
-            return base.Channel.GetChunk();
-        }
-        
-        public System.Threading.Tasks.Task<byte[]> GetChunkAsync() {
-            return base.Channel.GetChunkAsync();
-        }
-        
-        public System.Drawing.Bitmap GetResultBitmap() {
-            return base.Channel.GetResultBitmap();
-        }
-        
-        public System.Threading.Tasks.Task<System.Drawing.Bitmap> GetResultBitmapAsync() {
-            return base.Channel.GetResultBitmapAsync();
+        public System.Threading.Tasks.Task<bool> ReceiveChunkAsync(byte[] chunk, long fstBytePosition, long sizeOfChunk) {
+            return base.Channel.ReceiveChunkAsync(chunk, fstBytePosition, sizeOfChunk);
         }
     }
 }

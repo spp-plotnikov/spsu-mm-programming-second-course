@@ -16,7 +16,10 @@ namespace ClientFilters
         private string path;
         private Bitmap curImage;
         private Filtering.ServiceClient host;
-        
+        ManualResetEvent progressFinished = new ManualResetEvent(true);
+        ManualResetEvent cancelled = new ManualResetEvent(false);
+        bool finished = true;
+
         public Form1()
         {
             InitializeComponent();
@@ -42,8 +45,8 @@ namespace ClientFilters
 
         private void button2_Click(object sender, EventArgs e)
         {
-            backgroundWorker1.DoWork += SendNGetImage;
-            if (!backgroundWorker1.IsBusy && comboBox1.Items.Count > 0 && curImage != null)
+            SendImage.Enabled = false;
+            if (!backgroundWorker1.IsBusy)
                 backgroundWorker1.RunWorkerAsync();
         }
         
@@ -56,56 +59,76 @@ namespace ClientFilters
 
         private void SendNGetImage(object sender, DoWorkEventArgs e)
         {
+            bool error = false;
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                if (curImage == null) { MessageBox.Show("No image"); error = true; SendImage.Enabled = true; return; }
+                if (!(comboBox1.Items.Count > 0)) { MessageBox.Show("Choose filter!"); error = true; SendImage.Enabled = true; return; }
+            });
+            if (error) { return; }
+            finished = false;
             byte[] toSend = ConnectionMethods.ImageToByteArray(curImage);
-            host.SetByteArray(toSend.Length);
             this.Invoke((MethodInvoker)delegate ()
             {
                 host.SetFilter(comboBox1.SelectedValue.ToString());
             });
-            backgroundWorker2.DoWork += UpdatingProgressBar;
             if (!backgroundWorker2.IsBusy)
                 backgroundWorker2.RunWorkerAsync();
             ConnectionMethods.sendByteArrayUsingChunks(toSend, host);
             host.DoFilter();
             byte[] result1 = ConnectionMethods.receiveByteArrayUsingChunks(host);
             pictureBox3.Image = ConnectionMethods.byteArrayToBitmap(result1);
+            finished = true;
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                progressFinished.WaitOne();
+                progressBar1.Value = 100;
+                Thread.Sleep(100);
+                label7.Text = "done";
+                progressBar1.Value = 0;
+                SendImage.Enabled = true;                
+            });
         }
 
         private void UpdatingProgressBar(object sender, DoWorkEventArgs e)
         {
+            progressFinished.Reset();
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                label7.Text = "sending";
+            });
             progressBar1.Maximum = 100;
             progressBar1.Minimum = 0;
-            while (backgroundWorker1.IsBusy)
+            while (true)
             {
                 this.Invoke((MethodInvoker)delegate ()
                 {
                     int progress = host.GetProgress();
-                    if (progress == 0)
+                    if (Math.Abs(progressBar1.Value - progress) < 90)
                     {
-                        label7.Text = "sending";
-                    }
-                    if (progress <= 100)
-                    {
-                        progressBar1.Value = progress;
-                        label7.Text = "filtering";
-                    }
-                    if (progress == 100)
-                    {
-                        label7.Text = "recieving";
-                    }
+                        if (progress < 99 && progress > 0)
+                        {
+                            progressBar1.Value = progress;
+                            label7.Text = "filtering";
+                        }
+                        if (progress >= 99)
+                        {
+                            progressBar1.Value = progress;
+                            label7.Text = "recieving";
+                        }
+                    }                    
                 });
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
+                if (finished) { break; }
             }
-            this.Invoke((MethodInvoker)delegate ()
-            {
-                progressBar1.Value = 0;
-                label7.Text = "done";
-            });
-        }
+            progressFinished.Set();      
+        }               
 
         private void button4_Click(object sender, EventArgs e)
         {
             label7.Text = "cancelled";
+            host.Cancel();
+            ConnectionMethods.Cancelled = true;
         }
     }
 }

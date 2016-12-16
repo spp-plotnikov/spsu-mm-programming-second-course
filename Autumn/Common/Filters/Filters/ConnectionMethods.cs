@@ -19,7 +19,6 @@ namespace Filters
         static public Bitmap byteArrayToBitmap(byte[] inputArray)
         {
             return (Bitmap)((new ImageConverter()).ConvertFrom(inputArray));
-        }
-                
+        }                
     }
 }
