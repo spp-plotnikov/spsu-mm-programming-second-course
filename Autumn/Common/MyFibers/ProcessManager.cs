@@ -13,7 +13,15 @@ namespace MyFibers
         private static Dictionary<uint, uint> fibersWPriority = new Dictionary<uint, uint>();
         private static Dictionary<uint, uint> fibersWTime = new Dictionary<uint, uint>();
         private static Random rng = new Random();
-              
+
+        public static void DeleteAllFibers()
+        {
+            foreach (uint fiber in fibersId)
+            {
+                Fiber.Delete(fiber);
+            }
+        }
+
         private static uint pickFiberToSwitch()
         {
             uint maxPriorityWMinRatio = 0; // In case of several fibers has equal ratio
@@ -59,6 +67,7 @@ namespace MyFibers
                 {
                     Console.WriteLine("All fibers finished");
                     fibersId.Clear();
+                    DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
                 }
             }
@@ -90,6 +99,8 @@ namespace MyFibers
                 {
                     Console.WriteLine("All fibers finished");
                     fibersWPriority.Clear();
+                    fibersWTime.Clear();
+                    DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
                 }
             }
