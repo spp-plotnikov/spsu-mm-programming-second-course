@@ -49,6 +49,9 @@ namespace Lab_3_PandC
         public void Stop()
         {
             stopFlag = true;
+            Monitor.Enter(buf);
+            Monitor.PulseAll(buf);
+            Monitor.Exit(buf);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lab_5_Future
 {
-    class ArrSum2 : IArraySum
+    public class ArrSum2 : IArraySum
     {
         int taskNum = 100;
         public int Sum(int[] arr)

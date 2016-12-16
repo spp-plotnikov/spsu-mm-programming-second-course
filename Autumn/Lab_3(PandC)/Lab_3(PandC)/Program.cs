@@ -11,7 +11,7 @@ namespace Lab_3_PandC
         static void Main(string[] args)
         {
             const int NumOfC = 5;
-            const int NumOfP = 5;
+            const int NumOfP = 1;
             Queue<int> buf = new Queue<int>();
 
             Producer producers = new Producer(NumOfP, buf);
