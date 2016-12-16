@@ -110,6 +110,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1248, 788);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.FiltersList);
@@ -117,6 +118,8 @@
             this.Controls.Add(this.Filter_Button);
             this.Controls.Add(this.Load_Button);
             this.Controls.Add(this.pictureBox);
+            this.ForeColor = System.Drawing.Color.Black;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "FormFilters";
             this.Text = "Графические фильтры";
