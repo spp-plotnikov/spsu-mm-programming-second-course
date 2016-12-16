@@ -83,7 +83,6 @@ namespace Client
         private void Filter_Button_Click(object sender, EventArgs e)
         {
             ResetThreads();
-            //check = false;
             Image = new Bitmap(pictureBox.Image);
 
             int index = FiltersList.SelectedIndex + 1;
@@ -138,22 +137,19 @@ namespace Client
                 }
                 while (filter.CheckIsAlive());
 
-                //if (check)
-               // {
-                    if (IsProcess)
+                if (IsProcess)
+                {
+                    if (this.InvokeRequired)
                     {
-                        if (this.InvokeRequired)
-                        {
-                            this.Invoke(new Proc(delegate() { pictureBox.Image = ToBitMap(filter.GetImage()); }));
-                            this.Invoke(new Proc(delegate() { progressBar1.Value = Max; }));
-                        }
-                        else
-                        {
-                            pictureBox.Image = ToBitMap(filter.GetImage());
-                            progressBar1.Value = Max;
-                        }
+                        this.Invoke(new Proc(delegate() { progressBar1.Value = Max; }));
+                        this.Invoke(new Proc(delegate() { pictureBox.Image = ToBitMap(filter.GetImage()); }));
                     }
-               // }
+                    else
+                    {
+                        progressBar1.Value = Max;
+                        pictureBox.Image = ToBitMap(filter.GetImage());
+                    }
+                }
             }
             catch (Exception)
             {
@@ -163,8 +159,7 @@ namespace Client
 
         private void Cancel_Click(object sender, EventArgs e)
         {
-            filter.ChangeIsAlive(false);
-            check = true;
+            ResetThreads();
         }
     }
 }
