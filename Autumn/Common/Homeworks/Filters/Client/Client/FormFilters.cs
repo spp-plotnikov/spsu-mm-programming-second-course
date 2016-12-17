@@ -95,7 +95,8 @@ namespace Client
             int Max = progressBar1.Maximum;
             int Width = Image.Width;
 
-            thread = new Thread(delegate() { filter.Filter(Image, index); });
+            filter.GetIndex(index);
+            thread = new Thread(delegate() { filter.Filter(Image); });
             thread.IsBackground = true;
             thread.Start();
 

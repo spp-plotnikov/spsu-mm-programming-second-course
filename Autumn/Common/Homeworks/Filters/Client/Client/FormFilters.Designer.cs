@@ -83,7 +83,6 @@
             // 
             // FiltersList
             // 
-            this.FiltersList.FormattingEnabled = true;
             this.FiltersList.Location = new System.Drawing.Point(948, 51);
             this.FiltersList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.FiltersList.Name = "FiltersList";

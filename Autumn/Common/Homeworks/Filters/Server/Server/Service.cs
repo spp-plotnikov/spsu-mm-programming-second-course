@@ -15,6 +15,12 @@ namespace Server
         public int Progress = 0;
         public Bitmap Image;
         byte[] result;
+        int index;
+
+        public void GetIndex(int i)
+        {
+            index = i;
+        }
 
         public string[] GetFilters()
         {
@@ -56,7 +62,7 @@ namespace Server
             Progress++;
         }
 
-        public void Filter(Bitmap image, int index)
+        public void Filter(Bitmap image)
         {
             Image = image;
             IsAlive = true;
@@ -83,7 +89,6 @@ namespace Server
                         break;
                     }
             }
-            Image = newImage;
             IsAlive = false;
         }
 

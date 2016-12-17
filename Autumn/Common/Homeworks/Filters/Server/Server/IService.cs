@@ -5,8 +5,11 @@ using System.Text;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ServiceModel;
 using System.Drawing;
+using System.ServiceModel;
+using System.ServiceModel.Web;
+using System.ServiceModel.Channels;
+using System.ServiceModel.Description;
 
 namespace Server
 {
@@ -32,6 +35,9 @@ namespace Server
         byte[] GetImage();
 
         [OperationContract]
-        void Filter(Bitmap image, int index);
+        void GetIndex(int i);
+
+        [OperationContract]
+        void Filter(Bitmap image);
     }
 }
