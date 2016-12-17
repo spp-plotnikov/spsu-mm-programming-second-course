@@ -1,5 +1,3 @@
-import sun.awt.Mutex;
-
 import java.util.Random;
 
 public class Main {
@@ -14,9 +12,8 @@ public class Main {
         System.out.println("Count adding " + countAdd);
         System.out.println("Count checking " + countContains);
         System.out.println("Count removing " + countRemove);
-        Mutex mutex = new Mutex();
         FirstHashTable firstHashTable = new FirstHashTable(countAdd);
-        SecondHashTable secondHashTable = new SecondHashTable(countAdd, mutex);
+        SecondHashTable secondHashTable = new SecondHashTable(countAdd);
         random = new Random();
         long[] students = new long[countAdd];
         long[] courses = new long[countAdd];

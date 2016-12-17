@@ -1,56 +1,41 @@
-import sun.awt.Mutex;
-
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SecondHashTable implements IExamSystem {
-    private CoarseCuckooHashTable<Long, List<Long>> hashMap;
+    private RefinableHashTable<Long, CopyOnWriteArrayList> hashMap;
     private int countStudents;
-    Mutex mutex;
+    ReentrantLock lock;
 
-    SecondHashTable(int countStudents, Mutex mutex) {
+    SecondHashTable(int countStudents) {
         this.countStudents = countStudents;
-        this.mutex = mutex;
-        hashMap = new CoarseCuckooHashTable(countStudents);
+        lock = new ReentrantLock();
+        hashMap = new RefinableHashTable(countStudents);
     }
 
     public void add(long studentId, long courseId) {
-        List<Long> list = hashMap.get(studentId);
-        if (list != null) {
-            if (!list.contains(courseId)) {
-                list.add(courseId);
-            }
-        } else {
-            mutex.lock();
-            list = hashMap.get(studentId);
-            if (list == null) {
-                list = new LinkedList();
-                list.add(courseId);
-                hashMap.put(studentId, list);
-            } else {
-                if (!list.contains(courseId)) {
-                    list.add(courseId);
-                }
-            }
-            mutex.unlock();
+        lock.lock();
+        CopyOnWriteArrayList<Long> list = hashMap.get(studentId);
+        if (list == null) {
+            list = new CopyOnWriteArrayList();
+            list.add(courseId);
+            hashMap.put(studentId, list);
+        }
+        lock.unlock();
+        if (!list.contains(courseId)) {
+            list.add(courseId);
         }
     }
 
     public void remove(long studentId, long courseId) {
-        List<Long> list = hashMap.get(studentId);
-        if (list != null) {
-            if (list.contains(courseId)) {
-                list.remove(courseId);
-            }
-        }
+        CopyOnWriteArrayList<Long> list = hashMap.get(studentId);
+        list.remove(courseId);
     }
 
     public boolean contains(long studentId, long courseId) {
-        List<Long> list = hashMap.get(studentId);
-        if (list != null) {
-            return list.contains(courseId);
-        } else {
+        CopyOnWriteArrayList<Long> list = hashMap.get(studentId);
+        if (list == null) {
             return false;
         }
+        return  list.contains(courseId);
     }
 }
