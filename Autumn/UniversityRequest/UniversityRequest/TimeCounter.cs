@@ -9,7 +9,7 @@ namespace UniversityRequest
     {
         public static long Count(IExamSystem system)
         {
-            int percent = 30;
+            const int percent = 30;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             List<Task> tasks = new List<Task>();

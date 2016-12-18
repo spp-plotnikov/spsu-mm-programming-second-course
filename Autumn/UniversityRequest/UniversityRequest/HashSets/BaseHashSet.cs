@@ -17,11 +17,11 @@ namespace UniversityRequest.HashSets
 
         protected abstract void Release(T x);
 
-        protected abstract bool Policy();
+        protected abstract bool IsNeedResize();
 
         protected abstract void Resize();
 
-        public bool Contains(T x)
+        public virtual bool Contains(T x)
         {
             Acquire(x);
             try
@@ -35,7 +35,7 @@ namespace UniversityRequest.HashSets
             }
         }
 
-        public void Remove(T x)
+        public virtual void Remove(T x)
         {
             Acquire(x);
             try
@@ -52,7 +52,7 @@ namespace UniversityRequest.HashSets
             }
         }
 
-        public void Add(T x)
+        public virtual void Add(T x)
         {
             Acquire(x);
             try
@@ -71,7 +71,7 @@ namespace UniversityRequest.HashSets
             {
                 Release(x);
             }
-            if (Policy())
+            if (IsNeedResize())
                 Resize();
         }
     }

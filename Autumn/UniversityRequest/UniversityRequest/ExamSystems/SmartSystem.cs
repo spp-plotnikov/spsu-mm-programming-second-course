@@ -5,7 +5,7 @@ namespace UniversityRequest.ExamSystems
     public class SmartSystem : IExamSystem
     {
 
-        private StripedHashSet<SystemRecord> _system = new StripedHashSet<SystemRecord>(5297);
+        private readonly StripedHashSet<SystemRecord> _system = new StripedHashSet<SystemRecord>(5297);
 
         public void Add(long studentId, long courseId)
         {

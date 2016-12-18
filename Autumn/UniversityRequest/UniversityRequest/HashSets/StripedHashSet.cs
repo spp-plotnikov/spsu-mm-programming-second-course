@@ -24,7 +24,7 @@ namespace UniversityRequest.HashSets
             _locks[x.GetHashCode()%_locks.Length].ReleaseMutex();
         }
 
-        protected override bool Policy()
+        protected override bool IsNeedResize()
         {
             return (ElementCount/Table.Length > 4) ||
                    (Enumerable.Range(0, Table.Length).Select(i => Table[i].Count).Any(i => i > _threshold));
