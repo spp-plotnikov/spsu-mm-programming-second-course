@@ -28,115 +28,117 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox = new System.Windows.Forms.PictureBox();
-            this.Load_Button = new System.Windows.Forms.Button();
-            this.Filter_Button = new System.Windows.Forms.Button();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.PictureBox = new System.Windows.Forms.PictureBox();
+            this.LoadButton = new System.Windows.Forms.Button();
+            this.FilterButton = new System.Windows.Forms.Button();
+            this.ProgressBar = new System.Windows.Forms.ProgressBar();
             this.FiltersList = new System.Windows.Forms.ComboBox();
             this.FileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFile = new System.Windows.Forms.SaveFileDialog();
-            this.Cancel = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
+            this.CancelButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox
+            // PictureBox
             // 
-            this.pictureBox.Location = new System.Drawing.Point(33, 18);
-            this.pictureBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(840, 528);
-            this.pictureBox.TabIndex = 0;
-            this.pictureBox.TabStop = false;
+            this.PictureBox.Location = new System.Drawing.Point(51, 26);
+            this.PictureBox.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            this.PictureBox.Name = "PictureBox";
+            this.PictureBox.Size = new System.Drawing.Size(1307, 766);
+            this.PictureBox.TabIndex = 0;
+            this.PictureBox.TabStop = false;
             // 
-            // Load_Button
+            // LoadButton
             // 
-            this.Load_Button.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Load_Button.Location = new System.Drawing.Point(33, 642);
-            this.Load_Button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Load_Button.Name = "Load_Button";
-            this.Load_Button.Size = new System.Drawing.Size(306, 88);
-            this.Load_Button.TabIndex = 1;
-            this.Load_Button.Text = "Загрузить изображение";
-            this.Load_Button.UseVisualStyleBackColor = true;
-            this.Load_Button.Click += new System.EventHandler(this.Load_Button_Click);
+            this.LoadButton.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LoadButton.Location = new System.Drawing.Point(51, 931);
+            this.LoadButton.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            this.LoadButton.Name = "LoadButton";
+            this.LoadButton.Size = new System.Drawing.Size(476, 128);
+            this.LoadButton.TabIndex = 1;
+            this.LoadButton.Text = "Загрузить изображение";
+            this.LoadButton.UseVisualStyleBackColor = true;
+            this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
             // 
-            // Filter_Button
+            // FilterButton
             // 
-            this.Filter_Button.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Filter_Button.Location = new System.Drawing.Point(900, 634);
-            this.Filter_Button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Filter_Button.Name = "Filter_Button";
-            this.Filter_Button.Size = new System.Drawing.Size(306, 95);
-            this.Filter_Button.TabIndex = 1;
-            this.Filter_Button.Text = "Применить фильтр";
-            this.Filter_Button.UseVisualStyleBackColor = true;
-            this.Filter_Button.Click += new System.EventHandler(this.Filter_Button_Click);
+            this.FilterButton.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.FilterButton.Location = new System.Drawing.Point(1400, 919);
+            this.FilterButton.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            this.FilterButton.Name = "FilterButton";
+            this.FilterButton.Size = new System.Drawing.Size(476, 138);
+            this.FilterButton.TabIndex = 1;
+            this.FilterButton.Text = "Применить фильтр";
+            this.FilterButton.UseVisualStyleBackColor = true;
+            this.FilterButton.Click += new System.EventHandler(this.FilterButton_Click);
             // 
-            // progressBar1
+            // ProgressBar
             // 
-            this.progressBar1.Location = new System.Drawing.Point(348, 658);
-            this.progressBar1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.progressBar1.Maximum = 1000;
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(543, 48);
-            this.progressBar1.TabIndex = 2;
+            this.ProgressBar.ForeColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ProgressBar.Location = new System.Drawing.Point(541, 954);
+            this.ProgressBar.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            this.ProgressBar.Maximum = 1000;
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(845, 70);
+            this.ProgressBar.TabIndex = 2;
             // 
             // FiltersList
             // 
-            this.FiltersList.Location = new System.Drawing.Point(948, 51);
-            this.FiltersList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.FiltersList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.FiltersList.Location = new System.Drawing.Point(1475, 74);
+            this.FiltersList.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
             this.FiltersList.Name = "FiltersList";
-            this.FiltersList.Size = new System.Drawing.Size(277, 28);
+            this.FiltersList.Size = new System.Drawing.Size(429, 37);
             this.FiltersList.TabIndex = 3;
-            this.FiltersList.Text = "Выберите фильтр";
             // 
             // FileDialog
             // 
             this.FileDialog.FileName = "openFileDialog1";
             // 
-            // Cancel
+            // CancelButton
             // 
-            this.Cancel.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Cancel.Location = new System.Drawing.Point(900, 541);
-            this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(306, 85);
-            this.Cancel.TabIndex = 5;
-            this.Cancel.Text = "Отмена";
-            this.Cancel.UseVisualStyleBackColor = true;
-            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
+            this.CancelButton.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.CancelButton.Location = new System.Drawing.Point(1400, 784);
+            this.CancelButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(476, 123);
+            this.CancelButton.TabIndex = 5;
+            this.CancelButton.Text = "Отмена";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // FormFilters
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 29F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1248, 788);
-            this.Controls.Add(this.Cancel);
+            this.ClientSize = new System.Drawing.Size(1941, 1143);
+            this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.FiltersList);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.Filter_Button);
-            this.Controls.Add(this.Load_Button);
-            this.Controls.Add(this.pictureBox);
+            this.Controls.Add(this.ProgressBar);
+            this.Controls.Add(this.FilterButton);
+            this.Controls.Add(this.LoadButton);
+            this.Controls.Add(this.PictureBox);
             this.ForeColor = System.Drawing.Color.Black;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
             this.Name = "FormFilters";
-            this.Text = "Графические фильтры";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
+            this.Text = "Фильтры";
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox;
-        private System.Windows.Forms.Button Load_Button;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.PictureBox PictureBox;
+        private System.Windows.Forms.Button LoadButton;
+        private System.Windows.Forms.ProgressBar ProgressBar;
         private System.Windows.Forms.ComboBox FiltersList;
         private System.Windows.Forms.OpenFileDialog FileDialog;
         private System.Windows.Forms.SaveFileDialog saveFile;
-        public System.Windows.Forms.Button Filter_Button;
-        private System.Windows.Forms.Button Cancel;
+        public System.Windows.Forms.Button FilterButton;
+        private System.Windows.Forms.Button CancelButton;
     }
 }
 

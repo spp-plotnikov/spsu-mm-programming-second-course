@@ -20,7 +20,7 @@ namespace Server
         string[] GetFilters();
 
         [OperationContract]
-        void SetProgress();
+        void CancelProgress();
 
         [OperationContract]
         bool CheckIsAlive();
@@ -35,7 +35,7 @@ namespace Server
         byte[] GetImage();
 
         [OperationContract]
-        void GetIndex(int i);
+        void SetIndex(int idx);
 
         [OperationContract]
         void Filter(Bitmap image);

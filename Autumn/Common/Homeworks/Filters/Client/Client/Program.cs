@@ -18,13 +18,12 @@ namespace Client
         [STAThread]
         static void Main()
         {
-           // var cf = new ChannelFactory<IService>(new NetTcpBinding(), "net.tcp://127.0.0.1:11000/");
-            WebHttpBinding binding = new WebHttpBinding();
-            binding.MaxBufferPoolSize = 2147483647;
-            binding.MaxBufferSize = 2147483647;
-            binding.MaxReceivedMessageSize = 2147483647;
-            ChannelFactory<IService> cf = new ChannelFactory<IService>(binding, "http://localhost:11000/");
-            cf.Endpoint.Behaviors.Add(new WebHttpBehavior());
+            int bufferSize = 2147483647;
+            NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
+            binding.MaxBufferPoolSize = bufferSize;
+            binding.MaxBufferSize = bufferSize;
+            binding.MaxReceivedMessageSize = bufferSize;
+            ChannelFactory<IService> cf = new ChannelFactory<IService>(binding, "net.tcp://127.0.0.1:11000/");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormFilters(cf.CreateChannel()));

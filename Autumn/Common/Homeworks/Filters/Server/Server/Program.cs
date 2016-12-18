@@ -14,18 +14,15 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            int bufferSize = 2147483647;
             WebServiceHost host = new WebServiceHost(typeof(Service), new Uri("net.tcp://localhost:11000/"));
-            //host.AddDefaultEndpoints();
-            WebHttpBinding binding = new WebHttpBinding(WebHttpSecurityMode.None);
-            binding.MaxBufferPoolSize = 2147483647;
-            binding.MaxBufferSize = 2147483647;
-            binding.MaxReceivedMessageSize = 2147483647; 
-            host.AddServiceEndpoint(typeof(IService), binding, "http://localhost:11000/");
-            ServiceDebugBehavior stp = host.Description.Behaviors.Find<ServiceDebugBehavior>();
-            stp.HttpHelpPageEnabled = false;
+            NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
+            binding.MaxBufferPoolSize = bufferSize;
+            binding.MaxBufferSize = bufferSize;
+            binding.MaxReceivedMessageSize = bufferSize;
+            host.AddServiceEndpoint(typeof(IService), binding, "net.tcp://localhost:11000/");
             host.Open();
             Console.WriteLine("Сервис открыт");
-
             Console.ReadKey();
             host.Close();
         }

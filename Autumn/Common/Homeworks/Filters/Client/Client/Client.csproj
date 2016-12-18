@@ -51,7 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FilterClass.cs" />
     <Compile Include="FormFilters.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,9 +85,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Server\Server\Server.csproj">
-      <Project>{52c465f0-c887-4ace-b37a-b6657debf612}</Project>
-      <Name>Server</Name>
+    <ProjectReference Include="..\..\Contracts\Contracts\Contracts.csproj">
+      <Project>{c84ea803-52ce-422c-82a2-8ffcd2a947d8}</Project>
+      <Name>Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
