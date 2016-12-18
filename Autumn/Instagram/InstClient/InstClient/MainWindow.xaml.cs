@@ -53,18 +53,15 @@ namespace InstClient
 
         public void OpenPict(object sender, EventArgs args)
         {
-            OpenFileDialog dlg = new OpenFileDialog
+            var dlg = new OpenFileDialog
             {
                 Filter = "Bitmap| *.bmp",
                 CheckFileExists = true
             };
-            if (dlg.ShowDialog() == true)
-            {
-                var viewModel = DataContext as MainWindowViewModel;
-                if (viewModel != null)
-                    viewModel.InitalPictPath = dlg.FileName;
-                //ssd
-            }
+            if (dlg.ShowDialog() != true) return;
+            var viewModel = DataContext as MainWindowViewModel;
+            if (viewModel != null)
+                viewModel.InitalPictPath = dlg.FileName;
         }
 
         public void SavePict(object sender, EventArgs args)
@@ -77,16 +74,14 @@ namespace InstClient
                     DefaultExt = ".bmp",
                     Filter = "Bitmap(.bmp)|*.bmp"
                 };
-                if (dlg.ShowDialog() == true)
-                {
-                    var viewModel = DataContext as MainWindowViewModel;
-                    File.Copy(viewModel.ResultPictPath, dlg.FileName, true);
-                }
+                if (dlg.ShowDialog() != true) return;
+                var viewModel = DataContext as MainWindowViewModel;
+                if (viewModel != null) File.Copy(viewModel.ResultPictPath, dlg.FileName, true);
             }
             catch (Exception e)
             {
 
-                OnMessageShow(null, new ClientEventArgs("Error" + e.ToString()));
+                OnMessageShow(null, new ClientEventArgs("Error" + e));
             }
         }
     }

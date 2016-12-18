@@ -6,6 +6,9 @@ namespace Shared
     public interface IInstServiceCallback
     {
         [OperationContract(IsOneWay = true)]
-        void Notify(int progress);
+        void Notify(object progress);
+
+        [OperationContract(IsOneWay = true)]
+        void GetPict(byte[] pict);
     }
 }

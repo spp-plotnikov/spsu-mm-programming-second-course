@@ -235,7 +235,7 @@ namespace InstClient.ViewModel
         {
             if (args.Message != null)
             {
-                ResultPictPath = Directory.GetCurrentDirectory() + "/" + args.Message;
+                ResultPictPath =  args.Message;
                 ShowMessage?.BeginInvoke(this, new ClientEventArgs("Success! Pict was successfully edited. Click on it to compare."), null, null);
                 IsInitalPictVisible = false;
                 IsResultPictVisible = true;

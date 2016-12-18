@@ -51,6 +51,9 @@
   <wsdl:message name="IInstService_Notify_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:Notify" />
   </wsdl:message>
+  <wsdl:message name="IInstService_GetPict_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:GetPict" />
+  </wsdl:message>
   <wsdl:portType name="IInstService">
     <wsdl:operation name="GetFilters">
       <wsdl:input wsaw:Action="http://tempuri.org/IInstService/GetFilters" message="tns:IInstService_GetFilters_InputMessage" />
@@ -62,6 +65,9 @@
     </wsdl:operation>
     <wsdl:operation name="Notify">
       <wsdl:output wsaw:Action="http://tempuri.org/IInstService/Notify" message="tns:IInstService_Notify_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPict">
+      <wsdl:output wsaw:Action="http://tempuri.org/IInstService/GetPict" message="tns:IInstService_GetPict_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_IInstService" type="tns:IInstService">
@@ -87,6 +93,12 @@
     </wsdl:operation>
     <wsdl:operation name="Notify">
       <soap12:operation soapAction="http://tempuri.org/IInstService/Notify" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPict">
+      <soap12:operation soapAction="http://tempuri.org/IInstService/GetPict" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

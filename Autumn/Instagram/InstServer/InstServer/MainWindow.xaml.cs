@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,12 @@ namespace InstServer
         public MainWindow()
         {
             InitializeComponent();
+            var filtersPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent?.Parent?.FullName + "\\filters.config";
+            if (File.Exists(filtersPath))
+            {
+                File.Copy(filtersPath, Directory.GetCurrentDirectory() + "\\filters.config", true);
+            }
+            
             var model = new MainWindowModel();
             _model = model;
 

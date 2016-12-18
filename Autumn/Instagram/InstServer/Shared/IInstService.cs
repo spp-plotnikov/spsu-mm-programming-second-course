@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.ServiceModel;
-using System.Text;
+﻿using System.ServiceModel;
 
 namespace Shared
 {
@@ -16,7 +10,7 @@ namespace Shared
         string[] GetFilters();
 
         [OperationContract]
-        byte[] EditPict(byte[] data, string filter);
+        void EditPict(byte[] data, string filter);
 
     }
 }

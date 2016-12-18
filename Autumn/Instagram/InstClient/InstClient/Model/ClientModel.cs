@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.ServiceModel;
-using System.Text;
 using System.Threading;
 using ServiceInterface.InstSevrRef;
 
@@ -16,6 +15,7 @@ namespace InstClient.Model
         public event ClientEventHandler ProgressChanged;
         public List<string> UsedPicts { get; set; }
         private InstServiceClient _client;
+        private byte[] _pict;
         private bool _isAborted;
         private Mutex _abortFinished = new Mutex();
 
@@ -33,9 +33,14 @@ namespace InstClient.Model
                 _model = model;
             }
 
-            public void Notify(int progress)
+            public void Notify(object progress)
             {
-                _model.ProgressChanged?.Invoke(null, new ClientEventArgs(progress.ToString()));
+                _model.ProgressChanged?.Invoke(null, new ClientEventArgs(((int)progress).ToString()));
+            }
+
+            public void GetPict(byte[] pict)
+            {
+                _model._pict = pict;
             }
         }
 
@@ -79,17 +84,22 @@ namespace InstClient.Model
                 _client = null;
                 try
                 {
+                    _pict = null;
                     _isAborted = false;
                     Pict pict = ((UploadingData) data).Picture;
                     string filter = ((UploadingData) data).Filter;
-                    pict.PathToResult = GetValidName();
+                    pict.PathToResult = Path.GetTempPath() + Guid.NewGuid().ToString() + ".bmp";
 
                     _client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)),
                         "NetTcpBinding_IInstService");
-                    var result = _client.EditPict(pict.PictBytes, filter);
+                    _client.EditPict(pict.PictBytes, filter);
 
+                    while (_pict == null)
+                    {
+                        
+                    }
 
-                    pict.SavePict(result);
+                    pict.SavePict(_pict);
                     ProgressChanged?.Invoke(this, new ClientEventArgs("100"));
                     PictProcessed?.Invoke(this, new ClientEventArgs(pict.PathToResult));
                 }
@@ -113,31 +123,6 @@ namespace InstClient.Model
             });
 
             thread.Start();
-        }
-
-        private string GetValidName()
-        {
-            string result = "temp.bmp";
-            int count = 0;
-            while (true)
-            {
-                try
-                {
-                    string tempResult = "~" + count + result;
-                    if (!File.Exists(tempResult)) return tempResult;
-                    File.Open(tempResult, FileMode.Open).Close();
-
-                    if (!UsedPicts.Contains(tempResult))
-                    {
-                        UsedPicts.Add(tempResult);
-                    }
-                    return tempResult;
-                }
-                catch (Exception)
-                {
-                    count++;
-                }
-            }
         }
 
         public void AbortPictEdit()
