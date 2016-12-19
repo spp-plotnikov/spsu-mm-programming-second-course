@@ -36,7 +36,6 @@
             this.oldPictureBox = new System.Windows.Forms.PictureBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.percent = new System.Windows.Forms.Label();
-            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.newPictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.oldPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -117,15 +116,11 @@
             this.percent.Text = "0%";
             this.percent.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // backgroundWorker
-            // 
-            this.backgroundWorker.WorkerSupportsCancellation = true;
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.StartWork);
-            // 
             // ClientInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(870, 412);
             this.Controls.Add(this.percent);
             this.Controls.Add(this.progressBar);
@@ -138,6 +133,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.MaximizeBox = false;
             this.Name = "ClientInterface";
             this.Text = "Client";
             ((System.ComponentModel.ISupportInitialize)(this.newPictureBox)).EndInit();
@@ -156,7 +152,6 @@
         private System.Windows.Forms.PictureBox oldPictureBox;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label percent;
-        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }
 

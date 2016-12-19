@@ -11,18 +11,22 @@ using System.Windows.Forms;
 
 namespace Client
 {
-    public partial class ClientInterface : Form, MyServiceReference.IServiceCallback
+    public partial class ClientInterface : Form//, MyServiceReference.IServiceCallback
     {
         List<RadioButton> radioButtonList = new List<RadioButton>();
         Bitmap imageBitmap;
+        int width, height;
         MyServiceReference.ServiceClient client;
         string filter;
         float prog = 0;
         bool workFlag = false;
+        CallbackFunctions callback;
+        BackgroundWorker backgroundWorker;
 
-        public ClientInterface()
+        public ClientInterface(CallbackFunctions callback)
         {
-            var instanceContext = new InstanceContext(this);
+            this.callback = callback;           
+            var instanceContext = new InstanceContext(callback);
             client = new MyServiceReference.ServiceClient(instanceContext, "WSDualHttpBinding_IService");
             InitializeComponent();
             CreateFilterList();
@@ -46,6 +50,7 @@ namespace Client
             }
             radioButtonList[0].Checked = true;
         }
+
         private void AddPictureButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog file = new OpenFileDialog();
@@ -53,15 +58,26 @@ namespace Client
             if (file.ShowDialog() == DialogResult.OK)
             {
                 imageBitmap = new Bitmap(file.FileName);
-                this.oldPictureBox.Image = imageBitmap;
+                this.oldPictureBox.Image = imageBitmap;                
             }
         }
 
         private void SendPictureButton_Click(object sender, EventArgs e)
         {
-            if (workFlag) return;
-            workFlag = true;        
+            callback.Progress = 0;
+            progressBar.Value = 0;
+            percent.Text = "0%";
+            if (imageBitmap == null)
+            {
+                MessageBox.Show("Null Picture");
+                return;
+            }
+            SendPictureButton.Enabled = false;
+            height = imageBitmap.Height;
+            width = imageBitmap.Width;
+            workFlag = true;
             string filt = radioButtonList[0].Text;
+
             foreach (var but in radioButtonList)
             {
                 if (but.Checked)
@@ -70,81 +86,108 @@ namespace Client
                     break;
                 }
             }
-            if (imageBitmap == null)
-            {
-                MessageBox.Show("Null Picture");
-                return;
-            }
+
+            
 
             filter = filt;
-            BackgroundWorker backgroundWorker = new BackgroundWorker();
+
+            backgroundWorker = new BackgroundWorker();
+            backgroundWorker.WorkerSupportsCancellation = true;
+            backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.DoWork += new DoWorkEventHandler(StartWork);
-            backgroundWorker.RunWorkerAsync();
-            SendPictureButton.Enabled = false;
+            backgroundWorker.ProgressChanged += new ProgressChangedEventHandler(ProgBarWork);
+            backgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(FinishWork);
+            backgroundWorker.RunWorkerAsync();           
+            
             CancelWorkButton.Enabled = true;
 
         }
-
-        private void CancelWorkButton_Click(object sender, EventArgs e)
-        {
-            if (!workFlag) return;
-            client.StopWork();
-            workFlag = false;
-            backgroundWorker.CancelAsync();            
-        }               
 
         private void StartWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker here = sender as BackgroundWorker;
             client.GetPicture(imageBitmap, filter);
+            callback.IsHere = false;
+            workFlag = true;
 
-            while(workFlag)
+            while (workFlag && !callback.IsHere)
             {
                 if (here.CancellationPending == true)
                 {
                     e.Cancel = true;
                     workFlag = false;
-                }                
+                    break;
+                }
+                else
+                {
+                    backgroundWorker.ReportProgress((int)callback.Progress);
+                    System.Threading.Thread.Sleep(1000);
+                }
             }
         }
 
-        public void SendResult(byte[] res)
+        private void ProgBarWork(object sender, ProgressChangedEventArgs e)
         {
-            if (res == null)
+            PrintProgress(e.ProgressPercentage);
+        }
+
+        private void FinishWork(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (callback.Result == null)
             {
                 progressBar.Value = 0;
                 percent.Text = "Canceled";
-
             }
             else
-            {
-                newPictureBox.Image = ToBitMap(res);
-                percent.Text = "Done";
+            {               
+                using (var ms = new System.IO.MemoryStream(callback.Result))
+                {
+
+                    progressBar.Value = 100;
+                    newPictureBox.Image = ToBitMap(callback.Result);
+                    percent.Text = "Done";
+                }
             }
             SendPictureButton.Enabled = true;
             CancelWorkButton.Enabled = false;
+            AddPictureButton.Enabled = true;
             workFlag = false;
         }
 
+
+        private void CancelWorkButton_Click(object sender, EventArgs e)
+        {
+            client.StopWork();
+            workFlag = false;
+            backgroundWorker.CancelAsync();
+        }
+
+
         private Bitmap ToBitMap(byte[] array)
         {
-            Bitmap res = new Bitmap(imageBitmap.Width, imageBitmap.Height);
-            for (int i = 0; i < imageBitmap.Width; i++)
-                for (int j = 0; j < imageBitmap.Height; j++)
+            Bitmap res = new Bitmap(width, height);
+            for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++)
                 {
-                    res.SetPixel(i, j, Color.FromArgb(array[i * imageBitmap.Height * 3 + j * 3], 
-                                                      array[i * imageBitmap.Height * 3 + j * 3 + 1],
-                                                      array[i * imageBitmap.Height * 3 + j * 3 + 2]));
+                    res.SetPixel(i, j, Color.FromArgb(array[i * height * 3 + j * 3],
+                                                      array[i * height * 3 + j * 3 + 1],
+                                                      array[i * height * 3 + j * 3 + 2]));
                 }
             return res;
         }
 
-        public void SendProgress(float progr)
+        public void PrintProgress(float progr)
         {
             progressBar.Value = (int)progr;
             prog = progr;
             percent.Text = prog.ToString() + "%";
-            if (prog == 100) percent.Text = "Waiting for a picture...";
-        }       
+            if (prog == 100)
+            {
+                progressBar.Value = 100;
+                percent.Text = "Waiting for a picture...";              
+                AddPictureButton.Enabled = false;
+                CancelWorkButton.Enabled = false;
+            }
+        }      
     }
 }

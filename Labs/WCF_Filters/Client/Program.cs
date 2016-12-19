@@ -16,7 +16,8 @@ namespace Client
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ClientInterface());
+            var callback = new CallbackFunctions();
+            Application.Run(new ClientInterface(callback));
         }
     }
 }
