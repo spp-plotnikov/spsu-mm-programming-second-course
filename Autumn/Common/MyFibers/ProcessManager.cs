@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Fibers;
@@ -10,13 +10,14 @@ namespace MyFibers
     {
         private static uint curFiber;
         private static List<uint> fibersId = new List<uint>();
+        private static List<uint> fibersForKilling = new List<uint>();
         private static Dictionary<uint, uint> fibersWPriority = new Dictionary<uint, uint>();
         private static Dictionary<uint, uint> fibersWTime = new Dictionary<uint, uint>();
         private static Random rng = new Random();
 
         public static void DeleteAllFibers()
         {
-            foreach (uint fiber in fibersId)
+            foreach (uint fiber in fibersForKilling)
             {
                 Fiber.Delete(fiber);
             }
@@ -57,6 +58,7 @@ namespace MyFibers
                 fibersId.Remove(curFiber);
                 fibersWTime.Remove(curFiber);
                 fibersId.Remove(curFiber);
+                fibersForKilling.Add(curFiber);
                 if (fibersId.Count > 0)
                 {
                     uint randomFiber = fibersId[rng.Next(fibersId.Count)];
@@ -67,6 +69,8 @@ namespace MyFibers
                 {
                     Console.WriteLine("All fibers finished");
                     fibersId.Clear();
+                    fibersWPriority.Clear();
+                    fibersWTime.Clear();
                     DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
                 }
@@ -78,7 +82,7 @@ namespace MyFibers
                 Fiber.Switch(curFiber);
             }
         }
-        
+
         // For choosing next fiber we use pickFiberToSwitch()
         public static void PrioritySwitch(bool isFinished)
         {
@@ -88,6 +92,7 @@ namespace MyFibers
                 fibersWPriority.Remove(curFiber);
                 fibersWTime.Remove(curFiber);
                 fibersId.Remove(curFiber);
+                fibersForKilling.Add(curFiber);
                 if (fibersId.Count > 0)
                 {
                     uint fiberToSwitch = pickFiberToSwitch();
@@ -100,6 +105,7 @@ namespace MyFibers
                     Console.WriteLine("All fibers finished");
                     fibersWPriority.Clear();
                     fibersWTime.Clear();
+                    fibersId.Clear();
                     DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
                 }
@@ -123,7 +129,7 @@ namespace MyFibers
                 Console.WriteLine("Fiber id: " + fiber.Id + " process priority: " + process.Priority);
                 fibersId.Add(fiber.Id);
                 fibersWPriority.Add(fiber.Id, (uint)process.Priority);
-                fibersWTime.Add(fiber.Id, 0);                      
+                fibersWTime.Add(fiber.Id, 0);
             }
 
             curFiber = fibersId[0];
@@ -200,5 +206,5 @@ namespace MyFibers
                 }
             }
         }
-    }    
+    }
 }
