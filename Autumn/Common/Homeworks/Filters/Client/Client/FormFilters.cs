@@ -18,11 +18,11 @@ namespace Client
         private Thread _threadFilter, _threadLoad, _threadProcess;
         delegate void Proc();
         private Bitmap _image;
+        private Bitmap _prevIm;
         private IService _filter;
-        byte[] res = null;
         int _index;
+        byte[] res = null;
         bool _isProcess = false;
-        bool faulty = false;
 
         public FormFilters(IService server)
         {
@@ -39,21 +39,6 @@ namespace Client
             }
         }
 
-        private void ResetThreads()
-        {
-            faulty = true;
-            _isProcess = false;
-            _filter.ChangeIsAlive(false);
-            if ((this.InvokeRequired))
-            {
-                this.Invoke(new Proc(delegate() { FilterButton.Enabled = true; }));
-            }
-            else
-            {
-                FilterButton.Enabled = true;
-            }
-        }
-
         private void LoadImage(string addressRead)
         {
             var fileLength = new FileInfo(addressRead).Length; 
@@ -64,12 +49,11 @@ namespace Client
             }
             _image = new Bitmap(addressRead);
             PictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            PictureBox.Image = _image;
+            PictureBox.Image = (Bitmap)_image.Clone();
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
-            faulty = false;
             FileDialog.Filter = "Изображения |*.bmp";
             FileDialog.FileName = "";
             FileDialog.ShowDialog();
@@ -81,11 +65,10 @@ namespace Client
 
         private void FilterButton_Click(object sender, EventArgs e)
         {
-            faulty = false;
+            _image = new Bitmap(PictureBox.Image);
             ProgressBar.Value = 0;
             _filter.CancelProgress();
             FilterButton.Enabled = false;
-            _image = new Bitmap(PictureBox.Image);
             _index = FiltersList.SelectedIndex + 1;
 
             if ((_index == 0) || (_image == null))
@@ -103,11 +86,15 @@ namespace Client
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            ResetThreads();
+            Thread stop = new Thread(() => { _filter.ChangeIsAlive(false); });
+            stop.IsBackground = true;
+            stop.Start();
+            _isProcess = false;
         }
 
         private void Run()
         {
+            Bitmap old = new Bitmap(_image);
             _threadFilter = new Thread(() => { res = (_filter.Filter(_image, _index)); });
             _threadFilter.IsBackground = true;
             _threadFilter.Start();
@@ -115,10 +102,6 @@ namespace Client
             this.ProgressBar.Maximum = 100;
             while (progress != 100 && _isProcess)
             {
-                if (faulty)
-                {
-                    return;
-                }
                 Thread.Sleep(10);
                 progress = _filter.GetProgress();
                 if ((this.InvokeRequired))
@@ -130,11 +113,13 @@ namespace Client
                     ProgressBar.Value = progress;
                 }
             }
-            while (_filter.CheckIsAlive()) { }
-            _image = ToBitMap(res);
-            if (faulty)
+            if (_filter.CheckIsAlive())
             {
-                return;
+                _image = new Bitmap(ToBitMap(res));
+            }
+            else
+            {
+                _image = new Bitmap(old);
             }
             if (this.InvokeRequired)
             {

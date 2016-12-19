@@ -32,9 +32,6 @@ namespace Server
         int GetProgress();
 
         [OperationContract]
-        byte[] GetImage();
-
-        [OperationContract]
         byte[] Filter(Bitmap image, int index);
     }
 }

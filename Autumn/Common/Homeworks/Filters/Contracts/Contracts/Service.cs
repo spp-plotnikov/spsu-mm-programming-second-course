@@ -16,15 +16,7 @@ namespace Server
     {
         private bool _isAlive = false;
         private int _progress = 0;
-        private Bitmap _image;
-        private byte[] _result;
         private int _index;
-
-        // gets the index of the desired filter
-        public void SetIndex(int idx)
-        {
-            _index = idx;
-        }
 
         // sends list of filters to client
         public string[] GetFilters()
@@ -61,12 +53,6 @@ namespace Server
             return _progress;
         }
 
-        // sends image back to client
-        public byte[] GetImage()
-        {
-            return _result;
-        }
-
         // increments the progress
         private void ProgressIncr()
         {
@@ -77,25 +63,24 @@ namespace Server
         public byte[] Filter(Bitmap image, int index)
         {
             _index = index;
-            _image = image;
             _isAlive = true;
-            _result = new byte[image.Width * image.Height * 3];
+            Bitmap newIm = new Bitmap(image);
+            byte[] result = new byte[image.Width * image.Height * 3];
             switch (_index)
             {
                 case 1:
                     {
-                        InvertFilter();
+                        result = InvertFilter(newIm);
                         break;
                     }
 
                 case 2:
                     {
-                        SepiaFilter();
+                        result = SepiaFilter(newIm);
                         break;
                     }
             }
-            _isAlive = false;
-            return _result;
+            return result;
         }
 
         /// <summary>
@@ -104,37 +89,38 @@ namespace Server
         /// Sepia
         /// </summary>
 
-        private void InvertFilter()
+        byte[] InvertFilter(Bitmap image)
         {
-            for (int i = 0; i < _image.Width; i++)
+            byte[] result = new byte[image.Width * image.Height * 3];
+            for (int i = 0; i < image.Width && _isAlive; i++)
             {
-                for (int j = 0; j < _image.Height; j++)
+                for (int j = 0; j < image.Height && _isAlive; j++)
                 {
-                    Color c = _image.GetPixel(i, j);
+                    Color c = image.GetPixel(i, j);
                     int red = c.R;
                     int green = c.G;
                     int blue = c.B;
                     red = 255 - red;
                     green = 255 - green;
                     blue = 255 - blue;
-                    _result[i * _image.Height * 3 + j * 3] = (byte)red;
-                    _result[i * _image.Height * 3 + j * 3 + 1] = (byte)green;
-                    _result[i * _image.Height * 3 + j * 3 + 2] = (byte)blue;
-                    if (!_isAlive) return;
+                    result[i * image.Height * 3 + j * 3] = (byte)red;
+                    result[i * image.Height * 3 + j * 3 + 1] = (byte)green;
+                    result[i * image.Height * 3 + j * 3 + 2] = (byte)blue;
                 }
-                _progress = i * 100 / _image.Width;
+                _progress = i * 100 / image.Width;
             }
-            _isAlive = false;
-            _progress = 100;    
+            if (_isAlive) _progress = 100;
+            return result;
         }
 
-        private void SepiaFilter()
+        byte[] SepiaFilter(Bitmap image)
         {
-            for (int i = 0; i < _image.Width; i++)
+            byte[] result = new byte[image.Width * image.Height * 3];
+            for (int i = 0; i < image.Width && _isAlive; i++)
             {
-                for (int j = 0; j < _image.Height; j++)
+                for (int j = 0; j < image.Height && _isAlive; j++)
                 {
-                    Color c = _image.GetPixel(i, j);
+                    Color c = image.GetPixel(i, j);
                     byte red = c.R;
                     byte green = c.G;
                     byte blue = c.B;
@@ -142,16 +128,14 @@ namespace Server
                     red = (byte)((tone > 206) ? 255 : tone + 49);
                     green = (byte)((tone < 14) ? 0 : tone - 14);
                     blue = (byte)((tone < 56) ? 0 : tone - 56);
-                    _result[i * _image.Height * 3 + j * 3] = (byte)red;
-                    _result[i * _image.Height * 3 + j * 3 + 1] = (byte)green;
-                    _result[i * _image.Height * 3 + j * 3 + 2] = (byte)blue;
-                    if (!_isAlive) return;
+                    result[i * image.Height * 3 + j * 3] = (byte)red;
+                    result[i * image.Height * 3 + j * 3 + 1] = (byte)green;
+                    result[i * image.Height * 3 + j * 3 + 2] = (byte)blue;
                 }
-                _progress = i * 100 / _image.Width;
+                _progress = i * 100 / image.Width;
             }
-            _isAlive = false;
-            _progress = 100;
-            
+            if (_isAlive) _progress = 100;
+            return result;
         }
     }
 }
