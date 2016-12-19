@@ -35,9 +35,6 @@ namespace Server
         byte[] GetImage();
 
         [OperationContract]
-        void SetIndex(int idx);
-
-        [OperationContract]
-        void Filter(Bitmap image);
+        byte[] Filter(Bitmap image, int index);
     }
 }

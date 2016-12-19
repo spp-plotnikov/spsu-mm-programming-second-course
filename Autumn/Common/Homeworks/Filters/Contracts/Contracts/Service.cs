@@ -6,9 +6,12 @@ using System.IO;
 using System.Threading;
 using System.Data;
 using System.Drawing;
-
+using System.ServiceModel;
 namespace Server
 {
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+                    ConcurrencyMode = ConcurrencyMode.Multiple,
+                    UseSynchronizationContext = true)]
     public class Service : IService
     {
         private bool _isAlive = false;
@@ -28,7 +31,6 @@ namespace Server
         {
             string[] filters =
             {
-                "Оттенки серого",
                 "Инвертирование",
                 "Сепия",
             };
@@ -72,8 +74,9 @@ namespace Server
         }
 
         // call for applying a filter
-        public void Filter(Bitmap image)
+        public byte[] Filter(Bitmap image, int index)
         {
+            _index = index;
             _image = image;
             _isAlive = true;
             _result = new byte[image.Width * image.Height * 3];
@@ -81,55 +84,28 @@ namespace Server
             {
                 case 1:
                     {
-                        GreyFilter();
-                        break;
-                    }
-                case 2:
-                    {
                         InvertFilter();
                         break;
                     }
 
-                case 3:
+                case 2:
                     {
                         SepiaFilter();
                         break;
                     }
             }
-
             _isAlive = false;
+            return _result;
         }
 
         /// <summary>
         /// Available filters functions:
-        /// Grey
         /// Inversion
         /// Sepia
         /// </summary>
-        private void GreyFilter()
-        {
-            _isAlive = true;
-            for (int i = 0; i < _image.Width; i++)
-            {
-                for (int j = 0; j < _image.Height; j++)
-                {
-                    Color c = _image.GetPixel(i, j);
-                    byte red = c.R;
-                    byte green = c.G;
-                    byte blue = c.B;
-                    byte grey = (byte)(0.299 * red + 0.587 * green + 0.114 * blue);
-                    _result[i * _image.Height * 3 + j * 3] = grey;
-                    _result[i * _image.Height * 3 + j * 3 + 1] = grey;
-                    _result[i * _image.Height * 3 + j * 3 + 2] = grey;
-                    if (!_isAlive) return;
-                }
-                ProgressIncr();
-            }
-        }
 
         private void InvertFilter()
         {
-            _isAlive = true;
             for (int i = 0; i < _image.Width; i++)
             {
                 for (int j = 0; j < _image.Height; j++)
@@ -146,13 +122,14 @@ namespace Server
                     _result[i * _image.Height * 3 + j * 3 + 2] = (byte)blue;
                     if (!_isAlive) return;
                 }
-                ProgressIncr();
+                _progress = i * 100 / _image.Width;
             }
+            _isAlive = false;
+            _progress = 100;    
         }
 
         private void SepiaFilter()
         {
-            _isAlive = true;
             for (int i = 0; i < _image.Width; i++)
             {
                 for (int j = 0; j < _image.Height; j++)
@@ -170,8 +147,11 @@ namespace Server
                     _result[i * _image.Height * 3 + j * 3 + 2] = (byte)blue;
                     if (!_isAlive) return;
                 }
-                ProgressIncr();
+                _progress = i * 100 / _image.Width;
             }
+            _isAlive = false;
+            _progress = 100;
+            
         }
     }
 }

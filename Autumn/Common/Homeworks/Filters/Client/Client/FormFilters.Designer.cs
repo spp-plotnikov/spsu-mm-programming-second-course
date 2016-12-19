@@ -77,7 +77,6 @@
             this.ProgressBar.ForeColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ProgressBar.Location = new System.Drawing.Point(541, 954);
             this.ProgressBar.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
-            this.ProgressBar.Maximum = 1000;
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(845, 70);
             this.ProgressBar.TabIndex = 2;
