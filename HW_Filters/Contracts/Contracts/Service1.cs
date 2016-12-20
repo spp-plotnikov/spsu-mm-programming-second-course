@@ -54,12 +54,10 @@ namespace Contracts
             _progress = 100;
             if (_isAlive)
             {
-                Console.WriteLine("hmm");
                 return _image;
             }
             else
-            {
-                Console.WriteLine("FuckingShit");
+            { 
                 return image;
             }
         }
@@ -78,7 +76,6 @@ namespace Contracts
 
         private void Red()
         {
-            Console.WriteLine("correct");
             for (int i = 0; i < _image.Width && _isAlive; i++)
             {
                 for (int j = 0; j < _image.Height && _isAlive; j++)
@@ -93,7 +90,6 @@ namespace Contracts
                 }
                 _progress = i * 100 / _image.Width;
                 Thread.Sleep(1);
-                //Console.WriteLine(_progress);
             }
             _progress = 100;
         }
@@ -113,7 +109,7 @@ namespace Contracts
                     _image.SetPixel(i, j, newColor);
                 }
                 _progress = i * 100 / _image.Width;
-                Console.WriteLine(_progress);
+                Thread.Sleep(1);
             }
             _progress = 100;
         }
@@ -133,7 +129,7 @@ namespace Contracts
                     _image.SetPixel(i, j, newColor);
                 }
                 _progress = i * 100 / _image.Width;
-                Console.WriteLine(_progress);
+                Thread.Sleep(1);
             }
             _progress = 100;
         }

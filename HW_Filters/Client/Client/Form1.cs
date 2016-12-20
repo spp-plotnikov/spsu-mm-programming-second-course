@@ -15,10 +15,15 @@ namespace Client
 {
     public partial class Form1 : Form
     {
-        Bitmap _image;
-        IService1 _myService;
+        private Bitmap _image;
+        private IService1 _myService;
+        private Thread _filter;
+        private List<string> _listOfFilters;
+
+
         public Form1(IService1 service)
         {
+            _listOfFilters = new List<string>();
             _myService = service;
             InitializeComponent();
             _addFilters();
@@ -29,6 +34,7 @@ namespace Client
             foreach (string filter in _myService.GetListOfFilters())
             {
                 this.ChoiceButton.Items.Add(filter);
+                _listOfFilters.Add(filter);
             }
         }
 
@@ -66,22 +72,18 @@ namespace Client
 
         private void GoButton_Click(object sender, EventArgs e)
         {
-            //Task filter = new Task();
-            /* Task <Bitmap> filter = Task.Run(() => _myService.ApplyFilter(_image));
-             Bitmap newImage = filter.Result;*/
-
-            // BackgroundWorker worker
-            //  Thread fl = new Thread(delegate () { _myService.ApplyFilter(_image); });
 
             //string nameOfFilter = _myService.GetListOfFilters()[this.ChoiceButton.SelectedIndex];
+          //  this.textBox1.Text = this.ChoiceButton.SelectedIndex.ToString();
+            //this.textBox1.Show();
+            int idx = this.ChoiceButton.SelectedIndex;
+            _filter = new Thread(() => { _image = _myService.ApplyFilter(_image, _listOfFilters[idx]);  });
+            _filter.IsBackground = true;
+            _filter.Start();
 
-               Thread filter = new Thread(() => { _image = _myService.ApplyFilter(_image, "red");  });
-               filter.IsBackground = true;
-               filter.Start();
-
-               Thread progress = new Thread(() => { Progres(); });
-               progress.IsBackground = true;
-               progress.Start();
+            Thread progress = new Thread(() => { Progres(); });
+            progress.IsBackground = true;
+            progress.Start();
 
         }
 
@@ -93,8 +95,8 @@ namespace Client
             {
                 progress = _myService.GetProgress();
                 this.progressBar1.Value = progress;
-                //Thread.Sleep(10);
             }
+            while (_filter.IsAlive) { }
             this.pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
             this.pictureBox.Image = _image;
         }
