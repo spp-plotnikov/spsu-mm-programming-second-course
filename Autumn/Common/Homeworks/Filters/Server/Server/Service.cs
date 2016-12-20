@@ -9,9 +9,8 @@ using System.Drawing;
 using System.ServiceModel;
 namespace Server
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
-                    ConcurrencyMode = ConcurrencyMode.Multiple,
-                    UseSynchronizationContext = true)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession,
+                    ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class Service : IService
     {
         private bool _isAlive = false;
@@ -112,6 +111,7 @@ namespace Server
                     result[i * image.Height * 3 + j * 3 + 2] = (byte)blue;
                 }
                 _progress = i * 100 / image.Width;
+                Thread.Sleep(10);
             }
             if (_isAlive) _progress = 100;
             return result;
@@ -137,6 +137,7 @@ namespace Server
                     result[i * image.Height * 3 + j * 3 + 2] = (byte)blue;
                 }
                 _progress = i * 100 / image.Width;
+                Thread.Sleep(10);
             }
             if (_isAlive) _progress = 100;
             return result;
