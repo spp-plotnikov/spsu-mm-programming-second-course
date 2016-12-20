@@ -6,14 +6,16 @@ import java.util.concurrent.ExecutorService;
 public class MyWebSocketHandlerCreator implements WebSocketCreator {
     private ExecutorService workersPool;
     private Filter[] filters;
+    private ImageProcessingStorage storage;
 
-    public MyWebSocketHandlerCreator(ExecutorService workersPool, Filter[] filters) {
+    public MyWebSocketHandlerCreator(ImageProcessingStorage storage, ExecutorService workersPool, Filter[] filters) {
         this.workersPool = workersPool;
         this.filters = filters;
+        this.storage = storage;
     }
 
     @Override
     public Object createWebSocket(ServletUpgradeRequest request, ServletUpgradeResponse response) {
-        return new MyWebSocketHandler(workersPool, filters);
+        return new MyWebSocketHandler(storage, workersPool, filters);
     }
 }

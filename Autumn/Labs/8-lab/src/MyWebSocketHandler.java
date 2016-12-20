@@ -9,10 +9,12 @@ import java.util.concurrent.ExecutorService;
 public class MyWebSocketHandler {
     private ExecutorService workersPool;
     private Filter[] filters;
+    private ImageProcessingStorage storage;
 
-    public MyWebSocketHandler(ExecutorService workersPool, Filter[] filters) {
+    public MyWebSocketHandler(ImageProcessingStorage storage, ExecutorService workersPool, Filter[] filters) {
         this.workersPool = workersPool;
         this.filters = filters;
+        this.storage = storage;
     }
 
     @OnWebSocketClose
@@ -60,7 +62,7 @@ public class MyWebSocketHandler {
                         return;
                     }
 
-                    if (ImageProcessingServer.getImageProcessing(session) != null) {
+                    if (storage.getImageProcessing(session) != null) {
                         objReturn.put("commandType", 1);
                         objReturn.put("status", 6);
                         session.getRemote().sendString(objReturn.toString());
@@ -68,9 +70,9 @@ public class MyWebSocketHandler {
                         return;
                     }
 
-                    ImageProcessing ip = new ImageProcessing(session, obj.getString("imgB64"), filters[filterId]);
+                    ImageProcessing ip = new ImageProcessing(storage, session, obj.getString("imgB64"), filters[filterId]);
 
-                    ImageProcessingServer.putImageProcessing(session, ip);
+                    storage.putImageProcessing(session, ip);
                     workersPool.submit(ip);
 
                     objReturn.put("commandType", 1);
@@ -80,7 +82,7 @@ public class MyWebSocketHandler {
                     break;
 
                 case 2:
-                    ImageProcessing ipToCancel = ImageProcessingServer.getImageProcessing(session);
+                    ImageProcessing ipToCancel = storage.getImageProcessing(session);
                     if (ipToCancel == null) {
                         objReturn.put("commandType", 2);
                         objReturn.put("status", 2);

@@ -15,9 +15,11 @@ public class ImageProcessing implements Runnable {
     private Filter filter;
     private volatile Boolean isCancelled;
     private long prevTime;
+    private ImageProcessingStorage storage;
 
 
-    ImageProcessing(Session session, String imgB64, Filter filter) {
+    ImageProcessing(ImageProcessingStorage storage, Session session, String imgB64, Filter filter) {
+        this.storage = storage;
         this.session = session;
         this.imgB64 = imgB64;
         this.filter = filter;
@@ -132,6 +134,6 @@ public class ImageProcessing implements Runnable {
             }
         }
 
-        ImageProcessingServer.removeSession(session);
+        storage.removeImageProcessing(session);
     }
 }

@@ -1,25 +1,24 @@
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
 public class ImageProcessingServer {
     private ExecutorService workersPool;
-    private static ConcurrentHashMap<Session, ImageProcessing> processingImagesHashMap = new ConcurrentHashMap();
+    private ImageProcessingStorage storage;
     private Filter[] filters;
 
-    public ImageProcessingServer() throws Exception {
+    public ImageProcessingServer(int httpPort, int wsPort) throws Exception {
         workersPool = Executors.newFixedThreadPool(5);
         filters = parseConfig("config.json");
+        storage = new ImageProcessingStorage();
 
-        Server httpServer = new Server(8080);
+        Server httpServer = new Server(httpPort);
         ContextHandler httpContextHandler = new ContextHandler("/");
         httpContextHandler.setContextPath("/");
         httpContextHandler.setHandler(new MyHttpHandler(filters));
@@ -28,26 +27,14 @@ public class ImageProcessingServer {
         WebSocketHandler wsHandler = new WebSocketHandler() {
             @Override
             public void configure(WebSocketServletFactory factory) {
-                factory.setCreator(new MyWebSocketHandlerCreator(workersPool, filters));
+                factory.setCreator(new MyWebSocketHandlerCreator(storage, workersPool, filters));
             }
         };
-        Server wsServer = new Server(8081);
+        Server wsServer = new Server(wsPort);
         wsServer.setHandler(wsHandler);
 
         wsServer.start();
         httpServer.start();
-    }
-
-    public static void removeSession(Session session) {
-        processingImagesHashMap.remove(session);
-    }
-
-    public static void putImageProcessing(Session session, ImageProcessing ip) {
-        processingImagesHashMap.put(session, ip);
-    }
-
-    public static ImageProcessing getImageProcessing(Session session) {
-        return processingImagesHashMap.get(session);
     }
 
     private Filter[] parseConfig(String path) {
@@ -74,5 +61,3 @@ public class ImageProcessingServer {
         return filters;
     }
 }
-
-
