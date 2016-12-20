@@ -4,6 +4,7 @@ import java.util.Random;
 public class Producer implements Runnable {
     private LinkedList<Integer> buffer;
     private volatile Boolean producerIsRunning = true;
+
     Producer(LinkedList<Integer> buffer) {
         this.buffer = buffer;
     }
