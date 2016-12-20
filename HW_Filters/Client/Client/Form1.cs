@@ -16,6 +16,8 @@ namespace Client
     public partial class Form1 : Form
     {
         private Bitmap _image;
+        delegate void Proc();
+        private bool _isWorking;
         private IService1 _myService;
         private Thread _filter;
         private List<string> _listOfFilters;
@@ -27,6 +29,7 @@ namespace Client
             _myService = service;
             InitializeComponent();
             _addFilters();
+            _isWorking = false;
         }
 
         private void _addFilters()
@@ -62,29 +65,57 @@ namespace Client
             OpenFileDialog file = new OpenFileDialog();
             file.Filter = "Image File |*.bmp";
 
+            
+
             if (file.ShowDialog() == DialogResult.OK)
             {
-                _image = new Bitmap(file.FileName);
-                this.pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-                this.pictureBox.Image = _image;
+                if (!_isWorking)
+                {
+                    _image = new Bitmap(file.FileName);
+
+                    if (_image.Width * _image.Height > 1080 * 1080)
+                    {
+                        MessageBox.Show("too big");
+                        _image = null;
+                        return;
+                    }
+
+                    this.pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                    this.pictureBox.Image = _image;
+                }
+                else
+                {
+                    MessageBox.Show("You can't load new image, please wait");
+                }
             }
+
         }
 
         private void GoButton_Click(object sender, EventArgs e)
         {
+            if (!_isWorking)
+            {
+                _isWorking = true;
+                if (_image == null ||this.ChoiceButton.SelectedIndex == -1)
+                {
+                    MessageBox.Show("not enough arguments");
+                    _isWorking = false;
+                    return;
+                }
+                int idx = this.ChoiceButton.SelectedIndex;
+                string nameOfFilter = _listOfFilters[idx];
+                _filter = new Thread(() => { _image = _myService.ApplyFilter(_image, nameOfFilter); });
+                _filter.IsBackground = true;
+                _filter.Start();
 
-            //string nameOfFilter = _myService.GetListOfFilters()[this.ChoiceButton.SelectedIndex];
-          //  this.textBox1.Text = this.ChoiceButton.SelectedIndex.ToString();
-            //this.textBox1.Show();
-            int idx = this.ChoiceButton.SelectedIndex;
-            _filter = new Thread(() => { _image = _myService.ApplyFilter(_image, _listOfFilters[idx]);  });
-            _filter.IsBackground = true;
-            _filter.Start();
-
-            Thread progress = new Thread(() => { Progres(); });
-            progress.IsBackground = true;
-            progress.Start();
-
+                Thread progress = new Thread(() => { Progres(); });
+                progress.IsBackground = true;
+                progress.Start();
+            }
+            else
+            {
+                MessageBox.Show("You can't load image to server, please wait");
+            }
         }
 
         private void Progres()
@@ -94,11 +125,20 @@ namespace Client
             while (progress != 100)
             {
                 progress = _myService.GetProgress();
-                this.progressBar1.Value = progress;
+              //  this.progressBar1.Value = progress;
+                if ((this.progressBar1.InvokeRequired))
+                {
+                    this.Invoke(new Proc(delegate () { progressBar1.Value = progress; }));
+                }
+                else
+                {
+                    progressBar1.Value = progress;
+                }
             }
             while (_filter.IsAlive) { }
             this.pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
             this.pictureBox.Image = _image;
+            _isWorking = false;
         }
 
 

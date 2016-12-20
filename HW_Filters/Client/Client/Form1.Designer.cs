@@ -55,7 +55,7 @@
             // 
             // LoadButton
             // 
-            this.LoadButton.Location = new System.Drawing.Point(397, 12);
+            this.LoadButton.Location = new System.Drawing.Point(387, 12);
             this.LoadButton.Name = "LoadButton";
             this.LoadButton.Size = new System.Drawing.Size(114, 36);
             this.LoadButton.TabIndex = 3;
@@ -65,9 +65,9 @@
             // 
             // GoButton
             // 
-            this.GoButton.Location = new System.Drawing.Point(364, 225);
+            this.GoButton.Location = new System.Drawing.Point(387, 228);
             this.GoButton.Name = "GoButton";
-            this.GoButton.Size = new System.Drawing.Size(47, 32);
+            this.GoButton.Size = new System.Drawing.Size(114, 30);
             this.GoButton.TabIndex = 4;
             this.GoButton.TabStop = false;
             this.GoButton.Text = "Go";
@@ -77,17 +77,17 @@
             // ChoiceButton
             // 
             this.ChoiceButton.FormattingEnabled = true;
-            this.ChoiceButton.Location = new System.Drawing.Point(397, 82);
+            this.ChoiceButton.Location = new System.Drawing.Point(387, 95);
             this.ChoiceButton.Name = "ChoiceButton";
-            this.ChoiceButton.Size = new System.Drawing.Size(87, 21);
+            this.ChoiceButton.Size = new System.Drawing.Size(114, 21);
             this.ChoiceButton.TabIndex = 5;
             this.ChoiceButton.SelectedIndexChanged += new System.EventHandler(this.ChoiceButton_SelectedIndexChanged);
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(387, 142);
+            this.CancelButton.Location = new System.Drawing.Point(387, 157);
             this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(107, 38);
+            this.CancelButton.Size = new System.Drawing.Size(114, 38);
             this.CancelButton.TabIndex = 6;
             this.CancelButton.Text = "Cancel";
             this.CancelButton.UseVisualStyleBackColor = true;

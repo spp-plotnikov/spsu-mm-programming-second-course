@@ -38,7 +38,7 @@ namespace Contracts
             Console.WriteLine(nameOfFilter);
             _isAlive = true;
             _progress = 0;
-            _image = (Bitmap)image.Clone();
+            _image = new Bitmap(image);// (Bitmap)image.Clone();
             switch (nameOfFilter)
             {
                 case "red":
@@ -85,7 +85,6 @@ namespace Contracts
                     byte green = c.G;
                     byte blue = c.B;
                     Color newColor = Color.FromArgb((int)(red), (int)(0), (int)(0));
-                    
                     _image.SetPixel(i, j, newColor);
                 }
                 _progress = i * 100 / _image.Width;

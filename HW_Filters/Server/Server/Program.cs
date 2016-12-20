@@ -17,7 +17,7 @@ namespace Server
         static void Main(string[] args)
         {
             //поменяй тут все!!!
-            int bufferSize = 2147483647;
+            int bufferSize = 15000000;
             WebServiceHost host = new WebServiceHost(typeof(Service1), new Uri("net.tcp://localhost:11000/"));
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             binding.MaxBufferPoolSize = bufferSize;

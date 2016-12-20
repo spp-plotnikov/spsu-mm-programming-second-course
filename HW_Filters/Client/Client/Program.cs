@@ -23,7 +23,7 @@ namespace Client
         static void Main()
         {
 
-            int bufferSize = 2147483647;
+            int bufferSize = 15000000;
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             binding.MaxBufferPoolSize = bufferSize;
             binding.MaxBufferSize = bufferSize;
