@@ -14,9 +14,6 @@ namespace Contracts
     public interface IService1
     {
         [OperationContract]
-        void work();
-
-        [OperationContract]
         List<string> GetListOfFilters();
 
         [OperationContract]

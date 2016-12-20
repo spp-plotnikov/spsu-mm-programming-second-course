@@ -10,7 +10,7 @@ using System.Threading;
 namespace Contracts
 {
     // ПРИМЕЧАНИЕ. Команду "Переименовать" в меню "Рефакторинг" можно использовать для одновременного изменения имени класса "Service1" в коде и файле конфигурации.
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession,
                     ConcurrencyMode = ConcurrencyMode.Multiple,
                     UseSynchronizationContext = true)]
     public class Service1 : IService1
@@ -19,26 +19,20 @@ namespace Contracts
         private int _progress = 0;
         private bool _isAlive;
 
-        public void work()
-        {
-           // Console.Write("SERVER");
-        }
-
         public List<string> GetListOfFilters()
         {
-            List<string> ListOfFilters = new List<string>();
-            ListOfFilters.Add("blue");
-            ListOfFilters.Add("red");
-            ListOfFilters.Add("green");
-            return ListOfFilters;
+            List<string> listOfFilters = new List<string>();
+            listOfFilters.Add("blue");
+            listOfFilters.Add("red");
+            listOfFilters.Add("green");
+            return listOfFilters;
         }
 
         public Bitmap ApplyFilter(Bitmap image, string nameOfFilter)
         {
-            Console.WriteLine(nameOfFilter);
             _isAlive = true;
             _progress = 0;
-            _image = new Bitmap(image);// (Bitmap)image.Clone();
+            _image = new Bitmap(image);
             switch (nameOfFilter)
             {
                 case "red":
@@ -65,7 +59,7 @@ namespace Contracts
 
         public int GetProgress()
         {
-            Console.WriteLine(_progress);
+           // Console.WriteLine(_progress); // helpful for debuging
             return _progress;
         }
         
@@ -80,11 +74,11 @@ namespace Contracts
             {
                 for (int j = 0; j < _image.Height && _isAlive; j++)
                 {
-                    Color c = _image.GetPixel(i, j);
-                    byte red = c.R;
-                    byte green = c.G;
-                    byte blue = c.B;
-                    Color newColor = Color.FromArgb((int)(red), (int)(0), (int)(0));
+                    Color cur = _image.GetPixel(i, j);
+                    byte red = cur.R;
+                    byte green = cur.G;
+                    byte blue = cur.B;
+                    Color newColor = Color.FromArgb((int)red, 0, 0);
                     _image.SetPixel(i, j, newColor);
                 }
                 _progress = i * 100 / _image.Width;
@@ -99,11 +93,11 @@ namespace Contracts
             {
                 for (int j = 0; j < _image.Height && _isAlive; j++)
                 {
-                    Color c = _image.GetPixel(i, j);
-                    byte red = c.R;
-                    byte green = c.G;
-                    byte blue = c.B;
-                    Color newColor = Color.FromArgb((int)(0), (int)(0), (int)(blue));
+                    Color cur = _image.GetPixel(i, j);
+                    byte red = cur.R;
+                    byte green = cur.G;
+                    byte blue = cur.B;
+                    Color newColor = Color.FromArgb(0, 0, (int)blue);
 
                     _image.SetPixel(i, j, newColor);
                 }
@@ -119,11 +113,11 @@ namespace Contracts
             {
                 for (int j = 0; j < _image.Height && _isAlive; j++)
                 {
-                    Color c = _image.GetPixel(i, j);
-                    byte red = c.R;
-                    byte green = c.G;
-                    byte blue = c.B;
-                    Color newColor = Color.FromArgb((int)(0), (int)(green), (int)(0));
+                    Color cur = _image.GetPixel(i, j);
+                    byte red = cur.R;
+                    byte green = cur.G;
+                    byte blue = cur.B;
+                    Color newColor = Color.FromArgb(0, (int)green, 0);
 
                     _image.SetPixel(i, j, newColor);
                 }
