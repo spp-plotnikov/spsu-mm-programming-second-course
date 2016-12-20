@@ -17,7 +17,20 @@ namespace Filters
         public delegate Bitmap Mapping(Bitmap srcImage, ref double progress);
         private Mapping mapping;
         private double progress;
-        
+        private bool cancelled;
+        public bool Cancelled
+        {
+            get
+            {
+                return cancelled;
+            }
+            set
+            {
+                cancelled = value;
+            }
+        }
+
+
         public Filter(string filterName, Mapping filter)
         {
             this.filterName = filterName;

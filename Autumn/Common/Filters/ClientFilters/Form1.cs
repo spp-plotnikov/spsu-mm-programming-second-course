@@ -17,8 +17,9 @@ namespace ClientFilters
         private Bitmap curImage;
         private Filtering.ServiceClient host;
         ManualResetEvent progressFinished = new ManualResetEvent(true);
-        ManualResetEvent cancelled = new ManualResetEvent(false);
+        bool cancelled = false;
         bool finished = true;
+        ManualResetEvent backgroundWorker1IsFree = new ManualResetEvent(true);
 
         public Form1()
         {
@@ -42,7 +43,7 @@ namespace ClientFilters
             }
             catch { }
         }
-
+        
         private void button2_Click(object sender, EventArgs e)
         {
             SendImage.Enabled = false;
@@ -59,39 +60,50 @@ namespace ClientFilters
 
         private void SendNGetImage(object sender, DoWorkEventArgs e)
         {
+            backgroundWorker1IsFree.Reset();
             bool error = false;
             this.Invoke((MethodInvoker)delegate ()
             {
                 if (curImage == null) { MessageBox.Show("No image"); error = true; SendImage.Enabled = true; return; }
                 if (!(comboBox1.Items.Count > 0)) { MessageBox.Show("Choose filter!"); error = true; SendImage.Enabled = true; return; }
             });
-            if (error) { return; }
+            if (error) { backgroundWorker1IsFree.Set(); return; }
+            cancelled = false;
+            ConnectionMethods.Cancelled = false;            
             finished = false;
             byte[] toSend = ConnectionMethods.ImageToByteArray(curImage);
             this.Invoke((MethodInvoker)delegate ()
             {
                 host.SetFilter(comboBox1.SelectedValue.ToString());
             });
-            if (!backgroundWorker2.IsBusy)
-                backgroundWorker2.RunWorkerAsync();
+            if (!backgroundWorker2.IsBusy) { backgroundWorker2.RunWorkerAsync(); }
             ConnectionMethods.sendByteArrayUsingChunks(toSend, host);
             host.DoFilter();
             byte[] result1 = ConnectionMethods.receiveByteArrayUsingChunks(host);
-            pictureBox3.Image = ConnectionMethods.byteArrayToBitmap(result1);
+            if (!cancelled)
+            {                
+                pictureBox3.Image = ConnectionMethods.byteArrayToBitmap(result1);
+            }
+            else
+            {
+                backgroundWorker1IsFree.Set();
+                return;
+            }
             finished = true;
             this.Invoke((MethodInvoker)delegate ()
             {
                 progressFinished.WaitOne();
                 progressBar1.Value = 100;
-                Thread.Sleep(100);
                 label7.Text = "done";
                 progressBar1.Value = 0;
-                SendImage.Enabled = true;                
+                SendImage.Enabled = true;
+                backgroundWorker1IsFree.Set();            
             });
         }
 
         private void UpdatingProgressBar(object sender, DoWorkEventArgs e)
         {
+            int progress = 0;
             progressFinished.Reset();
             this.Invoke((MethodInvoker)delegate ()
             {
@@ -99,11 +111,11 @@ namespace ClientFilters
             });
             progressBar1.Maximum = 100;
             progressBar1.Minimum = 0;
-            while (true)
+            while (!cancelled)
             {
                 this.Invoke((MethodInvoker)delegate ()
                 {
-                    int progress = host.GetProgress();
+                    progress = host.GetProgress();
                     if (Math.Abs(progressBar1.Value - progress) < 90)
                     {
                         if (progress < 99 && progress > 0)
@@ -111,12 +123,12 @@ namespace ClientFilters
                             progressBar1.Value = progress;
                             label7.Text = "filtering";
                         }
-                        if (progress >= 99)
+                        if (progress >= 98)
                         {
                             progressBar1.Value = progress;
                             label7.Text = "recieving";
                         }
-                    }                    
+                    }
                 });
                 Thread.Sleep(500);
                 if (finished) { break; }
@@ -126,9 +138,17 @@ namespace ClientFilters
 
         private void button4_Click(object sender, EventArgs e)
         {
-            label7.Text = "cancelled";
+            label7.Text = "cancellation";
+            cancelled = true;
             host.Cancel();
             ConnectionMethods.Cancelled = true;
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                progressBar1.Value = 0;
+                backgroundWorker1IsFree.WaitOne();
+                label7.Text = "cancelled";
+                SendImage.Enabled = true;
+            });
         }
     }
 }

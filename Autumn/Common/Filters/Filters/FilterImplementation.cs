@@ -26,7 +26,7 @@ namespace Filters
         {
             progress = 0;
             int compressionRatio = 20;
-            double step = 1.0 / ((srcImage.Width / compressionRatio) * (srcImage.Height / compressionRatio));
+            double step = 1 / ((double)srcImage.Width) * compressionRatio;
             long sqCompressionRatio = compressionRatio * compressionRatio;
             Bitmap result = new Bitmap(srcImage.Width - srcImage.Width % compressionRatio, srcImage.Height - srcImage.Height % compressionRatio);
             for (int x = 0; x < srcImage.Width - compressionRatio; x += compressionRatio)
@@ -38,23 +38,24 @@ namespace Filters
                     long sumOfB = 0;
                     for (int i = 0; i < compressionRatio; i++)
                     {
+                        if (jackalFilter.Cancelled) { return result; }
                         for (int j = 0; j < compressionRatio; j++)
                         {
                             sumOfR += srcImage.GetPixel(x + i, y + j).R;
                             sumOfG += srcImage.GetPixel(x + i, y + j).G;
                             sumOfB += srcImage.GetPixel(x + i, y + j).B;
-                        }
+                        }                        
                     }
                     Color newColor = Color.FromArgb((int)(sumOfR / sqCompressionRatio), (int)(sumOfG / sqCompressionRatio), (int)(sumOfB / sqCompressionRatio));
                     for (int i = 0; i < compressionRatio; i++)
                     {
                         for (int j = 0; j < compressionRatio; j++)
                         {
-                            result.SetPixel(x + i, y + j, newColor);
-                        }
+                            result.SetPixel(x + i, y + j, newColor);                            
+                        }                        
                     }
-                    progress += step;
                 }
+                progress += step;
             }
             return result;
         }
@@ -68,11 +69,12 @@ namespace Filters
             {
                 for (int j = 0; j < result.Height; j++)
                 {
+                    if (invertFilter.Cancelled) { return result; }
                     Color pixelColor = result.GetPixel(i, j);
                     Color newColor = Color.FromArgb(255 - pixelColor.R, 255 - pixelColor.G, 255 - pixelColor.B);
                     result.SetPixel(i, j, newColor);                    
                 }
-                progress += step;
+                progress += step;                
             }
             return result;
         }
@@ -86,6 +88,7 @@ namespace Filters
             {
                 for (int j = 0; j < result.Height; j++)
                 {
+                    if (redFilter.Cancelled) { return result; }
                     Color pixelColor = result.GetPixel(i, j);
                     Color newColor = Color.FromArgb(pixelColor.R, 0, 0);
                     result.SetPixel(i, j, newColor);
