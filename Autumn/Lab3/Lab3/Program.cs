@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -6,15 +7,15 @@ namespace Lab3
 {
     public class Program
     {
-        public static List<int> Buffer = new List<int>();
+        static ConcurrentQueue<int> _buffer = new ConcurrentQueue<int>();
         static List<Producer> _listOfProducers = new List<Producer>();
         static List<Consumer> _listOfConsumers = new List<Consumer>();
 
         static void Main(string[] args)
         {
             var rnd = new Random();
-            int numberOfProducers = rnd.Next(1, 10);
-            int numberOfConsumers = rnd.Next(10);
+            int numberOfProducers = rnd.Next(1, 20);
+            int numberOfConsumers = rnd.Next(20);
             Console.WriteLine("Number of produsers: " + numberOfProducers);
             Console.WriteLine("Number of consumers: " + numberOfConsumers);
             Console.WriteLine("Press any button to start/finish");
@@ -22,24 +23,12 @@ namespace Lab3
 
             for (int i = 0; i < numberOfProducers; i++)
             {
-                _listOfProducers.Add(new Producer(i));
+                _listOfProducers.Add(new Producer(i, _buffer));
             }
 
             for (int i = 0; i < numberOfConsumers; i++)
             {
-                _listOfConsumers.Add(new Consumer(i));
-            }
-
-            foreach (var prod in _listOfProducers)
-            {
-                Thread thread = new Thread(() => prod.Process(ref Buffer));
-                thread.Start();
-            }
-
-            foreach (var cons in _listOfConsumers)
-            {
-                Thread thread = new Thread(delegate () { cons.Process(ref Buffer); });
-                thread.Start();
+                _listOfConsumers.Add(new Consumer(i, _buffer));
             }
 
             Console.ReadKey();
@@ -54,7 +43,7 @@ namespace Lab3
                 cons.Stop();
             }
 
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
             Console.WriteLine("The end");
             Console.Read();
         }

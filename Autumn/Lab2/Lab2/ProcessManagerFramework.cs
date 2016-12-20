@@ -13,6 +13,7 @@ namespace Lab2
         static uint _curFiber;
         static int _index;
         static bool _priority;
+        static double _rank;
 
         public static void Do(int numberOfFibers, bool priority)
         {
@@ -42,22 +43,22 @@ namespace Lab2
                         _index = 0;
                     }
                 }
+
                 if (_fibers.Count <= 1)
                 {
                     DeleteAll();
                     _curFiber = Fiber.PrimaryId;
                     Console.WriteLine("The end");
-                    Thread.Sleep(50);
-                    Fiber.Switch(_curFiber);
                 }
                 else
                 {
+                    GetRank();
                     _index = GetFiber();
                     _curFiber = _fibers[_index];
                     Console.WriteLine("Switch to another fiber");
-                    Thread.Sleep(50);
-                    Fiber.Switch(_curFiber);
                 }
+                Thread.Sleep(50);
+                Fiber.Switch(_curFiber);
             }
             else
             {
@@ -65,12 +66,12 @@ namespace Lab2
                 {
                     _fibersQueue.Dequeue();
                 }
+
                 if (_fibersQueue.Count <= 0)
                 {
                     Console.WriteLine("The end");
+                    DeleteAll();
                     _curFiber = Fiber.PrimaryId;
-                    Thread.Sleep(50);
-                    Fiber.Switch(_curFiber);
                 }
                 else
                 {
@@ -78,13 +79,34 @@ namespace Lab2
                     int tempFirstFiber = _fibersQueue.Dequeue();
                     _fibersQueue.Enqueue(tempFirstFiber);
                     _curFiber = _fibers[_fibersQueue.Peek()];
-                    Thread.Sleep(50);
-                    Fiber.Switch(_curFiber);
                 }
+                Thread.Sleep(50);
+                Fiber.Switch(_curFiber);
             }
         }
 
         private static int GetFiber()
+        {
+            List<Process> suitableFibers = new List<Process>();
+            Process newProcess = new Process();
+            Process curProcess = _processes[_index];
+            Random rand = new Random();
+            foreach (var proc in _processes)
+            {
+                if (proc.Priority > _rank && proc != curProcess)
+                {
+                    suitableFibers.Add(proc);
+                }
+            }
+            if (suitableFibers.Count > 0)
+            {
+                newProcess = suitableFibers.ElementAt(rand.Next(suitableFibers.Count - 1));
+                return _processes.IndexOf(newProcess);
+            }
+            return GetMaxFiber();
+        }
+
+        private static int GetMaxFiber()
         {
             Process newProcess = new Process();
             Process curProcess = _processes[_index];
@@ -98,6 +120,16 @@ namespace Lab2
                 }
             }
             return _processes.IndexOf(newProcess);
+        }
+
+        private static void GetRank()
+        {
+            _rank = 0;
+            foreach (var proc in _processes)
+            {
+                _rank += proc.Priority;
+            }
+            _rank = _rank / (double)_processes.Count;
         }
 
         private static void DeleteAll()

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 
 namespace Lab3
@@ -10,21 +10,26 @@ namespace Lab3
         int _id;
         Mutex _mutex;
         bool _isFinished;
+        ConcurrentQueue<int> _buffer;
+        Thread _thread;
 
-        public Producer(int id)
+        public Producer(int id, ConcurrentQueue<int> buffer)
         {
             _id = id;
             _mutex = new Mutex();
             _isFinished = false;
+            _buffer = buffer;
+            _thread = new Thread(Process);
+            _thread.Start();
         }
 
-        public void Process(ref List<int> buff)
+        public void Process()
         {
             while (!_isFinished)
             {
                 _mutex.WaitOne();
                 int item = _rnd.Next(1, 100);
-                buff.Add(item);
+                _buffer.Enqueue(item);
                 Console.WriteLine("Producer {0} add {1}", _id, item);
                 _mutex.ReleaseMutex();
                 Thread.Sleep(100);

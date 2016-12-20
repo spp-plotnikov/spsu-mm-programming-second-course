@@ -1,17 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Lab4
 {
     class ThreadPool : IDisposable
     {
+        private EventWaitHandle _waitHandle;
+        private EventWaitHandle _clearCount;
+
         ThreadInfo[] _threadsInfo;
         object _locker;
         bool _isFinished;
 
         public ThreadPool(int numberOfThreads)
         {
+            _clearCount = new EventWaitHandle(false, EventResetMode.AutoReset);
+
             _locker = new object();
             _isFinished = false;
             _threadsInfo = new ThreadInfo[numberOfThreads];
@@ -51,7 +55,11 @@ namespace Lab4
             }
             else
             {
-                Thread.Sleep(100);
+                //Task.Delay(10).Wait();
+
+                _waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+                WaitHandle.SignalAndWait(_waitHandle, _clearCount, 10, true);
+
                 return;
             }
         }

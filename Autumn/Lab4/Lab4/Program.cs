@@ -8,7 +8,7 @@ namespace Lab4
         static void Main(string[] args)
         {
             bool isFinished = false;
-            int numberOfThreads = new Random().Next(5, 50);
+            int numberOfThreads = new Random().Next(5, 20);
             Console.WriteLine("Number of threads: {0}", numberOfThreads);
             Console.WriteLine("Press any button to start/finish");
             Console.ReadKey();
@@ -16,14 +16,13 @@ namespace Lab4
             ThreadPool threadPool = new ThreadPool(numberOfThreads);
             threadPool.Start();
 
-            Action action = delegate ()
+            Action action = (() =>
             {
                 Console.WriteLine("Thread finished action");
-
                 Thread.Sleep(100);
-            };
+            });
 
-            Thread thread = new Thread(delegate ()
+            Thread thread = new Thread(() =>
             {
                 while (!isFinished)
                 {
