@@ -5,7 +5,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
     <style>
-
         body * {
             font-size: 20px;
         }
@@ -79,7 +78,6 @@
             background: red;
             border: 1px solid #ca2424;
         }
-
     </style>
 </head>
 <body>
@@ -124,7 +122,6 @@
                 var self = this,
                     ws = this.ws;
 
-
                 this.ws.onopen = function() {
                     console.log('Connection is opened!');
                     ws.send(JSON.stringify({
@@ -157,12 +154,10 @@
                     if (!self.isImageOpened) {
                         return;
                     }
-
  
                     var sourceImg = $(self.opts.beforeImg).attr('src'),
                         imgInBase64 = sourceImg,
-                        filter = parseInt($(self.opts.filtersSelect).val());                   
-                    
+                        filter = parseInt($(self.opts.filtersSelect).val());                    
 
                     $(self.opts.textStatus).text('Sending image...');
                     
