@@ -19,16 +19,15 @@ public class Producer implements Runnable {
             int i = random.nextInt(100);
             synchronized (buffer) {
                 buffer.add(i);
-
-                System.out.println("Producer " + Thread.currentThread().getId() + " produced " + i);
-
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
                 buffer.notifyAll();
+            }
+
+            System.out.println("Producer " + Thread.currentThread().getId() + " produced " + i);
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

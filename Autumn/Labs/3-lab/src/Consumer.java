@@ -10,11 +10,15 @@ public class Consumer implements Runnable {
 
     public void stop() {
         consumerIsRunning = false;
+        synchronized (buffer) {
+            buffer.notifyAll();
+        }
     }
 
     @Override
     public void run() {
         while (consumerIsRunning) {
+            int mine;
             synchronized (buffer) {
                 while (buffer.isEmpty() && consumerIsRunning) {
                     try {
@@ -28,8 +32,10 @@ public class Consumer implements Runnable {
                     break;
                 }
 
-                int mine = buffer.removeFirst();
+                mine = buffer.removeFirst();
+            }
 
+            if (consumerIsRunning) {
                 System.out.println("Consumer " + Thread.currentThread().getId() + " consumed " + mine);
 
                 try {

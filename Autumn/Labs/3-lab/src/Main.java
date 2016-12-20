@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 
 public class Main {
     private static LinkedList<Integer> buffer = new LinkedList<>();
-    private static final int producersCount = 1;
-    private static final int consumersCount = 4;
+    private static final int producersCount = 2;
+    private static final int consumersCount = 3;
 
     public static void main(String[] args) throws InterruptedException, IOException {
         Consumer[] consumers = new Consumer[consumersCount];
