@@ -18,10 +18,8 @@ namespace Client
         private Thread _threadFilter, _threadLoad, _threadProcess;
         delegate void Proc();
         private Bitmap _image;
-        private Bitmap _prevIm;
         private IService _filter;
         int _index;
-        byte[] res = null;
         bool _isProcess = false;
 
         public FormFilters(IService server)
@@ -38,7 +36,7 @@ namespace Client
                 FiltersList.Items.Add(fi);
             }
         }
-
+        
         private void LoadImage(string addressRead)
         {
             var fileLength = new FileInfo(addressRead).Length; 
@@ -47,9 +45,9 @@ namespace Client
                 MessageBox.Show("Ошибка! Файл должен быть меньше 7 MB");
                 return;
             }
-            _image = new Bitmap(addressRead);
+            Bitmap image = new Bitmap(addressRead);
             PictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            PictureBox.Image = (Bitmap)_image.Clone();
+            PictureBox.Image = new Bitmap((Bitmap)image.Clone());
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
@@ -65,16 +63,19 @@ namespace Client
 
         private void FilterButton_Click(object sender, EventArgs e)
         {
-            _image = new Bitmap(PictureBox.Image);
+            _filter.Clear();
+            _image = new Bitmap((Bitmap)PictureBox.Image.Clone());
             ProgressBar.Value = 0;
             _filter.CancelProgress();
             FilterButton.Enabled = false;
+            LoadButton.Enabled = false;
             _index = FiltersList.SelectedIndex + 1;
 
             if ((_index == 0) || (_image == null))
             {
                 MessageBox.Show("Ошибка! Не все поля заполнены!");
                 FilterButton.Enabled = true;
+                LoadButton.Enabled = true;
                 return;
             }
 
@@ -86,20 +87,18 @@ namespace Client
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
+            _isProcess = false;
             Thread stop = new Thread(() => { _filter.ChangeIsAlive(false); });
             stop.IsBackground = true;
             stop.Start();
-            _isProcess = false;
         }
 
         private void Run()
         {
-            Bitmap old = new Bitmap(_image);
-            _threadFilter = new Thread(() => { res = (_filter.Filter(_image, _index)); });
+            _threadFilter = new Thread(() => { _filter.Filter(_image, _index); });
             _threadFilter.IsBackground = true;
             _threadFilter.Start();
             int progress = 0;
-            this.ProgressBar.Maximum = 100;
             while (progress != 100 && _isProcess)
             {
                 Thread.Sleep(10);
@@ -113,23 +112,22 @@ namespace Client
                     ProgressBar.Value = progress;
                 }
             }
-            if (_filter.CheckIsAlive())
+            if (_isProcess)
             {
-                _image = new Bitmap(ToBitMap(res));
+                _image = ToBitMap(_filter.GetImage());
             }
-            else
-            {
-                _image = new Bitmap(old);
-            }
+
             if (this.InvokeRequired)
             {
                 this.Invoke(new Proc(delegate() { PictureBox.Image = _image;}));
                 this.Invoke(new Proc(delegate() { FilterButton.Enabled = true;}));
+                this.Invoke(new Proc(delegate() { LoadButton.Enabled = true; }));
             }
             else
             {
                 PictureBox.Image = _image;
                 FilterButton.Enabled = true;
+                LoadButton.Enabled = true;
             }
             _isProcess = false;
         }

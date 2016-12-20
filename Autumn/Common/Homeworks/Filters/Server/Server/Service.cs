@@ -17,6 +17,7 @@ namespace Server
         private bool _isAlive = false;
         private int _progress = 0;
         private int _index;
+        byte[] _res;
 
         // sends list of filters to client
         public string[] GetFilters()
@@ -40,6 +41,10 @@ namespace Server
         {
             return _isAlive;
         }
+        public byte[] GetImage()
+        {
+            return _res;
+        }
 
         // changes the status of process
         public void ChangeIsAlive(bool x)
@@ -53,34 +58,34 @@ namespace Server
             return _progress;
         }
 
-        // increments the progress
-        private void ProgressIncr()
+        public void Clear()
         {
-            _progress++;
+            _res = null;
+            GC.Collect();
         }
 
         // call for applying a filter
-        public byte[] Filter(Bitmap image, int index)
+        public void Filter(Bitmap image, int index)
         {
             _index = index;
             _isAlive = true;
-            Bitmap newIm = new Bitmap(image);
-            byte[] result = new byte[image.Width * image.Height * 3];
+            _res = new byte[image.Width * image.Height * 3];
+            Bitmap imag = new Bitmap(image);
             switch (_index)
             {
                 case 1:
                     {
-                        result = InvertFilter(newIm);
+                        _res = InvertFilter(imag);
                         break;
                     }
 
                 case 2:
                     {
-                        result = SepiaFilter(newIm);
+                        _res = SepiaFilter(imag);
                         break;
                     }
             }
-            return result;
+            return;
         }
 
         /// <summary>
@@ -88,7 +93,6 @@ namespace Server
         /// Inversion
         /// Sepia
         /// </summary>
-
         byte[] InvertFilter(Bitmap image)
         {
             byte[] result = new byte[image.Width * image.Height * 3];
