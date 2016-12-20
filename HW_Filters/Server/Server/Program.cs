@@ -17,12 +17,12 @@ namespace Server
         static void Main(string[] args)
         {
             int bufferSize = 15000000;
-            WebServiceHost host = new WebServiceHost(typeof(Service1), new Uri("net.tcp://localhost:11000/"));
+            WebServiceHost host = new WebServiceHost(typeof(Service), new Uri("net.tcp://localhost:11000/"));
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             binding.MaxBufferPoolSize = bufferSize;
             binding.MaxBufferSize = bufferSize;
             binding.MaxReceivedMessageSize = bufferSize;
-            host.AddServiceEndpoint(typeof(IService1), binding, "net.tcp://localhost:11000/");
+            host.AddServiceEndpoint(typeof(IService), binding, "net.tcp://localhost:11000/");
             host.Open();
             Console.WriteLine("Сервис открыт");
             Console.ReadKey();

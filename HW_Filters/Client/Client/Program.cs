@@ -16,9 +16,6 @@ namespace Client
 {
     static class Program
     {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
         [STAThread]
         static void Main()
         {
@@ -28,10 +25,10 @@ namespace Client
             binding.MaxBufferPoolSize = bufferSize;
             binding.MaxBufferSize = bufferSize;
             binding.MaxReceivedMessageSize = bufferSize;
-            ChannelFactory<IService1> cf = new ChannelFactory<IService1>(binding, "net.tcp://127.0.0.1:11000/");
+            ChannelFactory<IService> cf = new ChannelFactory<IService>(binding, "net.tcp://127.0.0.1:11000/");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1(cf.CreateChannel()));
+            Application.Run(new Form(cf.CreateChannel()));
 
         }
     }
