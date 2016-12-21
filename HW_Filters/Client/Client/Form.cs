@@ -28,11 +28,11 @@ namespace Client
             _listOfFilters = new List<string>();
             _myService = service;
             InitializeComponent();
-            _addFilters();
+            AddFilters();
             _isWorking = false;
         }
 
-        private void _addFilters()
+        private void AddFilters()
         {
             foreach (string filter in _myService.GetListOfFilters())
             {
@@ -52,7 +52,7 @@ namespace Client
                 {
                     _image = new Bitmap(file.FileName);
 
-                    if (_image.Width * _image.Height > 1080 * 1080)
+                    if (_image.Width * _image.Height > 3020 * 3020)
                     {
                         MessageBox.Show("too big");
                         _image = null;
@@ -74,6 +74,14 @@ namespace Client
         {
             if (!_isWorking)
             {
+                if ((this.progressBar.InvokeRequired))
+                {
+                    this.Invoke(new Proc(delegate () { progressBar.Value = 0; }));
+                }
+                else
+                {
+                    progressBar.Value = 0;
+                }
                 _isWorking = true;
                 if (_image == null ||this.ChoiceButton.SelectedIndex == -1)
                 {
