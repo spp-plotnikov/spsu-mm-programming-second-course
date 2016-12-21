@@ -7,7 +7,7 @@ using System.Drawing;
 
 class Filters
 {
-    static public Bitmap Filter1(Bitmap src, ref double progress)
+    public Bitmap Filter1(Bitmap src, ref double progress)
     {
         progress = 0;
 
@@ -27,7 +27,7 @@ class Filters
         return filtered;
     }
 
-    static public Bitmap Filter2(Bitmap src, ref double progress)
+    public Bitmap Filter2(Bitmap src, ref double progress)
     {
         progress = 0;
 
@@ -47,7 +47,7 @@ class Filters
         return filtered;
     }
 
-    static public Bitmap Filter3(Bitmap src, ref double progress)
+    public Bitmap Filter3(Bitmap src, ref double progress)
     {
         progress = 0;
 

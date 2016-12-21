@@ -42,6 +42,8 @@ namespace WebServer
         {
             JavaScriptSerializer jsonConvert = new JavaScriptSerializer();
 
+            //Console.WriteLine("Size: " + requestRAW.Length);
+
             var decodedRequest = new Dictionary<string, string>();
             try
             {
@@ -70,8 +72,6 @@ namespace WebServer
                 }
                 string prefix = decodedRequest["img"].Substring(0, decodedRequest["img"].IndexOf(",") + 1);
 
-
-               
                 bool Runnable = true;
                 
                 double progress = 0.0;
@@ -87,12 +87,14 @@ namespace WebServer
                 progressSend.Start();
                 Bitmap done;
 
+                var filter = new Filters();
+
                 if (decodedRequest["filter"] == "1")
-                    done = Filters.Filter1((Bitmap)Image.FromStream(new MemoryStream(hexImg)), ref progress);
+                    done = filter.Filter1((Bitmap)Image.FromStream(new MemoryStream(hexImg)), ref progress);
                 else if (decodedRequest["filter"] == "2")
-                    done = Filters.Filter2((Bitmap)Image.FromStream(new MemoryStream(hexImg)), ref progress);
+                    done = filter.Filter2((Bitmap)Image.FromStream(new MemoryStream(hexImg)), ref progress);
                 else
-                    done = Filters.Filter3((Bitmap)Image.FromStream(new MemoryStream(hexImg)), ref progress);
+                    done = filter.Filter3((Bitmap)Image.FromStream(new MemoryStream(hexImg)), ref progress);
 
                 Runnable = false;
                 progressSend.Join();
@@ -102,7 +104,7 @@ namespace WebServer
 
                 string response = jsonConvert.Serialize(new Dictionary<string, string>() { { "img", prefix + Convert.ToBase64String(stream.ToArray()) } });
 
-                socket.Send(response);
+                socket.Send(response).Wait();
                 
             }
             else
@@ -114,18 +116,18 @@ namespace WebServer
         
         static void Main(string[] args)
         {
-
             // Init WebSocket server
             var server = new WebSocketServer("ws://0.0.0.0:8089");
 
             server.RestartAfterListenError = true;
             
-
             // Start WebSocket server
             server.Start(socket =>
             {
-                socket.OnMessage = message => processingImg(socket, message);
 
+                //socket.test = 1;
+                socket.OnMessage = message => processingImg(socket, message);
+                //socket.OnMessage.
                 socket.OnClose = (() =>
                 {
                     socket.Close();

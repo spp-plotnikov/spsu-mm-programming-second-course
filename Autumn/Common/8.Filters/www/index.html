@@ -17,52 +17,69 @@
     <script type="text/javascript" src="js/progressbar.js"></script>
     <script>
         
-    
-            function wsStart() {
-                ws1 = new WebSocket("ws://localhost:8089/");
-                ws1.onopen = function () {
-                };
-                ws1.onmessage = function (evt) {
+        var bar;
+        function connectSocketServer() {
+            var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
 
-                    try {
-                        var json = jQuery.parseJSON(evt.data);
-                      
-                        var preview = document.querySelector('img');
-                        preview.src = json['img'];
+            if (support == null)
+            {
+                alert("websockets not supported");
+                return;
+            }
+
+            ws = new window[support]('ws://10.8.0.10:8089/');
+
+            ws.onmessage = function (evt) {
+                try {
+                    var json = jQuery.parseJSON(evt.data);
+                    var preview = document.querySelector('img');
+                    preview.src = json['img'];
+                    $("#sendBtn").prop('disabled', false);
+                    $("#cancelBtn").prop('disabled', true);
+                }
+                catch (e) {
+
+                    if (evt.data == "error") {
+                        bar.set(0);
                         $("#sendBtn").prop('disabled', false);
                         $("#cancelBtn").prop('disabled', true);
+                        alert("File is empty or too large");
+                        return false;
                     }
-                    catch (e) {
-                        
-                        if (evt.data == "error")
-                        {
-                            bar.set(0);
-                            $("#sendBtn").prop('disabled', false);
-                            $("#cancelBtn").prop('disabled', true);
-                            alert("File is empty or too large");
-                            return false;
-                        }
-                        
-                        bar.animate(evt.data.replace(",", "."));
-                       
-                    }
-                };
+                    bar.animate(evt.data.replace(",", "."));
+                }
+            };
+
+            ws.onopen = function () {
+            };
+
+            ws.onclose = function () {
             }
-            
+        }
 
-            
+        function sendMessage(message) {
+            if (ws) {
+                ws.send(message);
+            }
+        }
 
-         
-            
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        function connectWebSocket() {
+            connectSocketServer();
+        }
+    
       
         function previewFile() {
             var preview = document.querySelector('img');
             var reader = new FileReader();
-
             var file = document.querySelector('input[type=file]').files[0];
 
-            if (file.size > 2 * 1024 * 1024)
-            {
+            if (file.size > 2 * 1024 * 1024) {
                 alert("Too large file");
                 return false;
             }
@@ -70,8 +87,8 @@
             reader.onloadend = function () {
                 preview.style.border = "none";
                 preview.src = reader.result;
-
             }
+
             if (file) {
                 reader.readAsDataURL(file);
             } else {
@@ -79,7 +96,7 @@
             }
         }
         
-        var bar;
+       
         function sendImg() {
             var preview = document.querySelector('img');
             if (preview.src != "") {
@@ -87,29 +104,24 @@
                 $("#cancelBtn").prop('disabled', false);
                 bar.set(0);
 
-                var AssocArray = {};
-                AssocArray["filter"] = $("#filters").val();
-                AssocArray["img"] = preview.src;
-                var req = JSON.stringify(AssocArray);
-                ws1.send(req);
+                sendMessage(JSON.stringify({
+                    filter: $("#filters").val(), 
+                    img: preview.src
+                }));
             }
         }
 
         function cancel() {
-           
-            ws1.close();
-                
-                
+            disconnectWebSocket()
             bar.set(0);
             $("#sendBtn").prop('disabled', false);
             $("#cancelBtn").prop('disabled', true);
-               
-            wsStart();
+            connectWebSocket();
         }
        
         window.onload = function(){
             window.bar = new ProgressBar.Line('#container', { easing: 'easeInOut' });
-            wsStart();  
+            connectWebSocket()
         }
         
     </script>

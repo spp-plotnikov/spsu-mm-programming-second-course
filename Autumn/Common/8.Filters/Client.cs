@@ -44,7 +44,7 @@ class Client
             return;
 
         // Debug
-        Console.WriteLine("-----------------------\n" + httpHeaders + "\n---------------------------\n");
+        //Console.WriteLine("-----------------------\n" + httpHeaders + "\n---------------------------\n");
 
 
         // Matching request url for HTTP headers
