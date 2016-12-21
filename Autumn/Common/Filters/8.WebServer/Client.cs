@@ -56,7 +56,7 @@ class Client
 
         // Checking request and building file path
         string filePath;
-        if (checkRequestUrl(requestUrl))
+        if (СheckRequestUrl(requestUrl))
             filePath = rootPath + requestUrl;
         else
             return;
@@ -104,7 +104,7 @@ class Client
         return headersEncoded;
     }
 
-    private bool checkRequestUrl(string requestUrl)
+    private bool СheckRequestUrl(string requestUrl)
     {
         if (requestUrl.IndexOf("..") >= 0)
         {
