@@ -120,6 +120,7 @@ namespace Client
                 {
                     progressBar.Value = progress;
                 }
+                Thread.Sleep(1000);
             }
             while (_filter.IsAlive) { }
             this.pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
