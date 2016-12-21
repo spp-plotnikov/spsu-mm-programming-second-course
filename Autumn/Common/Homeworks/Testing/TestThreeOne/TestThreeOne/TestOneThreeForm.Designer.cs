@@ -60,8 +60,8 @@
             this.Font = new System.Drawing.Font("Segoe Print", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(7, 10, 7, 10);
             this.Name = "TestThreeOne";
-            this.Text = "First and Second Test";
-            this.Load += new System.EventHandler(this.MyForm_Load);
+            this.Text = "First and Third Test";
+            this.Load += new System.EventHandler(this.TestThreeOne_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ThirdTest)).EndInit();
             this.ResumeLayout(false);
 

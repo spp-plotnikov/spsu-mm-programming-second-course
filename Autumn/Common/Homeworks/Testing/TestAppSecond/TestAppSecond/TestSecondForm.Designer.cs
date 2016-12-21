@@ -1,4 +1,4 @@
-﻿namespace FormsThird
+﻿namespace TestAppSecond
 {
     partial class TestSecondForm
     {
@@ -61,7 +61,7 @@
             this.Margin = new System.Windows.Forms.Padding(7, 10, 7, 10);
             this.Name = "TestSecondForm";
             this.Text = "SecondTest";
-            this.Load += new System.EventHandler(this.MyForm_Load);
+            this.Load += new System.EventHandler(this.TestSecondForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.SecondTest)).EndInit();
             this.ResumeLayout(false);
 

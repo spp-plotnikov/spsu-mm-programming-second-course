@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
-namespace FormsThird
+namespace TestAppSecond
 {
     public partial class TestSecondForm : Form
     {
@@ -26,7 +26,7 @@ namespace FormsThird
             _imagesSize = imagesSize;
         }
 
-        private void MyForm_Load(object sender, EventArgs e)
+        private void TestSecondForm_Load(object sender, EventArgs e)
         {
             SecondTest.ChartAreas[0].AxisX.Title = "Количество пикселей";
             SecondTest.ChartAreas[0].AxisX.TitleAlignment = StringAlignment.Near;
@@ -41,10 +41,10 @@ namespace FormsThird
             SecondTest.SaveImage("SecondTest.png", ChartImageFormat.Png);
         }
 
-        private void Draw(string name, List<string> x, List<long> points)
+        private void Draw(string name, List<string> x, List<long> y)
         {
             var series = new Series(name);
-            series.Points.DataBindXY(x, points);
+            series.Points.DataBindXY(x, y);
             SecondTest.Series.Add(series);
             series.ChartType = SeriesChartType.Line;
             series.BorderWidth = 2;

@@ -11,7 +11,6 @@ using System.Drawing;
 using System.ServiceModel.Description;
 using Server;
 using System.Windows.Forms;
-using FormsThird;
 
 namespace TestAppSecond
 {
@@ -68,8 +67,8 @@ namespace TestAppSecond
 
         static long Test(int size, Bitmap nimage)
         {
-            Bitmap image = (Bitmap)nimage.Clone();
             var counter = System.Diagnostics.Stopwatch.StartNew();
+            Bitmap image = (Bitmap)nimage.Clone();
             int bufferSize = 2147483647;
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             binding.MaxBufferPoolSize = bufferSize;

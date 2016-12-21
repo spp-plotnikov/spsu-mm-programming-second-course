@@ -22,7 +22,7 @@ namespace TestThreeOne
             _numOfGuys = numOfClients;
         }
 
-        private void MyForm_Load(object sender, EventArgs e)
+        private void TestThreeOne_Load(object sender, EventArgs e)
         {
             ThirdTest.ChartAreas[0].AxisX.Title = "Количество клиентов";
             ThirdTest.ChartAreas[0].AxisX.TitleAlignment = StringAlignment.Near;
