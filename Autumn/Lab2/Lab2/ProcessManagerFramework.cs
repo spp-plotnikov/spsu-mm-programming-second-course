@@ -7,134 +7,117 @@ namespace Lab2
 {
     public static class ProcessManager
     {
-        static List<uint> _fibers = new List<uint>();
-        static Queue<int> _fibersQueue = new Queue<int>();
-        static List<Process> _processes = new List<Process>();
-        static uint _curFiber;
-        static int _index;
-        static bool _priority;
+        public static List<uint> Fibers = new List<uint>();
+        public static List<Process> Processes = new List<Process>();
+        public static uint CurFiber;
+        static int _index = 0;
+        public static bool Priority;
+        static int _step = 4;
         static double _rank;
-
-        public static void Do(int numberOfFibers, bool priority)
-        {
-            _priority = priority;
-            for (int i = 0; i < numberOfFibers; i++)
-            {
-                Process proc = new Process();
-                _processes.Add(proc);
-                Fiber fiber = new Fiber(new Action(proc.Run));
-                _fibers.Add(fiber.Id);
-                _fibersQueue.Enqueue(i);
-            }
-            _curFiber = _fibers.First();
-            _index = 0;
-        }
 
         public static void Switch(bool fiberFinished)
         {
-            if (_priority)
+            if (fiberFinished)
             {
-                if (fiberFinished)
+                if (CurFiber != Fiber.PrimaryId)
                 {
-                    if (_curFiber != Fiber.PrimaryId)
-                    {
-                        _fibers.Remove(_curFiber);
-                        _processes.Remove(_processes[_index]);
-                        _index = 0;
-                    }
+                    Fibers.Remove(CurFiber);
+                    Processes.Remove(Processes[_index]);
+                    _index = 0;
+                    Console.WriteLine("Fiber {0} finished", CurFiber);
                 }
+            }
 
-                if (_fibers.Count <= 1)
-                {
-                    DeleteAll();
-                    _curFiber = Fiber.PrimaryId;
-                    Console.WriteLine("The end");
-                }
-                else
-                {
-                    GetRank();
-                    _index = GetFiber();
-                    _curFiber = _fibers[_index];
-                    Console.WriteLine("Switch to another fiber");
-                }
-                Thread.Sleep(50);
-                Fiber.Switch(_curFiber);
+            if (Fibers.Count < 1)
+            {
+                Console.WriteLine("The end");
+                DeleteAll();
+                CurFiber = Fiber.PrimaryId;
             }
             else
             {
-                if (fiberFinished)
-                {
-                    _fibersQueue.Dequeue();
-                }
-
-                if (_fibersQueue.Count <= 0)
-                {
-                    Console.WriteLine("The end");
-                    DeleteAll();
-                    _curFiber = Fiber.PrimaryId;
-                }
-                else
-                {
-                    Console.WriteLine("Switch to another fiber");
-                    int tempFirstFiber = _fibersQueue.Dequeue();
-                    _fibersQueue.Enqueue(tempFirstFiber);
-                    _curFiber = _fibers[_fibersQueue.Peek()];
-                }
-                Thread.Sleep(50);
-                Fiber.Switch(_curFiber);
+                _index = Priority ? GetFiber() : GetRandomFiber();
+                CurFiber = Fibers[_index];
+                Console.WriteLine("Switch to another fiber");
             }
+            Thread.Sleep(100);
+            Fiber.Switch(CurFiber);
+        }
+
+        private static int GetRandomFiber()
+        {
+            Random rand = new Random();
+            Process newProcess = Processes.ElementAt(rand.Next(Processes.Count - 1));
+            return Processes.IndexOf(newProcess);
         }
 
         private static int GetFiber()
         {
+            GetRank();
             List<Process> suitableFibers = new List<Process>();
             Process newProcess = new Process();
-            Process curProcess = _processes[_index];
             Random rand = new Random();
-            foreach (var proc in _processes)
+            if (_step != 4)
             {
-                if (proc.Priority > _rank && proc != curProcess)
+                _step++;
+                foreach (var proc in Processes)
                 {
-                    suitableFibers.Add(proc);
+                    if (proc.Priority >= _rank)
+                    {
+                        suitableFibers.Add(proc);
+                    }
                 }
             }
-            if (suitableFibers.Count > 0)
+            else
+            {
+                _step = 0;
+                foreach (var proc in Processes)
+                {
+                    if (proc.Priority <= _rank)
+                    {
+                        suitableFibers.Add(proc);
+                    }
+                }
+            }
+            if (suitableFibers.Count > 1)
             {
                 newProcess = suitableFibers.ElementAt(rand.Next(suitableFibers.Count - 1));
-                return _processes.IndexOf(newProcess);
+                return Processes.IndexOf(newProcess);
             }
-            return GetMaxFiber();
+            else
+            {
+                return GetMaxFiber();
+            }
         }
 
         private static int GetMaxFiber()
         {
             Process newProcess = new Process();
-            Process curProcess = _processes[_index];
             int maxPrior = Int32.MinValue;
-            foreach (Process proc in _processes)
+            foreach (Process proc in Processes)
             {
-                if (proc != curProcess && maxPrior < proc.Priority)
+                if (maxPrior < proc.Priority)
                 {
                     newProcess = proc;
                     maxPrior = proc.Priority;
                 }
             }
-            return _processes.IndexOf(newProcess);
+            return Processes.IndexOf(newProcess);
         }
 
         private static void GetRank()
         {
             _rank = 0;
-            foreach (var proc in _processes)
+            foreach (var proc in Processes)
             {
                 _rank += proc.Priority;
             }
-            _rank = _rank / (double)_processes.Count;
+            _rank = _rank / (double)Processes.Count;
         }
 
         private static void DeleteAll()
         {
-            foreach (var fiber in _fibers)
+            foreach (var fiber in Fibers)
             {
                 Fiber.Delete(fiber);
             }
