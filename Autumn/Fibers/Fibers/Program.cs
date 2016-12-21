@@ -17,7 +17,8 @@ namespace Fibers
 
             ProcessManager.IsPriorityEnabled = true;
             ProcessManager.Switch(false);
-            Console.WriteLine("LALALA");
+            ProcessManager.DeleteFibers();;
+            Console.WriteLine("Done");
             Console.ReadLine();
         }
     }

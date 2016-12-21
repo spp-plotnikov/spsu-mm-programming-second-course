@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 
 namespace Fibers
 {
@@ -30,6 +28,13 @@ namespace Fibers
             }
         }
 
+        public static void DeleteFibers()
+        {
+            foreach (var fiber in _fibers)
+            {
+                Fiber.Delete(fiber.Item1);
+            }
+        }
 
         public static void Switch(bool isFiberFinished)
         {
