@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Fibers;
@@ -19,11 +19,14 @@ namespace MyFibers
         {
             foreach (uint fiber in fibersForKilling)
             {
-                Fiber.Delete(fiber);
+                if (fiber != curFiber)
+                {
+                    Fiber.Delete(fiber);
+                }                
             }
         }
 
-        private static uint pickFiberToSwitch()
+        private static uint PickFiberToSwitch()
         {
             uint maxPriorityWMinRatio = 0; // In case of several fibers has equal ratio
             double minRatio = Double.MaxValue; // minRatio = time / (priority + 1) (+1 to aboid division by 0)
@@ -95,7 +98,7 @@ namespace MyFibers
                 fibersForKilling.Add(curFiber);
                 if (fibersId.Count > 0)
                 {
-                    uint fiberToSwitch = pickFiberToSwitch();
+                    uint fiberToSwitch = PickFiberToSwitch();
                     curFiber = fiberToSwitch;
                     fibersWTime[curFiber] += 1;
                     Fiber.Switch(curFiber);
@@ -112,7 +115,7 @@ namespace MyFibers
             }
             else
             {
-                uint fiberToSwitch = pickFiberToSwitch();
+                uint fiberToSwitch = PickFiberToSwitch();
                 curFiber = fiberToSwitch;
                 fibersWTime[curFiber] += 1;
                 Fiber.Switch(curFiber);
@@ -125,7 +128,6 @@ namespace MyFibers
             {
                 Process process = new Process();
                 Fiber fiber = new Fiber(new Action(process.Run));
-
                 Console.WriteLine("Fiber id: " + fiber.Id + " process priority: " + process.Priority);
                 fibersId.Add(fiber.Id);
                 fibersWPriority.Add(fiber.Id, (uint)process.Priority);
@@ -134,7 +136,6 @@ namespace MyFibers
 
             curFiber = fibersId[0];
             NonPrioritySwitch(false);
-
             Console.ReadLine();
         }
 
