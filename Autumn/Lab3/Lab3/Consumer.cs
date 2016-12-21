@@ -12,10 +12,10 @@ namespace Lab3
         ConcurrentQueue<int> _buffer;
         Thread _thread;
 
-        public Consumer(int id, ConcurrentQueue<int> buffer)
+        public Consumer(int id, ConcurrentQueue<int> buffer, Mutex mutex)
         {
             _id = id;
-            _mutex = new Mutex();
+            _mutex = mutex;
             _isFinished = false;
             _buffer = buffer;
             _thread = new Thread(Process);
@@ -26,16 +26,16 @@ namespace Lab3
         {
             while (!_isFinished)
             {
-                _mutex.WaitOne();
-                if (_buffer.Count > 0)
+                if (!_buffer.IsEmpty)
                 {
+                    _mutex.WaitOne();
                     int item;
-                    if (_buffer.TryPeek(out item))
+                    if (_buffer.TryDequeue(out item))
                     {
                         Console.WriteLine("Consumer {0} take {1}", _id, item);
                     }
                     _mutex.ReleaseMutex();
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
             }
         }

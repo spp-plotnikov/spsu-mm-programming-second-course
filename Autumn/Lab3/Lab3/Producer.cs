@@ -13,10 +13,10 @@ namespace Lab3
         ConcurrentQueue<int> _buffer;
         Thread _thread;
 
-        public Producer(int id, ConcurrentQueue<int> buffer)
+        public Producer(int id, ConcurrentQueue<int> buffer, Mutex mutex)
         {
             _id = id;
-            _mutex = new Mutex();
+            _mutex = mutex;
             _isFinished = false;
             _buffer = buffer;
             _thread = new Thread(Process);
@@ -32,7 +32,7 @@ namespace Lab3
                 _buffer.Enqueue(item);
                 Console.WriteLine("Producer {0} add {1}", _id, item);
                 _mutex.ReleaseMutex();
-                Thread.Sleep(100);
+                Thread.Sleep(10);
             }
         }
 

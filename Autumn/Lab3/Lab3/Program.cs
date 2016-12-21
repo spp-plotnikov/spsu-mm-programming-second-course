@@ -10,6 +10,7 @@ namespace Lab3
         static ConcurrentQueue<int> _buffer = new ConcurrentQueue<int>();
         static List<Producer> _listOfProducers = new List<Producer>();
         static List<Consumer> _listOfConsumers = new List<Consumer>();
+        static Mutex _mutex = new Mutex();
 
         static void Main(string[] args)
         {
@@ -23,12 +24,12 @@ namespace Lab3
 
             for (int i = 0; i < numberOfProducers; i++)
             {
-                _listOfProducers.Add(new Producer(i, _buffer));
+                _listOfProducers.Add(new Producer(i, _buffer, _mutex));
             }
 
             for (int i = 0; i < numberOfConsumers; i++)
             {
-                _listOfConsumers.Add(new Consumer(i, _buffer));
+                _listOfConsumers.Add(new Consumer(i, _buffer, _mutex));
             }
 
             Console.ReadKey();
