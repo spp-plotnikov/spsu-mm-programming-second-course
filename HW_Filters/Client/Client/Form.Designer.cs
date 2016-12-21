@@ -102,6 +102,8 @@
             this.Controls.Add(this.LoadButton);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.progressBar);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Form";
             this.Text = "instageamm";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
