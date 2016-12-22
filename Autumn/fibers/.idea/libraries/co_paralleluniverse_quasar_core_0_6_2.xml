@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="co.paralleluniverse:quasar-core:0.6.2" type="repository">
+    <properties maven-id="co.paralleluniverse:quasar-core:0.6.2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/co/paralleluniverse/quasar-core/0.6.2/quasar-core-0.6.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/lmax/disruptor/3.3.0/disruptor-3.3.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/codahale/metrics/metrics-core/3.0.2/metrics-core-3.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/de/javakaffee/kryo-serializers/0.27/kryo-serializers-0.27.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/esotericsoftware/minlog/minlog/1.2/minlog-1.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/objenesis/objenesis/2.1/objenesis-2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/18.0/guava-18.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant/1.9.4/ant-1.9.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/ant/ant-launcher/1.9.4/ant-launcher-1.9.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
