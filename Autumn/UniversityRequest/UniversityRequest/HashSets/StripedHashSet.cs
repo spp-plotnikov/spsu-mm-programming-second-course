@@ -26,33 +26,33 @@ namespace UniversityRequest.HashSets
 
         protected override bool IsNeedResize()
         {
-            return (ElementCount/Table.Length > 4) ||
-                   (Enumerable.Range(0, Table.Length).Select(i => Table[i].Count).Any(i => i > _threshold));
+            return (elementCount/table.Length > 4) ||
+                   (Enumerable.Range(0, table.Length).Select(i => table[i].Count).Any(i => i > _threshold));
         }
 
         protected override void Resize()
         {
-            int oldCapacity = Table.Length;
+            int oldCapacity = table.Length;
             foreach (var @lock in _locks)
             {
                 @lock.WaitOne();
             }
             try
             {
-                if (oldCapacity != Table.Length)
+                if (oldCapacity != table.Length)
                 {
                     return; // someone beat us to it
                 }
 
                 int newCapacity = 2 * oldCapacity;
-                List<T>[] oldTable = Table;
-                Table = Enumerable.Range(0, newCapacity).Select(i => new List<T>()).ToArray();
+                List<T>[] oldTable = table;
+                table = Enumerable.Range(0, newCapacity).Select(i => new List<T>()).ToArray();
 
                 foreach (var list in oldTable)
                 {
                     foreach (var x in list)
                     {
-                        Table[x.GetHashCode()%Table.Length].Add(x);
+                        table[x.GetHashCode()%table.Length].Add(x);
                     }
                 }
             }

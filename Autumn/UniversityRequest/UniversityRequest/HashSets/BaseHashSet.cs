@@ -5,12 +5,12 @@ namespace UniversityRequest.HashSets
 {
     public abstract class BaseHashSet<T>
     {
-        protected List<T>[] Table;
-        protected int ElementCount;
+        protected List<T>[] table;
+        protected int elementCount;
 
         protected BaseHashSet(int capacity)
         {
-            Table = Enumerable.Range(0, capacity).Select(i => new List<T>()).ToArray();
+            table = Enumerable.Range(0, capacity).Select(i => new List<T>()).ToArray();
         }
 
         protected abstract void Acquire(T x);
@@ -26,8 +26,8 @@ namespace UniversityRequest.HashSets
             Acquire(x);
             try
             {
-                int myBucket = x.GetHashCode() % Table.Length;
-                return Table[myBucket].Contains(x);
+                int myBucket = x.GetHashCode() % table.Length;
+                return table[myBucket].Contains(x);
             }
             finally
             {
@@ -40,10 +40,10 @@ namespace UniversityRequest.HashSets
             Acquire(x);
             try
             {
-                int myBucket = x.GetHashCode() % Table.Length;
-                if(Table[myBucket].Contains(x))
+                int myBucket = x.GetHashCode() % table.Length;
+                if(table[myBucket].Contains(x))
                 {
-                    Table[myBucket].Remove(x);
+                    table[myBucket].Remove(x);
                 }
             }
             finally
@@ -57,14 +57,14 @@ namespace UniversityRequest.HashSets
             Acquire(x);
             try
             {
-                int bucket = x.GetHashCode() % Table.Length;
-                if (Table[bucket].Contains(x))
+                int bucket = x.GetHashCode() % table.Length;
+                if (table[bucket].Contains(x))
                 {
                     return;
                 }
                 else
                 {
-                    Table[bucket].Add(x);
+                    table[bucket].Add(x);
                 }
             }
             finally
