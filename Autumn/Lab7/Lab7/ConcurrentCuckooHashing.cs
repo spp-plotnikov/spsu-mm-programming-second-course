@@ -25,14 +25,14 @@ namespace Lab7
 
         public override void Acquire(KeyValuePair<long, long> x)
         {
-            _firstLocker[firstHash(x) % _numberOfLocker].WaitOne();
-            _secondLocker[secondHash(x) % _numberOfLocker].WaitOne();
+            _firstLocker[FirstHash(x) % _numberOfLocker].WaitOne();
+            _secondLocker[SecondHash(x) % _numberOfLocker].WaitOne();
         }
 
         public override void Release(KeyValuePair<long, long> x)
         {
-            _firstLocker[firstHash(x) % _numberOfLocker].ReleaseMutex();
-            _secondLocker[secondHash(x) % _numberOfLocker].ReleaseMutex();
+            _firstLocker[FirstHash(x) % _numberOfLocker].ReleaseMutex();
+            _secondLocker[SecondHash(x) % _numberOfLocker].ReleaseMutex();
         }
 
         public override void Resize()
@@ -64,7 +64,7 @@ namespace Lab7
                     {
                         foreach (var x in oldTable[i, j])
                         {
-                            Table[0, firstHash(x) % _capacity].Add(x);
+                            Table[0, FirstHash(x) % _capacity].Add(x);
                         }
                     }
                 }

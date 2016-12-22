@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab7
 {
@@ -30,8 +32,8 @@ namespace Lab7
             Acquire(x);
             try
             {
-                long h1 = firstHash(x) % _capacity;
-                long h2 = secondHash(x) % _capacity;
+                long h1 = FirstHash(x) % _capacity;
+                long h2 = SecondHash(x) % _capacity;
                 List<KeyValuePair<long, long>> firstSet = Table[0, h1];
                 List<KeyValuePair<long, long>> secondSet = Table[1, h2];
                 if (firstSet.Contains(x) || secondSet.Contains(x))
@@ -50,8 +52,8 @@ namespace Lab7
         public bool Add(KeyValuePair<long, long> x)
         {
             Acquire(x);
-            long h1 = firstHash(x) % _capacity;
-            long h2 = secondHash(x) % _capacity;
+            long h1 = FirstHash(x) % _capacity;
+            long h2 = SecondHash(x) % _capacity;
             long i = -1;
             long h = -1;
             bool needResize = false;
@@ -110,8 +112,8 @@ namespace Lab7
         public bool Remove(KeyValuePair<long, long> x)
         {
             Acquire(x);
-            long h1 = firstHash(x) % _capacity;
-            long h2 = secondHash(x) % _capacity;
+            long h1 = FirstHash(x) % _capacity;
+            long h2 = SecondHash(x) % _capacity;
             try
             {
                 List<KeyValuePair<long, long>> firstSet = Table[0, h1];
@@ -144,14 +146,14 @@ namespace Lab7
             for (int round = 0; round < _limit; round++)
             {
                 List<KeyValuePair<long, long>> iSet = Table[i, hi];
-                KeyValuePair<long, long> y = iSet[0];
+                KeyValuePair<long, long> y = iSet.First();
                 switch (i)
                 {
                     case 0:
-                        hj = secondHash(y) % _capacity;
+                        hj = SecondHash(y) % _capacity;
                         break;
                     case 1:
-                        hj = firstHash(y) % _capacity;
+                        hj = FirstHash(y) % _capacity;
                         break;
                 }
                 Acquire(y);
@@ -161,12 +163,12 @@ namespace Lab7
                 {
                     if (iSet.Remove(y))
                     {
-                        if (jSet.Capacity < _thresHold)
+                        if (jSet.Count < _thresHold)
                         {
                             jSet.Add(y);
                             return true;
                         }
-                        else if (jSet.Capacity < ProbSize)
+                        else if (jSet.Count < ProbSize)
                         {
                             jSet.Add(y);
                             i = 1 - i;
@@ -179,7 +181,7 @@ namespace Lab7
                             return false;
                         }
                     }
-                    else if (iSet.Capacity >= _thresHold)
+                    else if (iSet.Count >= _thresHold)
                     {
                         continue;
                     }
@@ -196,14 +198,14 @@ namespace Lab7
             return false;
         }
 
-        public long firstHash(KeyValuePair<long, long> x)
+        public long FirstHash(KeyValuePair<long, long> x)
         {
-            return x.Key % 243 + x.Value % 103;
+            return x.Key % 243 + x.Value % 53;
         }
 
-        public long secondHash(KeyValuePair<long, long> x)
+        public long SecondHash(KeyValuePair<long, long> x)
         {
-            return x.Key % 257 + x.Value % 97;
+            return x.Key % 257 + x.Value % 57;
         }
 
         public abstract void Acquire(KeyValuePair<long, long> x);

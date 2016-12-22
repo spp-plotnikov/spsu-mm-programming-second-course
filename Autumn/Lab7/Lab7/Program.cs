@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Lab7
 {
@@ -19,6 +20,7 @@ namespace Lab7
             }
 
             GetTimeWorking time = new GetTimeWorking(capacity, listOfStudents);
+
             Console.WriteLine("Simple implementation working time: {0}", time.FirstType());
             Console.WriteLine("Implementation with cuckoo hashing working time: {0}", time.SecondType());
             Console.Read();
