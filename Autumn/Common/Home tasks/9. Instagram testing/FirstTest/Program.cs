@@ -89,12 +89,8 @@ namespace FirstTest
                 numClients++;
 
                 // Stop == (timeout > 10000 mls)
-                if (max > 10000 || numClients > 53)
+                if (max > 10000)
                 {
-                    if (numClients == 54)
-                    {
-                        maxTime[maxTime.Count - 1] = 11000;
-                    }
                     break;
                 }
             }
