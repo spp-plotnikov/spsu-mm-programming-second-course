@@ -23,13 +23,13 @@ public class Process extends Fiber<Void> {
                 if (flag) {
                     continue;
                 }
-                flag = processManager.NoPrioritySwitch(this, false);
+                flag = processManager.noPrioritySwitch(this, false);
             } while (System.currentTimeMillis() - start < delta);
         }
 
         System.out.println(Fiber.currentFiber().getId() + " has finished");
 
-        processManager.NoPrioritySwitch(this, true);
+        processManager.noPrioritySwitch(this, true);
         return null;
     }
 }

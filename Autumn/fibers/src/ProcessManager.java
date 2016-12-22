@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
  4        .eE........$r===e$$$$eeP    J       *..        b              |       |
  $       $$$$$       $   4$$$$$$$     F       d$$$.      4              |       |
  $       $$$$$       $   4$$$$$$$     L       *$$$"      4              |       |
- 4         "      ""3P ===$$$$$$"     3                  P               |     |
+ 4         "    ''''3P ===$$$$$$"     3                  P               |     |
   *                 $       """        b                J                 |   |
    ".             .P                    %.             @                   | |
      %.         z*"                      ^%.        .r"                     #
@@ -57,7 +57,7 @@ public class ProcessManager {
         }
     }
 
-    public boolean NoPrioritySwitch(Process current, boolean isFinished) throws SuspendExecution {
+    public boolean noPrioritySwitch(Process current, boolean isFinished) throws SuspendExecution {
         if (queue.isEmpty()) {
             return true;
         }
@@ -70,8 +70,7 @@ public class ProcessManager {
                 next = queue.poll();
             }
         }
-        _switch(current, next);
-
+        switchProcess(current, next);
         if (isFinished) {
             return false;
         }
@@ -79,7 +78,7 @@ public class ProcessManager {
         return false;
     }
 
-    public boolean PrioritySwitch(Process current, boolean isFinished) throws SuspendExecution {
+    public boolean prioritySwitch(Process current, boolean isFinished) throws SuspendExecution {
         if (isFinished) {
             finish = true;
         }
@@ -104,7 +103,7 @@ public class ProcessManager {
                 if (!used[i]) {
                     used[i] = true;
                     next = processes[i];
-                    _switch(current, next);
+                    switchProcess(current, next);
                     return true;
                 }
             }
@@ -112,12 +111,12 @@ public class ProcessManager {
                 return true;
             }
         }
-        _switch(current, next);
+        switchProcess(current, next);
         Fiber.park();
         return false;
     }
 
-    private void _switch(Process current, Process next) {
+    private void switchProcess(Process current, Process next) {
         new Fiber<Void>((SuspendableRunnable) () -> {
             while (current.getState() == Strand.State.RUNNING) { }
             next.unpark();
