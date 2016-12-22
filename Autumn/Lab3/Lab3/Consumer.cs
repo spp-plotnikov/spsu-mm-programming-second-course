@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Lab3
@@ -9,10 +10,10 @@ namespace Lab3
         Mutex _mutex;
         int _id;
         bool _isFinished;
-        ConcurrentQueue<int> _buffer;
+        Queue<int> _buffer;
         Thread _thread;
 
-        public Consumer(int id, ConcurrentQueue<int> buffer, Mutex mutex)
+        public Consumer(int id, Queue<int> buffer, Mutex mutex)
         {
             _id = id;
             _mutex = mutex;
@@ -26,17 +27,14 @@ namespace Lab3
         {
             while (!_isFinished)
             {
-                if (!_buffer.IsEmpty)
+                _mutex.WaitOne();
+                if (_buffer.Count > 0)
                 {
-                    _mutex.WaitOne();
-                    int item;
-                    if (_buffer.TryDequeue(out item))
-                    {
-                        Console.WriteLine("Consumer {0} take {1}", _id, item);
-                    }
-                    _mutex.ReleaseMutex();
-                    Thread.Sleep(10);
+                    int item = _buffer.Dequeue();
+                    Console.WriteLine("Consumer {0} take {1}", _id, item);
                 }
+                _mutex.ReleaseMutex();
+                Thread.Sleep(10);
             }
         }
 

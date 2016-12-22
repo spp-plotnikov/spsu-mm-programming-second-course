@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Lab3
@@ -10,10 +11,10 @@ namespace Lab3
         int _id;
         Mutex _mutex;
         bool _isFinished;
-        ConcurrentQueue<int> _buffer;
+        Queue<int> _buffer;
         Thread _thread;
 
-        public Producer(int id, ConcurrentQueue<int> buffer, Mutex mutex)
+        public Producer(int id, Queue<int> buffer, Mutex mutex)
         {
             _id = id;
             _mutex = mutex;

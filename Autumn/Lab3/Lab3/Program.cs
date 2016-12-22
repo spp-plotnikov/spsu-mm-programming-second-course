@@ -7,7 +7,7 @@ namespace Lab3
 {
     public class Program
     {
-        static ConcurrentQueue<int> _buffer = new ConcurrentQueue<int>();
+        static Queue<int> _buffer = new Queue<int>();
         static List<Producer> _listOfProducers = new List<Producer>();
         static List<Consumer> _listOfConsumers = new List<Consumer>();
         static Mutex _mutex = new Mutex();
