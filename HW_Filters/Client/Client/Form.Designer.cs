@@ -75,11 +75,13 @@
             // 
             // ChoiceButton
             // 
+            this.ChoiceButton.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ChoiceButton.FormattingEnabled = true;
             this.ChoiceButton.Location = new System.Drawing.Point(387, 95);
             this.ChoiceButton.Name = "ChoiceButton";
             this.ChoiceButton.Size = new System.Drawing.Size(114, 21);
             this.ChoiceButton.TabIndex = 5;
+            this.ChoiceButton.Tag = "false";
             // 
             // CancelButton
             // 
