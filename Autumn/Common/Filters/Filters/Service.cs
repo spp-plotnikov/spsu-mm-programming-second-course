@@ -8,9 +8,11 @@ using System.Text;
 
 namespace Filters
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
-                 ConcurrencyMode = ConcurrencyMode.Multiple,
-                 UseSynchronizationContext = true)]
+    //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+    //             ConcurrencyMode = ConcurrencyMode.Multiple,
+    //             UseSynchronizationContext = true)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
+
     public class Service : IService
     {
         private Filter chosenFilter;

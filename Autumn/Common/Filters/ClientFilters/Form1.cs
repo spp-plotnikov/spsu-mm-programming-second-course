@@ -11,93 +11,96 @@ using System.Windows.Forms;
 
 namespace ClientFilters
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private string path;
         private Bitmap curImage;
         private Filtering.ServiceClient host;
-        ManualResetEvent progressFinished = new ManualResetEvent(true);
-        bool cancelled = false;
-        bool finished = true;
-        ManualResetEvent backgroundWorker1IsFree = new ManualResetEvent(true);
+        ManualResetEvent progressFinished = new ManualResetEvent(true); // Signals that checkingProgressWorker finished
+        bool cancelled = false; 
+        bool finished = true; // Becomes true, when sendSetFilterNReceiveWorker displayed result image
+        ManualResetEvent sendSetFilterNReceiveWorkerIsFree = new ManualResetEvent(true);
 
-        public Form1()
-        {
+        public MainForm()
+        { 
             InitializeComponent();
             this.host = new Filtering.ServiceClient();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void openImageButton_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.Filter = "Images (*.bmp; *.jpg)|*.jpg; *.bmp";
-            openFileDialog1.FilterIndex = 1;
-            openFileDialog1.RestoreDirectory = true;
-            openFileDialog1.ShowDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog();            
+            openFileDialog.Filter = "Images (*.bmp; *.jpg)|*.jpg; *.bmp";
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.ShowDialog();
             try
             {
-                pictureBox1.Image = new Bitmap(openFileDialog1.FileName);
-                curImage = new Bitmap(pictureBox1.Image);
-                path = openFileDialog1.FileName;
-                textBox1.Text = path;
+                BeforeImageBox.Image = new Bitmap(openFileDialog.FileName);
+                curImage = new Bitmap(BeforeImageBox.Image);
+                path = openFileDialog.FileName;
+                fileName.Text = path;
             }
             catch { }
         }
         
-        private void button2_Click(object sender, EventArgs e)
-        {
-            SendImage.Enabled = false;
-            if (!backgroundWorker1.IsBusy)
-                backgroundWorker1.RunWorkerAsync();
+        private void sendImageButton_Click(object sender, EventArgs e)
+        {            
+            sendImageButton.Enabled = false;
+            if (!sendSetFilterNReceiveWorker.IsBusy)
+                sendSetFilterNReceiveWorker.RunWorkerAsync();
         }
         
-        private void button3_Click(object sender, EventArgs e)
-        {
+        private void updateFilterListButton_Click(object sender, EventArgs e)
+        {            
             BindingSource filters = new BindingSource();
             filters.DataSource = host.Filters();
-            comboBox1.DataSource = filters;            
+            filterNameComboBox.DataSource = filters;            
         }
 
         private void SendNGetImage(object sender, DoWorkEventArgs e)
         {
-            backgroundWorker1IsFree.Reset();
+            sendSetFilterNReceiveWorkerIsFree.Reset();
             bool error = false;
             this.Invoke((MethodInvoker)delegate ()
             {
-                if (curImage == null) { MessageBox.Show("No image"); error = true; SendImage.Enabled = true; return; }
-                if (!(comboBox1.Items.Count > 0)) { MessageBox.Show("Choose filter!"); error = true; SendImage.Enabled = true; return; }
+                if (curImage == null) { MessageBox.Show("No image"); error = true; sendImageButton.Enabled = true; return; }
+                if (!(filterNameComboBox.Items.Count > 0)) { MessageBox.Show("Choose filter!"); error = true; sendImageButton.Enabled = true; return; }
             });
-            if (error) { backgroundWorker1IsFree.Set(); return; }
+            if (error) { sendSetFilterNReceiveWorkerIsFree.Set(); return; }
             cancelled = false;
             ConnectionMethods.Cancelled = false;            
             finished = false;
             byte[] toSend = ConnectionMethods.ImageToByteArray(curImage);
             this.Invoke((MethodInvoker)delegate ()
             {
-                host.SetFilter(comboBox1.SelectedValue.ToString());
+                host.SetFilter(filterNameComboBox.SelectedValue.ToString());
             });
-            if (!backgroundWorker2.IsBusy) { backgroundWorker2.RunWorkerAsync(); }
+            if (!checkingProgressWorker.IsBusy) { checkingProgressWorker.RunWorkerAsync(); }
+            if (cancelled) { sendSetFilterNReceiveWorkerIsFree.Set(); return; }
             ConnectionMethods.sendByteArrayUsingChunks(toSend, host);
+            if (cancelled) { sendSetFilterNReceiveWorkerIsFree.Set(); return; }
             host.DoFilter();
-            byte[] result1 = ConnectionMethods.receiveByteArrayUsingChunks(host);
+            if (cancelled) { sendSetFilterNReceiveWorkerIsFree.Set(); return; }
+            byte[] result = ConnectionMethods.receiveByteArrayUsingChunks(host);
             if (!cancelled)
             {                
-                pictureBox3.Image = ConnectionMethods.byteArrayToBitmap(result1);
+                AfterImageBox.Image = ConnectionMethods.byteArrayToBitmap(result);
             }
             else
             {
-                backgroundWorker1IsFree.Set();
+                sendSetFilterNReceiveWorkerIsFree.Set();
                 return;
             }
             finished = true;
             this.Invoke((MethodInvoker)delegate ()
-            {
+            {                
                 progressFinished.WaitOne();
-                progressBar1.Value = 100;
-                label7.Text = "done";
-                progressBar1.Value = 0;
-                SendImage.Enabled = true;
-                backgroundWorker1IsFree.Set();            
+                progressBar.Value = 100;
+                statusLabel.Text = "done";
+                progressBar.Value = 0;
+                sendImageButton.Enabled = true;
+                sendSetFilterNReceiveWorkerIsFree.Set();
             });
         }
 
@@ -107,26 +110,26 @@ namespace ClientFilters
             progressFinished.Reset();
             this.Invoke((MethodInvoker)delegate ()
             {
-                label7.Text = "sending";
+                statusLabel.Text = "sending";
             });
-            progressBar1.Maximum = 100;
-            progressBar1.Minimum = 0;
+            progressBar.Maximum = 100;
+            progressBar.Minimum = 0;
             while (!cancelled)
             {
                 this.Invoke((MethodInvoker)delegate ()
                 {
                     progress = host.GetProgress();
-                    if (Math.Abs(progressBar1.Value - progress) < 90)
+                    if (Math.Abs(progressBar.Value - progress) < 90)
                     {
                         if (progress < 99 && progress > 0)
                         {
-                            progressBar1.Value = progress;
-                            label7.Text = "filtering";
+                            progressBar.Value = progress;
+                            statusLabel.Text = "filtering";
                         }
                         if (progress >= 98)
                         {
-                            progressBar1.Value = progress;
-                            label7.Text = "recieving";
+                            progressBar.Value = progress;
+                            statusLabel.Text = "recieving";
                         }
                     }
                 });
@@ -138,16 +141,23 @@ namespace ClientFilters
 
         private void button4_Click(object sender, EventArgs e)
         {
-            label7.Text = "cancellation";
-            cancelled = true;
-            host.Cancel();
-            ConnectionMethods.Cancelled = true;
+            if (!cancellationWorker.IsBusy) { cancellationWorker.RunWorkerAsync(); }
+        }
+        
+        private void Cancellation(object sender, EventArgs e)
+        {
             this.Invoke((MethodInvoker)delegate ()
             {
-                progressBar1.Value = 0;
-                backgroundWorker1IsFree.WaitOne();
-                label7.Text = "cancelled";
-                SendImage.Enabled = true;
+                cancelButton.Enabled = false;
+                statusLabel.Text = "cancellation";
+                cancelled = true;
+                host.Cancel();
+                ConnectionMethods.Cancelled = true;
+                progressBar.Value = 0;
+                sendSetFilterNReceiveWorkerIsFree.WaitOne();
+                statusLabel.Text = "cancelled";
+                sendImageButton.Enabled = true;
+                cancelButton.Enabled = true;
             });
         }
     }

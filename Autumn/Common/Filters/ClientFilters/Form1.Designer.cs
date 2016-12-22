@@ -1,6 +1,6 @@
 ﻿namespace ClientFilters
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,37 +28,38 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.BeforeImageBox = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.filterNameComboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.OpenImage = new System.Windows.Forms.Button();
-            this.SendImage = new System.Windows.Forms.Button();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.openImageButton = new System.Windows.Forms.Button();
+            this.sendImageButton = new System.Windows.Forms.Button();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.fileName = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.UpdateList = new System.Windows.Forms.Button();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.AfterImageBox = new System.Windows.Forms.PictureBox();
+            this.updateFilterListButton = new System.Windows.Forms.Button();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.label5 = new System.Windows.Forms.Label();
-            this.button4 = new System.Windows.Forms.Button();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.sendSetFilterNReceiveWorker = new System.ComponentModel.BackgroundWorker();
+            this.checkingProgressWorker = new System.ComponentModel.BackgroundWorker();
             this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.cancellationWorker = new System.ComponentModel.BackgroundWorker();
+            ((System.ComponentModel.ISupportInitialize)(this.BeforeImageBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AfterImageBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // BeforeImageBox
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(12, 12);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(262, 216);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.BeforeImageBox.Location = new System.Drawing.Point(12, 12);
+            this.BeforeImageBox.Name = "BeforeImageBox";
+            this.BeforeImageBox.Size = new System.Drawing.Size(262, 216);
+            this.BeforeImageBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.BeforeImageBox.TabIndex = 0;
+            this.BeforeImageBox.TabStop = false;
             // 
             // label1
             // 
@@ -78,14 +79,14 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "After";
             // 
-            // comboBox1
+            // filterNameComboBox
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(79, 283);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(411, 21);
-            this.comboBox1.TabIndex = 5;
+            this.filterNameComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.filterNameComboBox.FormattingEnabled = true;
+            this.filterNameComboBox.Location = new System.Drawing.Point(79, 283);
+            this.filterNameComboBox.Name = "filterNameComboBox";
+            this.filterNameComboBox.Size = new System.Drawing.Size(411, 21);
+            this.filterNameComboBox.TabIndex = 5;
             // 
             // label3
             // 
@@ -96,37 +97,37 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "Filter:";
             // 
-            // OpenImage
+            // openImageButton
             // 
-            this.OpenImage.Location = new System.Drawing.Point(496, 247);
-            this.OpenImage.Name = "OpenImage";
-            this.OpenImage.Size = new System.Drawing.Size(79, 26);
-            this.OpenImage.TabIndex = 7;
-            this.OpenImage.Text = "Open image";
-            this.OpenImage.UseVisualStyleBackColor = true;
-            this.OpenImage.Click += new System.EventHandler(this.button1_Click);
+            this.openImageButton.Location = new System.Drawing.Point(496, 247);
+            this.openImageButton.Name = "openImageButton";
+            this.openImageButton.Size = new System.Drawing.Size(79, 26);
+            this.openImageButton.TabIndex = 7;
+            this.openImageButton.Text = "Open image";
+            this.openImageButton.UseVisualStyleBackColor = true;
+            this.openImageButton.Click += new System.EventHandler(this.openImageButton_Click);
             // 
-            // SendImage
+            // sendImageButton
             // 
-            this.SendImage.Location = new System.Drawing.Point(496, 311);
-            this.SendImage.Name = "SendImage";
-            this.SendImage.Size = new System.Drawing.Size(79, 26);
-            this.SendImage.TabIndex = 8;
-            this.SendImage.Text = "Send image";
-            this.SendImage.UseVisualStyleBackColor = true;
-            this.SendImage.Click += new System.EventHandler(this.button2_Click);
+            this.sendImageButton.Location = new System.Drawing.Point(496, 311);
+            this.sendImageButton.Name = "sendImageButton";
+            this.sendImageButton.Size = new System.Drawing.Size(79, 26);
+            this.sendImageButton.TabIndex = 8;
+            this.sendImageButton.Text = "Send image";
+            this.sendImageButton.UseVisualStyleBackColor = true;
+            this.sendImageButton.Click += new System.EventHandler(this.sendImageButton_Click);
             // 
-            // openFileDialog1
+            // openFileDialog
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog.FileName = "openFileDialog1";
             // 
-            // textBox1
+            // fileName
             // 
-            this.textBox1.Location = new System.Drawing.Point(79, 251);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(411, 20);
-            this.textBox1.TabIndex = 9;
+            this.fileName.Location = new System.Drawing.Point(79, 251);
+            this.fileName.Name = "fileName";
+            this.fileName.ReadOnly = true;
+            this.fileName.Size = new System.Drawing.Size(411, 20);
+            this.fileName.TabIndex = 9;
             // 
             // label4
             // 
@@ -137,31 +138,31 @@
             this.label4.TabIndex = 10;
             this.label4.Text = "Name of file:";
             // 
-            // pictureBox3
+            // AfterImageBox
             // 
-            this.pictureBox3.Location = new System.Drawing.Point(313, 12);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(262, 216);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox3.TabIndex = 11;
-            this.pictureBox3.TabStop = false;
+            this.AfterImageBox.Location = new System.Drawing.Point(313, 12);
+            this.AfterImageBox.Name = "AfterImageBox";
+            this.AfterImageBox.Size = new System.Drawing.Size(262, 216);
+            this.AfterImageBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.AfterImageBox.TabIndex = 11;
+            this.AfterImageBox.TabStop = false;
             // 
-            // UpdateList
+            // updateFilterListButton
             // 
-            this.UpdateList.Location = new System.Drawing.Point(496, 279);
-            this.UpdateList.Name = "UpdateList";
-            this.UpdateList.Size = new System.Drawing.Size(79, 26);
-            this.UpdateList.TabIndex = 12;
-            this.UpdateList.Text = "Update list";
-            this.UpdateList.UseVisualStyleBackColor = true;
-            this.UpdateList.Click += new System.EventHandler(this.button3_Click);
+            this.updateFilterListButton.Location = new System.Drawing.Point(496, 279);
+            this.updateFilterListButton.Name = "updateFilterListButton";
+            this.updateFilterListButton.Size = new System.Drawing.Size(79, 26);
+            this.updateFilterListButton.TabIndex = 12;
+            this.updateFilterListButton.Text = "Update list";
+            this.updateFilterListButton.UseVisualStyleBackColor = true;
+            this.updateFilterListButton.Click += new System.EventHandler(this.updateFilterListButton_Click);
             // 
-            // progressBar1
+            // progressBar
             // 
-            this.progressBar1.Location = new System.Drawing.Point(79, 313);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(411, 20);
-            this.progressBar1.TabIndex = 13;
+            this.progressBar.Location = new System.Drawing.Point(79, 313);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(411, 20);
+            this.progressBar.TabIndex = 13;
             // 
             // label5
             // 
@@ -172,25 +173,30 @@
             this.label5.TabIndex = 14;
             this.label5.Text = "Progress:";
             // 
-            // button4
+            // cancelButton
             // 
-            this.button4.Location = new System.Drawing.Point(79, 339);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(411, 31);
-            this.button4.TabIndex = 15;
-            this.button4.Text = "Cancel";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.cancelButton.Location = new System.Drawing.Point(79, 339);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(411, 31);
+            this.cancelButton.TabIndex = 15;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.button4_Click);
             // 
-            // backgroundWorker1
+            // sendSetFilterNReceiveWorker
             // 
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.SendNGetImage);
+            this.sendSetFilterNReceiveWorker.WorkerSupportsCancellation = true;
+            this.sendSetFilterNReceiveWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.SendNGetImage);
             // 
-            // backgroundWorker2
+            // checkingProgressWorker
             // 
-            this.backgroundWorker2.WorkerSupportsCancellation = true;
-            this.backgroundWorker2.DoWork += new System.ComponentModel.DoWorkEventHandler(this.UpdatingProgressBar);
+            this.checkingProgressWorker.WorkerSupportsCancellation = true;
+            this.checkingProgressWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.UpdatingProgressBar);
+            //
+            // cancellationWorker 
+            //
+            this.cancellationWorker.WorkerSupportsCancellation = true;
+            this.cancellationWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Cancellation);
             // 
             // label6
             // 
@@ -201,40 +207,41 @@
             this.label6.TabIndex = 16;
             this.label6.Text = "Status:";
             // 
-            // label7
+            // statusLabel
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(535, 348);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(0, 13);
-            this.label7.TabIndex = 17;
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Location = new System.Drawing.Point(535, 348);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(0, 13);
+            this.statusLabel.TabIndex = 17;
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(596, 382);
-            this.Controls.Add(this.label7);
+            this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.button4);
+            this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.UpdateList);
-            this.Controls.Add(this.pictureBox3);
+            this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.updateFilterListButton);
+            this.Controls.Add(this.AfterImageBox);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.SendImage);
-            this.Controls.Add(this.OpenImage);
+            this.Controls.Add(this.fileName);
+            this.Controls.Add(this.sendImageButton);
+            this.Controls.Add(this.openImageButton);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.filterNameComboBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.pictureBox1);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Controls.Add(this.BeforeImageBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            this.MaximizeBox = false;
+            this.Name = "MainForm";
+            this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.BeforeImageBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AfterImageBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -242,25 +249,26 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox BeforeImageBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button OpenImage;
-        private System.Windows.Forms.Button SendImage;
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button openImageButton;
+        private System.Windows.Forms.Button sendImageButton;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.TextBox fileName;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.Button UpdateList;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.PictureBox AfterImageBox;
+        private System.Windows.Forms.Button updateFilterListButton;
+        private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button button4;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.ComponentModel.BackgroundWorker backgroundWorker2;
-        protected System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button cancelButton;
+        private System.ComponentModel.BackgroundWorker sendSetFilterNReceiveWorker;
+        private System.ComponentModel.BackgroundWorker checkingProgressWorker;
+        protected System.Windows.Forms.ComboBox filterNameComboBox;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label statusLabel;
+        private System.ComponentModel.BackgroundWorker cancellationWorker;
     }
 }
 
