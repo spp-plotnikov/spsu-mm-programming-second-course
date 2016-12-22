@@ -74,8 +74,8 @@ namespace MyFibers
                     fibersId.Clear();
                     fibersWPriority.Clear();
                     fibersWTime.Clear();
-                    DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
+                    DeleteAllFibers();
                 }
             }
             else
@@ -109,8 +109,8 @@ namespace MyFibers
                     fibersWPriority.Clear();
                     fibersWTime.Clear();
                     fibersId.Clear();
-                    DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
+                    DeleteAllFibers();
                 }
             }
             else
