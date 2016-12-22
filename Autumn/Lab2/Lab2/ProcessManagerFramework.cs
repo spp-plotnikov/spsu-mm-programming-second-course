@@ -8,6 +8,7 @@ namespace Lab2
     public static class ProcessManager
     {
         public static List<uint> Fibers = new List<uint>();
+        static List<uint> _fibersForDelete = new List<uint>();
         public static List<Process> Processes = new List<Process>();
         public static uint CurFiber;
         static int _index = 0;
@@ -17,37 +18,38 @@ namespace Lab2
 
         public static void Switch(bool fiberFinished)
         {
-            if (fiberFinished)
-            {
-                if (CurFiber != Fiber.PrimaryId)
-                {
-                    Fibers.Remove(CurFiber);
-                    Processes.Remove(Processes[_index]);
-                    _index = 0;
-                    Console.WriteLine("Fiber {0} finished", CurFiber);
-                }
-            }
-
             if (Fibers.Count < 1)
             {
-                Console.WriteLine("The end");
                 DeleteAll();
-                CurFiber = Fiber.PrimaryId;
             }
             else
             {
-                _index = Priority ? GetFiber() : GetRandomFiber();
-                CurFiber = Fibers[_index];
-                Console.WriteLine("Switch to another fiber");
+                if (fiberFinished)
+                {
+                    _fibersForDelete.Add(CurFiber);
+                    Fibers.Remove(CurFiber);
+                    Processes.Remove(Processes[_index]);
+                }
+                if (Fibers.Count < 1)
+                {
+                    Console.WriteLine("The end");
+                    Fiber.Switch(Fiber.PrimaryId);
+                }
+                else
+                {
+                    _index = Priority ? GetFiber() : GetRandomFiber();
+                    CurFiber = Fibers[_index];
+                    Console.WriteLine("Switch to another fiber");
+                    Fiber.Switch(CurFiber);
+                }
+                Thread.Sleep(100);
             }
-            Thread.Sleep(100);
-            Fiber.Switch(CurFiber);
         }
 
         private static int GetRandomFiber()
         {
             Random rand = new Random();
-            Process newProcess = Processes.ElementAt(rand.Next(Processes.Count - 1));
+            Process newProcess = Processes.ElementAt(rand.Next(Processes.Count));
             return Processes.IndexOf(newProcess);
         }
 
@@ -79,9 +81,9 @@ namespace Lab2
                     }
                 }
             }
-            if (suitableFibers.Count > 1)
+            if (suitableFibers.Count > 0)
             {
-                newProcess = suitableFibers.ElementAt(rand.Next(suitableFibers.Count - 1));
+                newProcess = suitableFibers.ElementAt(rand.Next(suitableFibers.Count));
                 return Processes.IndexOf(newProcess);
             }
             else
@@ -117,7 +119,7 @@ namespace Lab2
 
         private static void DeleteAll()
         {
-            foreach (var fiber in Fibers)
+            foreach (var fiber in _fibersForDelete)
             {
                 Fiber.Delete(fiber);
             }
