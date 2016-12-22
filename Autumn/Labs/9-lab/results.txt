@@ -1,0 +1,27 @@
+Starting test, type: 0
+WARMING-UP! Clients: 5, median: 1739, average: 1670, min: 1448, max: 1860
+Clients: 1, median: 881, average: 881, min: 881, max: 881
+Clients: 5, median: 1401, average: 1382, min: 1213, max: 1520
+Clients: 10, median: 2008, average: 1832, min: 1137, max: 2700
+Clients: 20, median: 3228, average: 3015, min: 1193, max: 4710
+Clients: 30, median: 4548, average: 4326, min: 1721, max: 7280
+Clients: 40, median: 5131, average: 5164, min: 1769, max: 9216
+Clients: 50, median: 6614, average: 6521, min: 1875, max: 11507
+Clients: 60, median: 7399, average: 7421, min: 2265, max: 13192
+Clients: 70, median: 8595, average: 8680, min: 1768, max: 15964
+Clients: 80, median: 9336, average: 9533, min: 1246, max: 17708
+Clients: 90, median: 10382, average: 10647, min: 1696, max: 19924
+Clients: 100, median: 12214, average: 12214, min: 2717, max: 22458
+Failed at number of clients: 110, reason: Time out
+Starting test, type: 1
+WARMING-UP! Image pixels: 90000, median: 1502, average: 1486
+Image pixels: 100, median: 18, average: 19
+Image pixels: 2500, median: 22, average: 21
+Image pixels: 10000, median: 111, average: 102
+Image pixels: 90000, median: 1029, average: 1047
+Image pixels: 250000, median: 2620, average: 2573
+Image pixels: 1000000, median: 10924, average: 10697
+Image pixels: 1440000, median: 15785, average: 15773
+Failed at image pixels: 2250000, reason: Time out
+
+Process finished with exit code 0
