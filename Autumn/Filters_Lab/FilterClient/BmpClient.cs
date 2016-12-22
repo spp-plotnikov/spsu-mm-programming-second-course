@@ -51,7 +51,7 @@ namespace FilterClient
             NetworkStream io = client.GetStream();
 
             //try
-            Bitmap img = new Bitmap(path);
+            Image img = Image.FromFile(path);
 
             int size;
             byte[] imgBuf;
@@ -79,19 +79,10 @@ namespace FilterClient
                 update(status);
             }
 
-
-
-            byte[] bytetmp = new byte[size];
-            int sum = 0;
-            while (sum < size)
-            {
-                sum += io.Read(bytetmp, sum, size - sum);
-            }
+            Image res = Image.FromStream(io);
+            io.Close();
             client.Close();
-            for (int i=0; i<size;i++)
-                if (imgBuf[i]!=bytetmp[i])
-                    return (Bitmap)(new ImageConverter().ConvertFrom(bytetmp));
-            return (Bitmap)(new ImageConverter().ConvertFrom(bytetmp));
+            return res;
         }
     }
 }

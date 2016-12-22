@@ -10,7 +10,7 @@ namespace FilterServer
     {
         static void Main(string[] args)
         {
-            BmpServer server = new BmpServer(13000, "../../config.txt");
+            BmpServer server = new BmpServer(13000, "config.txt");
         }
     }
 }

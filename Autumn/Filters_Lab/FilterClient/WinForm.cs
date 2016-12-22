@@ -33,6 +33,7 @@ namespace FilterClient
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                _status = 0;
                 BeforeFilePath.Text = openFileDialog.FileName;
                 PicBefore.ImageLocation = openFileDialog.FileName;
             }
@@ -48,9 +49,6 @@ namespace FilterClient
 
                 Thread thread = new Thread(() => newImage = _client.Send(filter, path, ProgressBarUpdate));
                 thread.Start();
-                
-                thread.Join();
-                PicAfter.Image = newImage;
             }
         }
 

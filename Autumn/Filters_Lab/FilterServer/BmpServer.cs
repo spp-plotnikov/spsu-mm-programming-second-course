@@ -80,15 +80,13 @@ namespace FilterServer
                 {
                     sum += io.Read(bytetmp, sum, size - sum);
                 }
-                Bitmap src = (Bitmap)(new ImageConverter().ConvertFrom(bytetmp));
 
-                Bitmap dst = BMPFilter.ApplyFilter(src, filter, io);
-
+                Bitmap dst = BMPFilter.ApplyFilter((Bitmap)(new ImageConverter().ConvertFrom(bytetmp)), filter, io);
                 using (MemoryStream ms = new MemoryStream())
                 {
                     dst.Save(ms, ImageFormat.Bmp);
                     byte[] imgBuf = ms.GetBuffer();
-                    io.Write(imgBuf, 0, size);
+                    io.Write(imgBuf, 0, (int)ms.Length);
                 }
                 client.Close();
             }
