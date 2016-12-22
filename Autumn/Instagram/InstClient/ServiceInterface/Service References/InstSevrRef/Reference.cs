@@ -22,10 +22,10 @@ namespace ServiceInterface.InstSevrRef {
         System.Threading.Tasks.Task<string[]> GetFiltersAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/EditPict", ReplyAction="http://tempuri.org/IInstService/EditPictResponse")]
-        void EditPict(byte[] data, string filter);
+        byte[] EditPict(byte[] data, string filter);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInstService/EditPict", ReplyAction="http://tempuri.org/IInstService/EditPictResponse")]
-        System.Threading.Tasks.Task EditPictAsync(byte[] data, string filter);
+        System.Threading.Tasks.Task<byte[]> EditPictAsync(byte[] data, string filter);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -34,9 +34,6 @@ namespace ServiceInterface.InstSevrRef {
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IInstService/Notify")]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(string[]))]
         void Notify(object progress);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IInstService/GetPict")]
-        void GetPict(byte[] pict);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -75,11 +72,11 @@ namespace ServiceInterface.InstSevrRef {
             return base.Channel.GetFiltersAsync();
         }
         
-        public void EditPict(byte[] data, string filter) {
-            base.Channel.EditPict(data, filter);
+        public byte[] EditPict(byte[] data, string filter) {
+            return base.Channel.EditPict(data, filter);
         }
         
-        public System.Threading.Tasks.Task EditPictAsync(byte[] data, string filter) {
+        public System.Threading.Tasks.Task<byte[]> EditPictAsync(byte[] data, string filter) {
             return base.Channel.EditPictAsync(data, filter);
         }
     }

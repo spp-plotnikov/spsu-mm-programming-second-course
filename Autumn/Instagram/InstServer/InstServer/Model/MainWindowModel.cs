@@ -7,7 +7,6 @@ namespace InstServer.Model
 {
     public class MainWindowModel
     {
-        private InstService _service;
         private bool _isServiceEnabled;
 
         public event ModelEventHandler SendInformToConsole;
@@ -17,14 +16,9 @@ namespace InstServer.Model
         public void OpenService(object port)
         {
 
-            _service = new InstService();
-            _service.OnClientRequestedFilterList += FiltersRequestHandler;
-            _service.OnClientRequestedProcess += ProcessRequestHandler;
-            _service.Filters = CurrentFilters;
-
             Thread thread = new Thread(() =>
             {
-                using (var host = new ServiceHost(_service))
+                using (var host = new ServiceHost(typeof(InstService)))
                 {
                     _isServiceEnabled = true;
 
@@ -62,7 +56,6 @@ namespace InstServer.Model
         public void UpdateFilterList(string[] filters)
         {
             CurrentFilters = filters;
-            _service.Filters = filters;
         }
     }
 }

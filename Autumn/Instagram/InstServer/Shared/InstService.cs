@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,31 +7,35 @@ using BmpLibrary;
 
 namespace Shared
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Single)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class InstService : IInstService
     {
-        public string[] Filters { get; set; } = { "Grey" };
 
         public event EventHandler OnClientRequestedProcess;
         public event EventHandler OnClientRequestedFilterList;
         private Timer _timer;
+        private IInstServiceCallback _notificator;
 
         public string[] GetFilters()
         {
             OnClientRequestedFilterList?.Invoke(this, null);
-            return Filters;
+            string[] result = null;
+            try
+            {
+                StreamReader sr = File.OpenText(Path.GetFullPath("filters.config"));
+                string filters = sr.ReadToEnd();
+                result = filters.Split(' ');
+            }
+            catch
+            {
+                //ign
+            }
+            return result;
         }
 
-        //private void Notify()
-
-        public void EditPict(byte[] data, string filter)
+        public byte[] EditPict(byte[] data, string filter)
         {
-            var notificator = OperationContext.Current.GetCallbackChannel<IInstServiceCallback>();
-            Task.Run(() => Edit(data, filter, notificator));
-        }
-
-        private void Edit(byte[] data, string filter, IInstServiceCallback notificator)
-        {
+            _notificator = OperationContext.Current.GetCallbackChannel<IInstServiceCallback>();
             OnClientRequestedProcess?.Invoke(this, null);
 
             object curProgress = 10;
@@ -48,7 +53,7 @@ namespace Shared
                     Thread.CurrentThread.Priority = ThreadPriority.Highest;
                     try
                     {
-                        notificator?.Notify(curProgress);
+                        _notificator?.Notify(curProgress);
                     }
                     catch (Exception)
                     {
@@ -76,7 +81,7 @@ namespace Shared
 
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
 
-            notificator.GetPict(editResult);
+            return editResult;
         }
     }
 }

@@ -15,9 +15,7 @@ namespace InstClient.Model
         public event ClientEventHandler ProgressChanged;
         public List<string> UsedPicts { get; set; }
         private InstServiceClient _client;
-        private byte[] _pict;
         private bool _isAborted;
-        private Mutex _abortFinished = new Mutex();
 
         public ClientModel()
         {
@@ -36,11 +34,6 @@ namespace InstClient.Model
             public void Notify(object progress)
             {
                 _model.ProgressChanged?.Invoke(null, new ClientEventArgs(((int)progress).ToString()));
-            }
-
-            public void GetPict(byte[] pict)
-            {
-                _model._pict = pict;
             }
         }
 
@@ -79,27 +72,25 @@ namespace InstClient.Model
 
         public void EditPict(object data)
         {
+
+            
             var thread = new Thread(() =>
             {
                 _client = null;
                 try
                 {
-                    _pict = null;
+                    _client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)),
+                        "NetTcpBinding_IInstService");
+
                     _isAborted = false;
                     Pict pict = ((UploadingData) data).Picture;
                     string filter = ((UploadingData) data).Filter;
                     pict.PathToResult = Path.GetTempPath() + Guid.NewGuid().ToString() + ".bmp";
 
-                    _client = new InstServiceClient(new InstanceContext(new NotificationHandler(this)),
-                        "NetTcpBinding_IInstService");
-                    _client.EditPict(pict.PictBytes, filter);
 
-                    while (_pict == null)
-                    {
-                        
-                    }
+                    var result = _client?.EditPict(pict.PictBytes, filter);
 
-                    pict.SavePict(_pict);
+                    pict.SavePict(result);
                     ProgressChanged?.Invoke(this, new ClientEventArgs("100"));
                     PictProcessed?.Invoke(this, new ClientEventArgs(pict.PathToResult));
                 }

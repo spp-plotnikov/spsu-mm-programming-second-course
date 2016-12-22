@@ -10,7 +10,7 @@ namespace Shared
         string[] GetFilters();
 
         [OperationContract]
-        void EditPict(byte[] data, string filter);
+        byte[] EditPict(byte[] data, string filter);
 
     }
 }

@@ -7,8 +7,5 @@ namespace Shared
     {
         [OperationContract(IsOneWay = true)]
         void Notify(object progress);
-
-        [OperationContract(IsOneWay = true)]
-        void GetPict(byte[] pict);
     }
 }
