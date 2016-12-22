@@ -32,8 +32,7 @@ namespace FirstTest
 
         static public void GetData()
         {
-            //int num = 15;
-            for (int i = 1; i < 5; i++)
+            for (int i = 1; true; i++)
             {
                 Time.Add(0);
                 try

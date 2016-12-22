@@ -19,7 +19,8 @@ namespace TestSecond
         static private int picH = 1;
         static private int picW = 1;
         static private int numClients = 3;
-        static private List<Point> listOfPoints = new List<Point>();
+        static private List<Point> listOfPointsMid = new List<Point>();
+        static private List<Point> listOfPointsAver = new List<Point>();
         static private List<long> Time = new List<long>();
 
         [STAThread]
@@ -28,7 +29,7 @@ namespace TestSecond
             GetData();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SecondTest(listOfPoints));
+            Application.Run(new SecondTest(listOfPointsMid, listOfPointsAver));
         }
 
         static private void GetData()
@@ -37,12 +38,11 @@ namespace TestSecond
             {
                 Time.Add(0);
             }
-            for (int i = 1; i < 7; i++)
+            for (int i = 1; i < 8; i++)
             {
                 picH += 100;
                 picW += 100;
-
-
+                
                 try
                 {
                     List<Thread> clients = new List<Thread>();
@@ -69,7 +69,9 @@ namespace TestSecond
                     {
                         break;
                     }
-                    listOfPoints.Add(new Point(picW * picH, (int)result));
+                    listOfPointsAver.Add(new Point(picW * picH, (int)(result / numClients)));
+                    Time.Sort();
+                    listOfPointsMid.Add(new Point(picW * picH, (int)Time[numClients / 2]));
                 }
                 catch
                 {
