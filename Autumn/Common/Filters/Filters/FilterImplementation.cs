@@ -7,14 +7,22 @@ using System.Threading.Tasks;
 
 namespace Filters
 {
-    static class FiltersWImplementation
+    class FiltersWImplementation
     {
-        private static Filter jackalFilter = new Filter("Jackal", JackalFilterImplementation);
-        private static Filter invertFilter = new Filter("Invert", InvertFilterImplementation);
-        private static Filter redFilter = new Filter("Red", RedFilterImplementation);
-        public static List<Filter> filterList = new List<Filter>() { invertFilter, redFilter, jackalFilter };
+        private Filter jackalFilter;
+        private Filter invertFilter;
+        private Filter redFilter;
+        public List<Filter> filterList;
 
-        static public List<Filter> ListOfFilters
+        public FiltersWImplementation()
+        {
+            jackalFilter = new Filter("Jackal", JackalFilterImplementation);
+            invertFilter = new Filter("Invert", InvertFilterImplementation);
+            redFilter = new Filter("Red", RedFilterImplementation);
+            filterList = new List<Filter>() { invertFilter, redFilter, jackalFilter };
+        }
+
+        public List<Filter> ListOfFilters
         {
             get
             {
@@ -22,7 +30,7 @@ namespace Filters
             }
         }
 
-        static private Bitmap JackalFilterImplementation(Bitmap srcImage, ref double progress)
+        private Bitmap JackalFilterImplementation(Bitmap srcImage, ref double progress)
         {
             progress = 0;
             int compressionRatio = 20;
@@ -60,7 +68,7 @@ namespace Filters
             return result;
         }
 
-        static private Bitmap InvertFilterImplementation(Bitmap srcImage, ref double progress)
+        private Bitmap InvertFilterImplementation(Bitmap srcImage, ref double progress)
         {
             progress = 0;
             double step = 1.0 / srcImage.Width;
@@ -79,7 +87,7 @@ namespace Filters
             return result;
         }
 
-        static private Bitmap RedFilterImplementation(Bitmap srcImage, ref double progress)
+        private Bitmap RedFilterImplementation(Bitmap srcImage, ref double progress)
         {
             progress = 0;
             double step = 1.0 / srcImage.Width;

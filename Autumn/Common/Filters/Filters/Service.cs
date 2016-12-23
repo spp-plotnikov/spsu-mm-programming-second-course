@@ -8,9 +8,6 @@ using System.Text;
 
 namespace Filters
 {
-    //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
-    //             ConcurrencyMode = ConcurrencyMode.Multiple,
-    //             UseSynchronizationContext = true)]
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
 
     public class Service : IService
@@ -22,7 +19,8 @@ namespace Filters
         private byte[] sendArray;
         private long sizeOfChunk = 2048;
         private bool cancelled = false;
-        
+        private FiltersWImplementation filters;
+
         public long SizeOfResult
         {
             get
@@ -46,8 +44,9 @@ namespace Filters
 
         public List<string> Filters()
         {
+            filters = new FiltersWImplementation();
             List<string> result = new List<string>();
-            foreach (Filter filter in FiltersWImplementation.filterList)
+            foreach (Filter filter in filters.filterList)
             {
                 result.Add(filter.Name);
             }
@@ -70,7 +69,7 @@ namespace Filters
 
         public void SetFilter(string filterName)
         {
-            chosenFilter = FiltersWImplementation.ListOfFilters.Find(x => x.Name == filterName);
+            chosenFilter = filters.ListOfFilters.Find(x => x.Name == filterName);
         }
 
         public bool ReceiveChunk(byte[] chunk, long fstBytePosition, long sizeOfChunk) // Server recieve chunk from Client
