@@ -11,7 +11,7 @@ namespace Filters
     //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
     //             ConcurrencyMode = ConcurrencyMode.Multiple,
     //             UseSynchronizationContext = true)]
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
 
     public class Service : IService
     {
