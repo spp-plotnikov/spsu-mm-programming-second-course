@@ -19,10 +19,7 @@ namespace MyFibers
         {
             foreach (uint fiber in fibersForKilling)
             {
-                if (fiber != curFiber)
-                {
-                    Fiber.Delete(fiber);
-                }                
+                Fiber.Delete(fiber);                                
             }
         }
 
