@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Lab1
 {
@@ -53,11 +55,11 @@ namespace Lab1
             }
         }
 
-        public static int[] Reader(string file)
+        public static int[] Reader(string fileName)
         {
             try
             {
-                StreamReader reader = new StreamReader(file);
+                StreamReader reader = new StreamReader(fileName);
                 string data = reader.ReadToEnd();
                 reader.Close();
                 if (data.Split(' ').Length < 1)
@@ -68,16 +70,15 @@ namespace Lab1
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
-
         }
 
-        public static void Writer(int[] array, string file)
+        public static void Writer(int[] array, string fileName)
         {
             try
             {
-                StreamWriter writer = new StreamWriter(new FileStream(file, FileMode.Create));
+                StreamWriter writer = new StreamWriter(fileName);
                 for (int i = 0; i < array.Length; i++)
                 {
                     writer.Write(array[i] + " ");
@@ -86,9 +87,8 @@ namespace Lab1
             }
             catch (Exception)
             {
-                return;
+                throw;
             }
-
         }
     }
 }
