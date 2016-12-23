@@ -28,7 +28,7 @@ namespace Program
             ChannelFactory<IService> cf = new ChannelFactory<IService>(binding, localhost);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1(cf.CreateChannel()));
+            Application.Run(new FilterForm(cf.CreateChannel()));
         }
     }
 }

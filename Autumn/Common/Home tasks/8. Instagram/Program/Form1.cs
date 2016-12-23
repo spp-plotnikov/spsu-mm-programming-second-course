@@ -13,7 +13,7 @@ using Server;
 
 namespace Program
 {
-    public partial class Form1 : Form
+    public partial class FilterForm : Form
     {
         /*
          * Fields
@@ -56,7 +56,7 @@ namespace Program
             string[] filters = serviceServer.GetFilters();
             for (int i = 0; i < filters.Length; i++)
             {
-                comboBox1.Items.Add(filters[i]);
+                filterBox.Items.Add(filters[i]);
             }
         }
 
@@ -64,30 +64,30 @@ namespace Program
         {
             if (InvokeRequired)
             {
-                Invoke(new Procceed(delegate () { progressBar1.Value = progress; }));
+                Invoke(new Procceed(delegate () { progressBar.Value = progress; }));
             }
             else
             {
-                progressBar1.Value = progress;
+                progressBar.Value = progress;
             }
         }
 
         private void Clear()
         {
             serviceServer.Clear();
-            progressBar1.Value = 0;
+            progressBar.Value = 0;
             Deactiv();
         }
 
         private void Activ()
         {
-            button1.Enabled = true;
+            filterButton.Enabled = true;
             toolStripMenuItem1.Enabled = true;
         }
 
         private void Deactiv()
         {
-            button1.Enabled = false;
+            filterButton.Enabled = false;
             toolStripMenuItem1.Enabled = false;
         }
 
@@ -97,7 +97,7 @@ namespace Program
             filtering.IsBackground = true;
             filtering.Start();
 
-            while (progressBar1.Value != 100 && isWorking)
+            while (progressBar.Value != 100 && isWorking)
             {
                 SetProgressBar(serviceServer.GetProgress());
                 Thread.Sleep(3);
@@ -114,11 +114,11 @@ namespace Program
 
             if (InvokeRequired)
             {
-                Invoke(new Procceed(delegate () { pictureBox1.Image = curImage; Activ(); }));
+                Invoke(new Procceed(delegate () { pictureBox.Image = curImage; Activ(); }));
             }
             else
             {
-                pictureBox1.Image = curImage;
+                pictureBox.Image = curImage;
                 Activ();
             }
 
@@ -129,7 +129,7 @@ namespace Program
          * Form functions
          * */
 
-        public Form1(IService server)
+        public FilterForm(IService server)
         {
             serviceServer = server;
             InitializeComponent();
@@ -145,9 +145,9 @@ namespace Program
                 try
                 {
                     curImage = new Bitmap(open_dialog.FileName);
-                    pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-                    pictureBox1.Image = curImage;
-                    pictureBox1.Invalidate(); 
+                    pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                    pictureBox.Image = curImage;
+                    pictureBox.Invalidate(); 
                 }
                 catch
                 {
@@ -157,10 +157,10 @@ namespace Program
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void filterButton_Click(object sender, EventArgs e)
         {
             Clear();
-            curFilter = comboBox1.SelectedIndex + 1;
+            curFilter = filterBox.SelectedIndex + 1;
 
             if ((curImage == null) || (curFilter == 0))
             {
@@ -175,7 +175,7 @@ namespace Program
             proccessing.Start();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void cancel_Click(object sender, EventArgs e)
         {
             isWorking = false;
             Thread stop = new Thread(() => { serviceServer.Clear(); });
