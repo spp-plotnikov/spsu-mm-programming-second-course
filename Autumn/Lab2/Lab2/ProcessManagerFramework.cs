@@ -18,32 +18,25 @@ namespace Lab2
 
         public static void Switch(bool fiberFinished)
         {
+            if (fiberFinished)
+            {
+                _fibersForDelete.Add(CurFiber);
+                Fibers.Remove(CurFiber);
+                Processes.Remove(Processes[_index]);
+            }
             if (Fibers.Count < 1)
             {
-                DeleteAll();
+                Console.WriteLine("The end");
+                Fiber.Switch(Fiber.PrimaryId);
             }
             else
             {
-                if (fiberFinished)
-                {
-                    _fibersForDelete.Add(CurFiber);
-                    Fibers.Remove(CurFiber);
-                    Processes.Remove(Processes[_index]);
-                }
-                if (Fibers.Count < 1)
-                {
-                    Console.WriteLine("The end");
-                    Fiber.Switch(Fiber.PrimaryId);
-                }
-                else
-                {
-                    _index = Priority ? GetFiber() : GetRandomFiber();
-                    CurFiber = Fibers[_index];
-                    Console.WriteLine("Switch to another fiber");
-                    Fiber.Switch(CurFiber);
-                }
-                Thread.Sleep(100);
+                _index = Priority ? GetFiber() : GetRandomFiber();
+                CurFiber = Fibers[_index];
+                Console.WriteLine("Switch to another fiber");
+                Fiber.Switch(CurFiber);
             }
+            Thread.Sleep(100);
         }
 
         private static int GetRandomFiber()
@@ -64,6 +57,7 @@ namespace Lab2
                 _step++;
                 foreach (var proc in Processes)
                 {
+
                     if (proc.Priority >= _rank)
                     {
                         suitableFibers.Add(proc);
@@ -98,7 +92,7 @@ namespace Lab2
             int maxPrior = Int32.MinValue;
             foreach (Process proc in Processes)
             {
-                if (maxPrior < proc.Priority)
+                if (maxPrior < proc.Priority && proc != Processes[_index])
                 {
                     newProcess = proc;
                     maxPrior = proc.Priority;
@@ -117,11 +111,14 @@ namespace Lab2
             _rank = _rank / (double)Processes.Count;
         }
 
-        private static void DeleteAll()
+        public static void DeleteAll()
         {
             foreach (var fiber in _fibersForDelete)
             {
-                Fiber.Delete(fiber);
+                if (fiber != Fiber.PrimaryId)
+                {
+                    Fiber.Delete(fiber);
+                }
             }
         }
     }

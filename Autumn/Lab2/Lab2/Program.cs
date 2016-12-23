@@ -25,6 +25,7 @@ namespace Lab2
             Console.ReadKey();
 
             ProcessManager.Switch(false);
+            ProcessManager.DeleteAll();
             Console.Read();
         }
     }
