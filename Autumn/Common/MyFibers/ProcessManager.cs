@@ -106,6 +106,7 @@ namespace MyFibers
                     fibersWPriority.Clear();
                     fibersWTime.Clear();
                     fibersId.Clear();
+                    DeleteAllFibers();
                     Fiber.Switch(Fiber.PrimaryId);
                 }
             }
@@ -132,7 +133,7 @@ namespace MyFibers
             Console.WriteLine("PrimaryId: {0}", Fiber.PrimaryId);
             curFiber = fibersId[0];
             NonPrioritySwitch(false);
-            DeleteAllFibers();
+            //DeleteAllFibers();
             Console.ReadLine();
         }
 
