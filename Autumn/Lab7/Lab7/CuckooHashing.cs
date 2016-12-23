@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Lab7
 {
@@ -30,23 +31,29 @@ namespace Lab7
         public bool Contains(KeyValuePair<long, long> x)
         {
             Acquire(x);
+            List<KeyValuePair<long, long>> firstSet = null;
+            List<KeyValuePair<long, long>> secondSet = null;
+            bool result = false;
             try
             {
                 long h1 = FirstHash(x) % _capacity;
                 long h2 = SecondHash(x) % _capacity;
-                List<KeyValuePair<long, long>> firstSet = Table[0, h1];
-                List<KeyValuePair<long, long>> secondSet = Table[1, h2];
+                firstSet = Table[0, h1];
+                secondSet = Table[1, h2];
+                Acquire(firstSet);
+                Acquire(secondSet);
                 if (firstSet.Contains(x) || secondSet.Contains(x))
                 {
-                    return true;
+                    result = true;
                 }
-                return false;
-
             }
             finally
             {
+                Release(firstSet);
+                Release(secondSet);
                 Release(x);
             }
+            return result;
         }
 
         public bool Add(KeyValuePair<long, long> x)
@@ -57,10 +64,14 @@ namespace Lab7
             long i = -1;
             long h = -1;
             bool needResize = false;
+            List<KeyValuePair<long, long>> firstSet = null;
+            List<KeyValuePair<long, long>> secondSet = null;
             try
             {
-                List<KeyValuePair<long, long>> firstSet = Table[0, h1];
-                List<KeyValuePair<long, long>> secondSet = Table[1, h2];
+                firstSet = Table[0, h1];
+                secondSet = Table[1, h2];
+                Acquire(firstSet);
+                Acquire(secondSet);
                 if (firstSet.Contains(x) || secondSet.Contains(x))
                 {
                     return false;
@@ -92,8 +103,14 @@ namespace Lab7
                     needResize = true;
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
             finally
             {
+                Release(firstSet);
+                Release(secondSet);
                 Release(x);
             }
 
@@ -114,29 +131,36 @@ namespace Lab7
             Acquire(x);
             long h1 = FirstHash(x) % _capacity;
             long h2 = SecondHash(x) % _capacity;
+            List<KeyValuePair<long, long>> firstSet = null;
+            List<KeyValuePair<long, long>> secondSet = null;
+            bool result = false;
             try
             {
-                List<KeyValuePair<long, long>> firstSet = Table[0, h1];
+                firstSet = Table[0, h1];
+                secondSet = Table[1, h2];
+                Acquire(firstSet);
+                Acquire(secondSet);
                 if (firstSet.Contains(x))
                 {
                     firstSet.Remove(x);
-                    return true;
+                    result = true;
                 }
                 else
                 {
-                    List<KeyValuePair<long, long>> secondSet = Table[1, h2];
                     if (secondSet.Contains(x))
                     {
                         secondSet.Remove(x);
-                        return true;
+                        result = true;
                     }
                 }
-                return false;
             }
             finally
             {
+                Release(firstSet);
+                Release(secondSet);
                 Release(x);
             }
+            return result;
         }
 
         protected bool Relocate(long i, long hi)
@@ -145,8 +169,11 @@ namespace Lab7
             long j = 1 - i;
             for (int round = 0; round < _limit; round++)
             {
-                List<KeyValuePair<long, long>> iSet = Table[i, hi];
+                List<KeyValuePair<long, long>> iSet;
+                Acquire(iSet = Table[i, hi]);
                 KeyValuePair<long, long> y = iSet.First();
+                Release(iSet);
+
                 switch (i)
                 {
                     case 0:
@@ -209,8 +236,11 @@ namespace Lab7
         }
 
         public abstract void Acquire(KeyValuePair<long, long> x);
+        public abstract void Acquire(List<KeyValuePair<long, long>> x);
 
         public abstract void Release(KeyValuePair<long, long> x);
+        public abstract void Release(List<KeyValuePair<long, long>> x);
+
 
         public abstract void Resize();
     }

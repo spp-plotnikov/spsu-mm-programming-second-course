@@ -9,7 +9,7 @@ namespace Lab7
         static Random _rnd = new Random();
         static void Main(string[] args)
         {
-            int capacity = _rnd.Next(500, 10000);
+            int capacity = _rnd.Next(5000, 20000);
             capacity -= capacity % 100;
             List<KeyValuePair<long, long>> listOfStudents = new List<KeyValuePair<long, long>>();
             Console.WriteLine("Number of students: {0}", capacity);

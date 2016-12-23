@@ -16,6 +16,7 @@ namespace Lab7
             _numberOfLocker = 10;
             _firstLocker = new Mutex[_capacity];
             _secondLocker = new Mutex[_capacity];
+
             for (int i = 0; i < _capacity; i++)
             {
                 _firstLocker[i] = new Mutex();
@@ -33,6 +34,16 @@ namespace Lab7
         {
             _firstLocker[FirstHash(x) % _numberOfLocker].ReleaseMutex();
             _secondLocker[SecondHash(x) % _numberOfLocker].ReleaseMutex();
+        }
+
+        public override void Acquire(List<KeyValuePair<long, long>> x)
+        {
+            Monitor.Enter(x);
+        }
+
+        public override void Release(List<KeyValuePair<long, long>> x)
+        {
+            Monitor.Exit(x);
         }
 
         public override void Resize()
