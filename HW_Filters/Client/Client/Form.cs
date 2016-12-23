@@ -109,6 +109,18 @@ namespace Client
         {
             int progress = 0;
             this.progressBar.Maximum = 100;
+            while (_myService.GetProgress() == 100 && _filter.IsAlive) { }
+            if (!_filter.IsAlive)
+            {
+                if ((this.progressBar.InvokeRequired))
+                {
+                    this.Invoke(new Proc(delegate () { progressBar.Value = progress; }));
+                }
+                else
+                {
+                    progressBar.Value = progress;
+                }
+            }
             while (progress != 100)
             {
                 progress = _myService.GetProgress();
