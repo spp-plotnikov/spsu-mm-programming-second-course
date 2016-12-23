@@ -55,6 +55,7 @@ public class Client implements Runnable {
 
             timeOut();
         } catch (URISyntaxException ex) {
+            errorOccured();
             System.err.println("URISyntaxException exception: " + ex.getMessage());
         } catch (InterruptedException e) { }
     }

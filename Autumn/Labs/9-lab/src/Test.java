@@ -8,19 +8,18 @@ public class Test {
     private BufferedImage imageSrc;
     private int maxTimeout;
     private long[] results;
-    private int resultsCount;
-    private Boolean waitingForResults;
-    private int reasonFailed;
+    private volatile int reasonFailed;
+    private Thread[] threads;
 
     Test(TestingSystem ts, int clientsCount, BufferedImage imageSrc, int maxTimeout) {
         this.ts = ts;
         this.clientsCount = clientsCount;
         this.imageSrc = imageSrc;
         this.maxTimeout = maxTimeout;
-        this.waitingForResults = true;
         this.reasonFailed = 0;
 
         this.results = new long[clientsCount];
+        this.threads = new Thread[clientsCount];
     }
 
     public BufferedImage getImageSrc() {
@@ -29,13 +28,16 @@ public class Test {
 
     public void start() {
         for (int i = 0; i < clientsCount; i++) {
-            new Thread(new Client(this, i, maxTimeout)).start();
+            threads[i] = new Thread(new Client(this, i, maxTimeout));
+            threads[i].start();
         }
 
-        while (waitingForResults) {
+        for (int i = 0; i < clientsCount; i++) {
             try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) { }
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (reasonFailed == 0) {
@@ -90,17 +92,11 @@ public class Test {
     public void addResult(int id, long duration) {
         synchronized (results) {
             results[id] = duration;
-            resultsCount++;
-        }
-
-        if (resultsCount == clientsCount) {
-            waitingForResults = false;
         }
     }
 
     public void noResult(int reasonFailed) {
         this.reasonFailed = reasonFailed;
-        waitingForResults = false;
     }
 }
 
