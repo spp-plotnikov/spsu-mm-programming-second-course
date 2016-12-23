@@ -27,14 +27,6 @@ namespace FirstTest
 
         private void DrawIt()
         {
-            int maxh = 0;
-            for (int i = 0; i < listOfPoints.Count; i++)
-            {
-                if (listOfPoints[i].Y > maxh)
-                {
-                    maxh = listOfPoints[i].Y;
-                }
-            }
             for (int i = 0; i < listOfPoints.Count; i++)
             {
                 this.Graph.Series["Time"].Points.AddXY(listOfPoints[i].X, listOfPoints[i].Y);

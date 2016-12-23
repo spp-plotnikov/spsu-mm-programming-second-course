@@ -38,7 +38,7 @@ namespace TestSecond
             {
                 Time.Add(0);
             }
-            for (int i = 1; i < 8; i++)
+            for (int i = 1; i < 10; i++)
             {
                 picH += 100;
                 picW += 100;

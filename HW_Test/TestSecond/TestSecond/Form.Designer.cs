@@ -49,6 +49,8 @@
             // 
             // Graph
             // 
+            chartArea1.AxisX.Title = "SizeOfPic";
+            chartArea1.AxisY.Title = "ResponseTime";
             chartArea1.Name = "ChartArea1";
             this.Graph.ChartAreas.Add(chartArea1);
             legend1.Name = "Time";
