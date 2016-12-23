@@ -19,7 +19,8 @@ namespace MyFibers
         {
             foreach (uint fiber in fibersForKilling)
             {
-                Fiber.Delete(fiber);                                
+                Console.WriteLine(fiber);
+                Fiber.Delete(fiber);                           
             }
         }
 
@@ -70,9 +71,8 @@ namespace MyFibers
                     Console.WriteLine("All fibers finished");
                     fibersId.Clear();
                     fibersWPriority.Clear();
-                    fibersWTime.Clear();
+                    fibersWTime.Clear();                    
                     Fiber.Switch(Fiber.PrimaryId);
-                    DeleteAllFibers();
                 }
             }
             else
@@ -107,7 +107,6 @@ namespace MyFibers
                     fibersWTime.Clear();
                     fibersId.Clear();
                     Fiber.Switch(Fiber.PrimaryId);
-                    DeleteAllFibers();
                 }
             }
             else
@@ -130,9 +129,10 @@ namespace MyFibers
                 fibersWPriority.Add(fiber.Id, (uint)process.Priority);
                 fibersWTime.Add(fiber.Id, 0);
             }
-
+            Console.WriteLine("PrimaryId: {0}", Fiber.PrimaryId);
             curFiber = fibersId[0];
             NonPrioritySwitch(false);
+            DeleteAllFibers();
             Console.ReadLine();
         }
 
