@@ -40,7 +40,8 @@
             this.PanelBefore = new System.Windows.Forms.Panel();
             this.PanelAfter = new System.Windows.Forms.Panel();
             this.PicAfter = new System.Windows.Forms.PictureBox();
-            this.AfterFilePath = new System.Windows.Forms.Label();
+            this.SendInfo = new System.Windows.Forms.Label();
+            this.SaveBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PicBefore)).BeginInit();
             this.PanelBefore.SuspendLayout();
             this.PanelAfter.SuspendLayout();
@@ -153,21 +154,31 @@
             this.PicAfter.TabIndex = 9;
             this.PicAfter.TabStop = false;
             // 
-            // AfterFilePath
+            // SendInfo
             // 
-            this.AfterFilePath.AutoSize = true;
-            this.AfterFilePath.Location = new System.Drawing.Point(518, 79);
-            this.AfterFilePath.Name = "AfterFilePath";
-            this.AfterFilePath.Size = new System.Drawing.Size(79, 13);
-            this.AfterFilePath.TabIndex = 11;
-            this.AfterFilePath.Text = "After File Path: ";
+            this.SendInfo.AutoSize = true;
+            this.SendInfo.Location = new System.Drawing.Point(130, 104);
+            this.SendInfo.Name = "SendInfo";
+            this.SendInfo.Size = new System.Drawing.Size(0, 13);
+            this.SendInfo.TabIndex = 12;
+            // 
+            // SaveBtn
+            // 
+            this.SaveBtn.Location = new System.Drawing.Point(521, 93);
+            this.SaveBtn.Name = "SaveBtn";
+            this.SaveBtn.Size = new System.Drawing.Size(75, 23);
+            this.SaveBtn.TabIndex = 13;
+            this.SaveBtn.Text = "Save";
+            this.SaveBtn.UseVisualStyleBackColor = true;
+            this.SaveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
             // 
             // WinForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1041, 640);
-            this.Controls.Add(this.AfterFilePath);
+            this.Controls.Add(this.SaveBtn);
+            this.Controls.Add(this.SendInfo);
             this.Controls.Add(this.PanelAfter);
             this.Controls.Add(this.PanelBefore);
             this.Controls.Add(this.ServerText);
@@ -205,7 +216,8 @@
         private System.Windows.Forms.Panel PanelBefore;
         private System.Windows.Forms.Panel PanelAfter;
         private System.Windows.Forms.PictureBox PicAfter;
-        private System.Windows.Forms.Label AfterFilePath;
+        private System.Windows.Forms.Label SendInfo;
+        private System.Windows.Forms.Button SaveBtn;
     }
 }
 

@@ -1,1 +1,1 @@
-Grey
+Grey Gauss Sobel Median
