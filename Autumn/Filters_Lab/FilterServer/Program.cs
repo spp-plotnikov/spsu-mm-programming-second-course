@@ -10,8 +10,7 @@ namespace FilterServer
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Path to config:");
-            BmpServer server = new BmpServer(13000, Console.ReadLine());
+            BmpServer server = new BmpServer(13000, "config.txt");
         }
     }
 }

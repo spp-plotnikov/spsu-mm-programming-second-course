@@ -19,8 +19,7 @@ namespace FilterServer
         private string _filterNames;
         private ASCIIEncoding _encoding = new ASCIIEncoding();
         private int _count = 1;
-        private Dictionary<int, MyListener> _lPool = new Dictionary<int, MyListener>();
-        private Dictionary<int, Thread> _tPool = new Dictionary<int, Thread>();
+        private Dictionary<int, bool[]> _abortPool = new Dictionary<int, bool[]>();
         public BmpServer (int port, string pathToConfig)
         {
             try
@@ -57,10 +56,10 @@ namespace FilterServer
                 NetworkStream io = client.GetStream();
 
                 int newPort = 13000 + _count++;
-                MyListener newListener = new MyListener();
-                _lPool.Add(newPort, newListener);
-                Thread newThread = new Thread(() => newListener.Listen(newPort));
-                _tPool.Add(newPort, newThread);
+                bool[] abort = { false };
+                _abortPool.Add(newPort, abort);
+
+                Thread newThread = new Thread(() => Listen(newPort));
                 newThread.Start();
 
                 byte[] buf = _encoding.GetBytes(newPort.ToString() + ' ' + _filterNames);
@@ -83,36 +82,21 @@ namespace FilterServer
                 string tmp = _encoding.GetString(bytePort);
 
                 int port = Int32.Parse(tmp);
-                _lPool[port].Abort();
-                _tPool[port].Abort();
-                _tPool.Remove(port);
-
-                Thread newThread = new Thread(() => _lPool[port].Listen(port));
-                _tPool.Add(port, newThread);
-                newThread.Start();
+                _abortPool[port][0] = true;
             }
         }
 
-        private class MyListener
+        public void Listen(int port)
         {
-            private TcpListener _listener;
-            private ASCIIEncoding _encoding = new ASCIIEncoding();
-
-            public void Abort()
+            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            listener.Start();
+            while (true)
             {
-                _listener.Stop();
-            }
+                TcpClient client = listener.AcceptTcpClient();
+                NetworkStream io = client.GetStream();
 
-            public void Listen(int port)
-            {
-                _listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
-                _listener.Start();
-                while (true)
+                try
                 {
-                    TcpClient client = _listener.AcceptTcpClient();
-                    NetworkStream io = client.GetStream();
-
-
                     byte[] byteFilterSize = new byte[32];
                     io.Read(byteFilterSize, 0, 32);
                     string[] tmp = new string[2];
@@ -127,18 +111,27 @@ namespace FilterServer
                         sum += io.Read(bytetmp, sum, size - sum);
                     }
 
-                    Bitmap dst = BMPFilter.ApplyFilter((Bitmap)(new ImageConverter().ConvertFrom(bytetmp)), filter, io);
-                    using (MemoryStream ms = new MemoryStream())
+                    Bitmap dst = BMPFilter.ApplyFilter((Bitmap)(new ImageConverter().ConvertFrom(bytetmp)), filter, io, ref _abortPool[port][0]);
+                    if (!_abortPool[port][0])
                     {
-                        dst.Save(ms, ImageFormat.Bmp);
-                        byte[] imgBuf = ms.GetBuffer();
-                        io.Write(imgBuf, 0, (int)ms.Length);
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            dst.Save(ms, ImageFormat.Bmp);
+                            byte[] imgBuf = ms.GetBuffer();
+                            io.Write(imgBuf, 0, (int)ms.Length);
+                        }
                     }
+                    else
+                    {
+                        _abortPool[port][0] = false;
+                    }
+                }
+                finally
+                {
                     io.Close();
                     client.Close();
                 }
             }
         }
-
     }
 }

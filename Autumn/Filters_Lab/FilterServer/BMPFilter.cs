@@ -10,8 +10,7 @@ namespace FilterServer
 {
     static class BMPFilter
     {
-        public delegate void update(int status);
-        public static Bitmap ApplyFilter(Bitmap src, string filter, Stream io)
+        public static Bitmap ApplyFilter(Bitmap src, string filter, Stream io, ref bool abort)
         {
             Bitmap dst = (Bitmap)src.Clone();
             
@@ -25,6 +24,8 @@ namespace FilterServer
                     for (int x = 0; x < dst.Width; x++)
                         for (int y = 0; y < dst.Height; y++)
                         {
+                            if (abort)
+                                return null;
                             Color color = src.GetPixel(x, y);
                             int newColor = (color.R + color.G + color.B) / 3;
                             dst.SetPixel(x, y, Color.FromArgb(newColor, newColor, newColor));
@@ -33,7 +34,14 @@ namespace FilterServer
                                 startTime = DateTime.Now;
                                 double count = (x * src.Height + y + 1) / (double)size;
                                 status = (int)(count * 100);
-                                io.WriteByte(Convert.ToByte(status));
+                                try
+                                {
+                                    io.WriteByte(Convert.ToByte(status));
+                                }
+                                catch
+                                {
+                                    abort = true;
+                                }
                             }
                         }
                     break;
@@ -43,6 +51,8 @@ namespace FilterServer
                     for (int x = 1; x < dst.Width - 1; x++)
                         for (int y = 1; y < dst.Height - 1; y++)
                         {
+                            if (abort)
+                                return null;
                             int newR = 0, newG = 0, newB = 0;
                             for (int dx = -1; dx <= 1; dx++)
                                 for (int dy = -1; dy <= 1; dy++)
@@ -58,7 +68,14 @@ namespace FilterServer
                                 startTime = DateTime.Now;
                                 double count = (x * src.Height + y + 1) / (double)size;
                                 status = (int)(count * 100);
-                                io.WriteByte(Convert.ToByte(status));
+                                try
+                                {
+                                    io.WriteByte(Convert.ToByte(status));
+                                }
+                                catch
+                                {
+                                    abort = true;
+                                }
                             }
                         }
                     break;
@@ -69,6 +86,8 @@ namespace FilterServer
                     for (int x = 1; x < dst.Width - 1; x++)
                         for (int y = 1; y < dst.Height - 1; y++)
                         {
+                            if (abort)
+                                return null;
                             int resX = 0, resY = 0;
                             for (int dx = -1; dx <= -1; dx++)
                                 for (int dy = -1; dy <= -1; dy++)
@@ -87,7 +106,14 @@ namespace FilterServer
                                 startTime = DateTime.Now;
                                 double count = (x * src.Height + y + 1) / (double)size;
                                 status = (int)(count * 100);
-                                io.WriteByte(Convert.ToByte(status));
+                                try
+                                {
+                                    io.WriteByte(Convert.ToByte(status));
+                                }
+                                catch
+                                {
+                                    abort = true;
+                                }
                             }
                         }
                     break;
@@ -96,6 +122,8 @@ namespace FilterServer
                     {
                         for (int y = 1; y < dst.Height - 1; y++)
                         {
+                            if (abort)
+                                return null;
                             int[] R = new int[9];
                             int[] G = new int[9];
                             int[] B = new int[9];
@@ -120,7 +148,14 @@ namespace FilterServer
                                 startTime = DateTime.Now;
                                 double count = (x * src.Height + y + 1) / (double)size;
                                 status = (int)(count * 100);
-                                io.WriteByte(Convert.ToByte(status));
+                                try
+                                {
+                                    io.WriteByte(Convert.ToByte(status));
+                                }
+                                catch
+                                {
+                                    abort = true;
+                                }
                             }
                         }
                     }

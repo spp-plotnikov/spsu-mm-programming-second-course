@@ -190,6 +190,7 @@
             this.Controls.Add(this.SelectFile);
             this.Controls.Add(this.progressBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "WinForm";
             ((System.ComponentModel.ISupportInitialize)(this.PicBefore)).EndInit();
             this.PanelBefore.ResumeLayout(false);
