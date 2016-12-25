@@ -28,10 +28,6 @@ public class SimpleRealisation implements IExamSystem {
         synchronized (courses) {
             if (courses != null) {
                 courses.remove(courseId);
-
-                if (courses.isEmpty()) {
-                    storage.remove(studentId);
-                }
             }
         }
     }
