@@ -11,14 +11,14 @@ public class SimpleRealisation implements IExamSystem {
     @Override
     public void add(long studentId, long courseId) {
         HashSet courses = storage.get(studentId);
-        if (courses != null) {
-            synchronized (courses) {
+        synchronized (courses) {
+            if (courses != null) {
                 courses.add(courseId);
+            } else {
+                courses = new HashSet();
+                courses.add(courseId);
+                storage.put(studentId, courses);
             }
-        } else {
-            courses = new HashSet();
-            courses.add(courseId);
-            storage.put(studentId, courses);
         }
     }
 
