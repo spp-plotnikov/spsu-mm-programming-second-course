@@ -25,8 +25,8 @@ public class SimpleRealisation implements IExamSystem {
     @Override
     public void remove(long studentId, long courseId) {
         HashSet courses = storage.get(studentId);
-        if (courses != null) {
-            synchronized (courses) {
+        synchronized (courses) {
+            if (courses != null) {
                 courses.remove(courseId);
 
                 if (courses.isEmpty()) {
@@ -39,12 +39,12 @@ public class SimpleRealisation implements IExamSystem {
     @Override
     public boolean contains(long studentId, long courseId) {
         HashSet courses = storage.get(studentId);
-        if (courses != null) {
-            synchronized (courses) {
+        synchronized (courses) {
+            if (courses != null) {
                 return courses.contains(courseId);
+            } else {
+                return false;
             }
-        } else {
-            return false;
         }
     }
 }
