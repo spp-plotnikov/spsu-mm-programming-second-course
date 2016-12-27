@@ -17,62 +17,56 @@ import java.util.concurrent.FutureTask;
  */
 public class MedianAndMiddleTest {
 
-    private static final int COUNT_OF_CLIENTS = 9;
+    private static final int COUNT_OF_CLIENTS = 5;
+    private static final int COUNT_OF_PIC = 5;
     private static ArrayList<FutureTask<Long>> clients = new ArrayList();
-
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         ExecutorService exService = Executors.newCachedThreadPool();
-        
-        init(exService);
-        
+        long[] result = new long[COUNT_OF_PIC];
+        long[] sum = new long[COUNT_OF_PIC];
+        int commonCount = 0;
 
-        long[] result = new long[9];
-        long sum = 0;
+        init(exService, result, sum, "D:\\hqdefault.jpg", commonCount);
+        commonCount++;
 
-        for (int i = 0; i < COUNT_OF_CLIENTS; i++) {
-            result[i] = clients.get(i).get();
-            sum += clients.get(i).get();
+        Thread.sleep(3000);
+        init(exService, result, sum, "D:\\mal.jpg", commonCount);
+        commonCount++;
+        Thread.sleep(3000);
+        init(exService, result, sum, "D:\\42_059.jpg", commonCount);
+        commonCount++;
+        Thread.sleep(3000);
+        init(exService, result, sum, "D:\\1335868183_malenkie_kotjata_20.jpg", commonCount);
+        commonCount++;
+
+        init(exService, result, sum, "D:\\Чихуахуа.jpg", commonCount);
+        commonCount++;
+
+        sortArr(result);
+
+        for (int i = 0; i < COUNT_OF_PIC; i++) {
+            System.out.println("Median: " + result[i]);
+            System.out.println("Middle: " + sum[i] / COUNT_OF_CLIENTS);
         }
 
-            sortArr(result);
-            
-            System.out.println("Median: " + result[(int) COUNT_OF_CLIENTS / 2 + 1]);
-            System.out.println("Middle: " + sum / COUNT_OF_CLIENTS);
-
-            System.out.println("End");
-            exService.shutdown();
+        System.out.println("End");
+        exService.shutdown();
     }
-    
-    private static void init(ExecutorService exService){
-        
-        FutureTask<Long> ft = new FutureTask<>(new Client("D:\\hqdefault.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\1335868183_malenkie_kotjata_20.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\42_059.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\mal.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\Чихуахуа.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\img.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\chihu.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\1335868138_malenkie_kotjata_43.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
-        ft = new FutureTask<>(new Client("D:\\kitten_7-5.jpg"));
-        clients.add(ft);
-        exService.execute(ft);
+
+    private static void init(ExecutorService exService, long[] result, long[] sum, String path, int commonCount) throws InterruptedException, ExecutionException, ExecutionException {
+        long[] supportArr = new long[COUNT_OF_CLIENTS];
+        for (int i = 0; i < COUNT_OF_CLIENTS; i++) {
+            FutureTask<Long> ft = new FutureTask<>(new Client(path));
+            clients.add(ft);
+            exService.execute(ft);
+        }
+        for (int i = 0; i < COUNT_OF_CLIENTS; i++) {
+            supportArr[i] = clients.get(i + commonCount * COUNT_OF_CLIENTS).get();
+            sum[commonCount] += clients.get(i + commonCount * COUNT_OF_CLIENTS).get();
+        }
+        sortArr(supportArr);
+        result[commonCount] = supportArr[(int) COUNT_OF_CLIENTS / 2];
     }
 
     private static void sortArr(long[] arr) {
