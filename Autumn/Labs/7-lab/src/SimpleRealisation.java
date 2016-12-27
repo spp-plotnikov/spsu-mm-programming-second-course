@@ -11,22 +11,22 @@ public class SimpleRealisation implements IExamSystem {
     @Override
     public void add(long studentId, long courseId) {
         HashSet courses = storage.get(studentId);
-        synchronized (courses) {
-            if (courses != null) {
+        if (courses != null) {
+            synchronized (courses) {
                 courses.add(courseId);
-            } else {
-                courses = new HashSet();
-                courses.add(courseId);
-                storage.put(studentId, courses);
             }
+        } else {
+            courses = new HashSet();
+            courses.add(courseId);
+            storage.put(studentId, courses);
         }
     }
 
     @Override
     public void remove(long studentId, long courseId) {
         HashSet courses = storage.get(studentId);
-        synchronized (courses) {
-            if (courses != null) {
+        if (courses != null) {
+            synchronized (courses) {
                 courses.remove(courseId);
             }
         }
@@ -35,12 +35,12 @@ public class SimpleRealisation implements IExamSystem {
     @Override
     public boolean contains(long studentId, long courseId) {
         HashSet courses = storage.get(studentId);
-        synchronized (courses) {
-            if (courses != null) {
+        if (courses != null) {
+            synchronized (courses) {
                 return courses.contains(courseId);
-            } else {
-                return false;
             }
+        } else {
+            return false;
         }
     }
 }
