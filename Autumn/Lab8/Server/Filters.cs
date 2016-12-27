@@ -6,12 +6,10 @@ namespace Server
 {
     public class Filters
     {
-        public bool CancelProcess;
         public int Progress;
 
         public Filters()
         {
-            CancelProcess = false;
             Progress = 0;
         }
 
@@ -25,14 +23,9 @@ namespace Server
                 {
                     Color color = image.GetPixel(i, j);
                     image.SetPixel(i, j, Color.FromArgb(255 - color.R, 255 - color.G, 255 - color.B));
-                    if (CancelProcess)
-                    {
-                        Progress = 75;
-                        return null;
-                    }
                 }
+                Progress = 75;
             }
-            Progress = 75;
             return image;
         }
 
@@ -47,11 +40,6 @@ namespace Server
                     Color color = image.GetPixel(i, j);
                     int gr = (color.R + color.G + color.B) / 3;
                     image.SetPixel(i, j, Color.FromArgb(gr, gr, gr));
-                    if (CancelProcess)
-                    {
-                        Progress = 75;
-                        return null;
-                    }
                 }
             }
             Progress = 75;
@@ -78,11 +66,6 @@ namespace Server
                     blue = blue > 0 ? (blue < 255 ? blue : 255) : 0;
 
                     image.SetPixel(i, j, Color.FromArgb(red, green, blue));
-                    if (CancelProcess)
-                    {
-                        Progress = 75;
-                        return null;
-                    }
                 }
             }
             Progress = 75;
@@ -101,7 +84,7 @@ namespace Server
                     break;
                 }
             }
-            Progress = 35;
+            Progress = 40;
             switch (filterIndex)
             {
                 case 0:

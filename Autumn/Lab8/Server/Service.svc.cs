@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.ServiceModel;
@@ -14,13 +13,15 @@ namespace Server
         readonly List<string> _filters;
         readonly Filters _filterWorking;
         readonly IServiceCallback _client;
+        bool _cancelProcess;
 
         public Service()
         {
             _client = OperationContext.Current.GetCallbackChannel<IServiceCallback>();
-            
+
             _filterWorking = new Filters();
             _filters = new List<string> { "Negative", "Gray", "Contrast" };
+            _cancelProcess = false;
         }
 
         public string[] GetFilters()
@@ -30,7 +31,6 @@ namespace Server
 
         public void SendImage(byte[] imageArray, string filter)
         {
-            _filterWorking.CancelProcess = false;
             MemoryStream memoryStream = new MemoryStream();
             memoryStream = new MemoryStream(imageArray);
             Bitmap image = (Bitmap)Bitmap.FromStream(memoryStream);
@@ -43,15 +43,23 @@ namespace Server
                 Thread.Sleep(100);
                 _client.GetProgress(_filterWorking.Progress);
             }
-            ImageConverter converter = new ImageConverter();
-            byte[] newImageArray = (byte[])converter.ConvertTo(newImage.Result, typeof(byte[]));
 
-            _client.GetImage(newImageArray);
+            if (!_cancelProcess)
+            {
+                ImageConverter converter = new ImageConverter();
+                byte[] newImageArray = (byte[])converter.ConvertTo(newImage.Result, typeof(byte[]));
+                _client.GetImage(newImageArray);
+            }
+            else
+            {
+                _client.GetImage(imageArray);
+            }
+            _cancelProcess = false;
         }
 
         public void SendCancel(bool cancel)
         {
-            _filterWorking.CancelProcess = cancel;
+            _cancelProcess = cancel;
         }
     }
 }

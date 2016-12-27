@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 
 namespace Server
 {

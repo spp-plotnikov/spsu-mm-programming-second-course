@@ -1,12 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.ServiceModel;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Client
@@ -16,8 +14,9 @@ namespace Client
         Bitmap _image;
         string[] _filters;
         string _filter;
-        bool _inProgress;
+        bool _inProcess;
         int _curProgress;
+        bool _cancelProcess;
 
         BackgroundWorker _worker;
 
@@ -31,15 +30,16 @@ namespace Client
             _callbackClient = callback;
             _server = new ServiceReference.ServiceClient(new InstanceContext(_callbackClient), "NetTcpBinding_IService");
 
+            _cancelProcess = false;
             _curProgress = 0;
-            _inProgress = false;
+            _inProcess = false;
             _filters = _server.GetFilters();
             foreach (var filter in _filters)
             {
                 filterSelectionBox.Items.Add(filter);
             }
 
-            _worker=new BackgroundWorker();
+            _worker = new BackgroundWorker();
             _worker.WorkerReportsProgress = true;
             _worker.WorkerSupportsCancellation = true;
             _worker.DoWork += new DoWorkEventHandler(DoWork);
@@ -49,7 +49,7 @@ namespace Client
 
         private void ChooseImage(object sender, EventArgs e)
         {
-            if (!_inProgress)
+            if (!_inProcess)
             {
                 using (OpenFileDialog openImage = new OpenFileDialog())
                 {
@@ -69,7 +69,7 @@ namespace Client
 
         private void FilterSelected(object sender, EventArgs e)
         {
-            if (!_inProgress)
+            if (!_inProcess)
             {
                 _filter = filterSelectionBox.SelectedItem.ToString();
             }
@@ -77,7 +77,7 @@ namespace Client
 
         private void SendImageToServer(object sender, EventArgs e)
         {
-            if (!_inProgress)
+            if (!_inProcess)
             {
                 if (_filter != null && _image != null)
                 {
@@ -85,10 +85,10 @@ namespace Client
                 }
             }
         }
-        
+
         private void SaveButtonClick(object sender, EventArgs e)
         {
-            if (!_inProgress)
+            if (!_inProcess)
             {
                 if (imageBox.Image != null)
                 {
@@ -101,7 +101,7 @@ namespace Client
 
                         if (saveImage.ShowDialog() == DialogResult.OK && saveImage.FileName != "")
                         {
-                            FileStream saveStream = (FileStream) saveImage.OpenFile();
+                            FileStream saveStream = (FileStream)saveImage.OpenFile();
                             _image.Save(saveStream, ImageFormat.Bmp);
                             saveStream.Close();
                             imageBox.Image = null;
@@ -113,22 +113,24 @@ namespace Client
 
         private void CancelProcessingButtonClick(object sender, EventArgs e)
         {
-            if (_inProgress)
+            if (_inProcess)
             {
-                _server.SendCancel(true);
+                _cancelProcess = true;
+                Thread cancel = new Thread(() => { _server.SendCancel(true); });
+                cancel.IsBackground = true;
+                cancel.Start();
             }
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            _inProgress = true;
-
+            _inProcess = true;
+            progressBar.Invoke(new Action(() => { progressBar.Value = 0; }));
+            _curProgress = 0;
             ImageConverter converter = new ImageConverter();
             byte[] imageArray = (byte[])converter.ConvertTo(_image, typeof(byte[]));
             _server.SendImage(imageArray, _filter);
-            progressBar.Value = 0;
-            _curProgress = 0;
 
             while (_curProgress != 75)
             {
@@ -145,21 +147,27 @@ namespace Client
                 }
             }
         }
+
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             Bitmap newImage = _callbackClient.Image;
-            if (newImage != null)
+            if (!_cancelProcess)
             {
                 _image = newImage;
+                progressBar.Invoke(new Action(() => { progressBar.Value = 100; }));
             }
-            imageBox.Image = _image;
-            progressBar.Value = 100;
-           _inProgress = false;
+            else
+            {
+                progressBar.Invoke(new Action(() => { progressBar.Value = 0; }));
+            }
+            imageBox.Invoke(new Action(() => { imageBox.Image = _image; }));
+            _inProcess = false;
+            _cancelProcess = false;
         }
 
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            progressBar.Value = e.ProgressPercentage;
+            progressBar.Invoke(new Action(() => { progressBar.Value = e.ProgressPercentage; }));
         }
     }
 }
