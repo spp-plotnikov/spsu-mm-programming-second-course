@@ -1,7 +1,7 @@
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
-
 import java.util.concurrent.ThreadLocalRandom;
+
 
 public class Process extends Fiber<Void> implements Comparable<Process> {
     private int priority;

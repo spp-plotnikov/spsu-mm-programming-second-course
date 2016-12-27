@@ -1,9 +1,9 @@
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.strands.SuspendableRunnable;
-
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
+
 
 public class PriorityProcessManager implements ProcessManager {
     private volatile IntervalHeap<Process> processesDeque; // processes queue, processes can leave and enter it during program execution
