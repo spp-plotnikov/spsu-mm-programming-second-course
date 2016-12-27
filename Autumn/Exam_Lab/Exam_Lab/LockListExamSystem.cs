@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Exam_Lab
 {
-    class LockExamSystem : IExamSystem
+    class LockListExamSystem : IExamSystem
     {
         private List<KeyValuePair<long, long>> _students = new List<KeyValuePair<long, long>>();
 
