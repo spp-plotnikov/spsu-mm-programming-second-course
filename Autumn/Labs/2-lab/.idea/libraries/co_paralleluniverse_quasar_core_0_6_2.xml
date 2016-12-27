@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="co.paralleluniverse:quasar-core:0.6.2" type="repository">
+    <properties maven-id="co.paralleluniverse:quasar-core:0.6.2" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/quasar-core-0.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/disruptor-3.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/metrics-core-3.0.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/kryo-serializers-0.27.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/kryo-2.24.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/minlog-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/objenesis-2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/guava-18.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ant-1.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ant-launcher-1.9.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
