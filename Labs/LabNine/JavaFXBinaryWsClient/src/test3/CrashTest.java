@@ -17,28 +17,36 @@ import java.util.concurrent.FutureTask;
  */
 public class CrashTest {
 
-    private static final int COUNT_OF_CLIENTS = 35;
-
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         ArrayList<FutureTask<Long>> clients = new ArrayList();
         ExecutorService exService = Executors.newCachedThreadPool();
-        try {
-            for (int i = 0; i < COUNT_OF_CLIENTS; i++) {
-                FutureTask<Long> ft = new FutureTask<>(new Client("D:\\kitten_7-5.jpg"));
+
+        System.out.println(init(clients, exService));
+
+        exService.shutdown();
+        System.out.println("End");
+
+    }
+
+    private static int init(ArrayList<FutureTask<Long>> clients, ExecutorService exService) throws InterruptedException, ExecutionException {
+        int count = 0;
+        while (true) {
+            for (int i = 0; i < count; i++) {
+                Client client = new Client("D:\\kitten_7-5.jpg");
+                FutureTask<Long> ft = new FutureTask<>(client);
                 clients.add(ft);
                 exService.execute(ft);
             }
-            for (int i = 0; i < COUNT_OF_CLIENTS; i++) {
-                clients.get(i).get();
+            for (int i = 0; i < count; i++) {
+                if (clients.get(i).get() == -1) {
+                    System.out.println("Count: " + count);
+                    return count;
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            for(int i=0;i<clients.size();i++){
+                clients.remove(0);
+            }
         }
-
-        System.out.println("End");
-
-        exService.shutdown();
-
     }
 
 }

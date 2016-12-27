@@ -24,6 +24,7 @@ import javafxbinarywsclient.JavaFXBinaryWsClient;
 import javax.imageio.ImageIO;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.DeploymentException;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -38,12 +39,18 @@ public class Client implements Callable<Long> {
 
     private long start;
     private long finish;
-    private Session session;
+    public Session session;
     public volatile long result;
     private String path;
     
     public Client(String path){
         this.path  = path;
+    }
+    
+    @OnError
+    public void onError(Session session, Throwable t) throws IOException{
+        result = -1;
+        this.session.close();
     }
     
     @OnOpen
