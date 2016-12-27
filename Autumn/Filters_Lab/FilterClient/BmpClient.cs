@@ -17,6 +17,7 @@ namespace FilterClient
         private int _ownPort;
         private int _abortPort;
         private string _IP;
+        private bool _abort = false;
         private ASCIIEncoding _encoding = new ASCIIEncoding();
         public delegate void statusUpdate(int status);
         public delegate void connectError();
@@ -51,6 +52,7 @@ namespace FilterClient
 
         public void Abort ()
         {
+            _abort = true;
             TcpClient client = new TcpClient(_IP, _abortPort);
             NetworkStream io = client.GetStream();
 
@@ -81,21 +83,31 @@ namespace FilterClient
                     io.Write(imgBuf, 0, size);
                 }
 
-                int status = 0;
+                int status = 1;
+                update(status);
                 while (status < 100)
                 {
                     int tmp = io.ReadByte();
-                    while (tmp == -1)
+                    while (tmp <= 1)
                     {
+                        if (_abort)
+                            break;
                         tmp = io.ReadByte();
                     }
+                    if (_abort)
+                        break;
                     status = tmp;
                     update(status);
                 }
 
-                Image res = Image.FromStream(io);
+                Image res;
+                if (!_abort)
+                    res = Image.FromStream(io);
+                else
+                    res = null;
                 io.Close();
                 client.Close();
+                _abort = false;
                 return res;
             }
             catch

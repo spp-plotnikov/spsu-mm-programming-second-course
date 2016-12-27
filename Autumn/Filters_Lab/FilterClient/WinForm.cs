@@ -63,7 +63,7 @@ namespace FilterClient
             else
             {
                 _client.Abort();
-                _thread.Abort();
+                _thread.Join();
                 _status = 0;
                 SendBtn.Text = "Send";
             }
