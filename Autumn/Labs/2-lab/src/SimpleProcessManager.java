@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutionException;
 
 public class SimpleProcessManager implements ProcessManager {
     private volatile LinkedList<Process> processesList; // processes queue, processes can leave and enter it during program execution
-    private volatile LinkedList<Process> processesStorage; // every added process stays here up to the end of program execution
+    private volatile LinkedList<Process> processesStorage; // storage, every added process stays here up to the end of program execution
 
     SimpleProcessManager() {
         this.processesList = new LinkedList<>();

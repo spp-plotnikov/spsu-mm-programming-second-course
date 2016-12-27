@@ -7,13 +7,13 @@ import java.util.concurrent.ExecutionException;
 
 public class PriorityProcessManager implements ProcessManager {
     private volatile IntervalHeap<Process> processesDeque; // processes queue, processes can leave and enter it during program execution
-    private volatile LinkedList<Process> processesStorage; // every added process stays here up to the end of program execution
+    private volatile LinkedList<Process> processesStorage; // storage, every added process stays here up to the end of program execution
     private volatile byte counter;
 
     PriorityProcessManager() {
         this.processesDeque = new IntervalHeap<>();
         this.processesStorage = new LinkedList<>();
-        this.counter = 20;
+        this.counter = 10;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class PriorityProcessManager implements ProcessManager {
 
             if (--counter == 0) { // for processes with low priority
                 nextProcess = processesDeque.dequeueMax();
-                counter = 20;
+                counter = 10;
             } else { // for processes with high priority
                 nextProcess = processesDeque.dequeueMin();
             }
