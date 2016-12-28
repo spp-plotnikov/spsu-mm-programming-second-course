@@ -153,7 +153,7 @@ namespace ExamSystem
                 AddBucket(hash);
             }
 
-            while (true)
+            while (_flag)
             {
                 ListItem preNode = buckets[hash].Next;
                 ListItem node = preNode.Next;
@@ -193,6 +193,7 @@ namespace ExamSystem
                     }
                 }
             }
+            return false;
         }
 
         public void Remove(long studentId, long courseId)
