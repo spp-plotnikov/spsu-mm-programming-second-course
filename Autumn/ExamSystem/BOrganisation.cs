@@ -26,6 +26,10 @@ namespace ExamSystem
             buckets[0].Next = total;
         }
 
+        public void Stop()
+        {
+            _flag = false;
+        }
         private void AddBucket(int number)
         {
             ListItem preNode = total;
@@ -151,7 +155,7 @@ namespace ExamSystem
             {
                 ListItem preNode = buckets[hash].Next;
                 ListItem node = preNode.Next;
-                while (node != null && node.BinFormat.CompareTo(curSt.BinFormat) < 0) 
+                while (node != null && node.BinFormat.CompareTo(curSt.BinFormat) < 0)
                 {
                     preNode = node;
                     node = node.Next;
@@ -165,21 +169,26 @@ namespace ExamSystem
                 {
                     preNode.BucketMutex.WaitOne();
                     node.BucketMutex.WaitOne();
-                }
 
-                try
-                {
-                    if (!Validate(preNode, node, hash)) continue;
-                    return node.BinFormat.Equals(curSt.BinFormat);
-                }
-                catch
-                {
-                    return false;
-                }
-                finally
-                {
-                    preNode.BucketMutex.ReleaseMutex();
-                    node.BucketMutex.ReleaseMutex();
+
+                    try
+                    {
+                        if (!Validate(preNode, node, hash)) continue;
+                        return node.BinFormat.Equals(curSt.BinFormat);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                    finally
+                    {
+
+                        preNode.BucketMutex.ReleaseMutex();
+                        node.BucketMutex.ReleaseMutex();
+
+
+
+                    }
                 }
             }
         }

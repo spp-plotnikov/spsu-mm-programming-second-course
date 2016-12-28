@@ -23,7 +23,9 @@ namespace ExamSystem
             for (int i = 0; i < _tsize; i++)
                 _table[i] = new List<StudInfo>();
         }
-
+        public void Stop()
+        {
+        }
         void Resize()
         {
             _mut.WaitOne();

@@ -55,6 +55,7 @@ namespace ExamSystem
         public void StatInfo()
         {
             _flag = false;
+            _strategy.Stop();
             foreach (Thread th in _pool)
                 th.Abort();
 

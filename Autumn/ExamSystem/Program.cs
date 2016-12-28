@@ -11,17 +11,20 @@ namespace ExamSystem
     {
         static void Main(string[] args)
         {
-            const int n = 10;
-            Bots NaiveHAsh = new Bots(n, new NaiveOrganisation());
-            Bots BucketHash = new Bots(n, new BOrganisation());
+            for (int i = 0; i < 10; i++)
+            {
+                const int n = 10;
+                Bots NaiveHAsh = new Bots(n, new NaiveOrganisation());
+                Bots BucketHash = new Bots(n, new BOrganisation());
 
-            Thread.Sleep(1000); 
+                Thread.Sleep(1000);
 
 
-            Console.Write("Naive Hаsh Organisation:  ");
-            NaiveHAsh.StatInfo();
-            Console.Write("Bucket Organisation:");
-            BucketHash.StatInfo();
+                Console.Write("Naive Hаsh Organisation:  ");
+                NaiveHAsh.StatInfo();
+                Console.Write("Bucket Organisation:");
+                BucketHash.StatInfo();
+            }
         }
     }
 }
