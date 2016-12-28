@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Threading;
+using System.Diagnostics;
 
 namespace FiltersTest_Lab
 {
@@ -50,7 +51,7 @@ namespace FiltersTest_Lab
             return res;
         }
 
-        public Image Send(string filter, string path)
+        public long Send(string filter, string path)
         {
             TcpClient client = new TcpClient(_IP, _ownPort);
             NetworkStream io = client.GetStream();
@@ -69,17 +70,17 @@ namespace FiltersTest_Lab
                 io.Write(imgBuf, 0, size);
             }
 
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
             int status = io.ReadByte();
             while (status < 100)
             {
                 status = io.ReadByte();
             }
-
-            Image res;
-            res = Image.FromStream(io);
+            timer.Stop();
             io.Close();
             client.Close();
-            return res;
+            return timer.ElapsedMilliseconds;
         }
     }
 }

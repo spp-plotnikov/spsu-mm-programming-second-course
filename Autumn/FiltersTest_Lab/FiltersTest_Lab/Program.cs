@@ -12,7 +12,7 @@ namespace FiltersTest_Lab
 
         static void Main(string[] args)
         {
-            const int N = 10;
+            const int N = 1;
             List<Task<long>> tasks = new List<Task<long>>();
             for (int i = 0; i < N; i++)
             {
@@ -30,7 +30,7 @@ namespace FiltersTest_Lab
                 time += task.Result;
             }
             Console.WriteLine(N.ToString() + ": " + (time / N).ToString());
-
+            Console.ReadKey();
 
         }
 
@@ -53,12 +53,8 @@ namespace FiltersTest_Lab
 
             string filter = FilterList[0];
             string path = "C:/Test/test4.bmp";
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
-            client.Send(filter, path);
-            timer.Stop();
 
-            return timer.ElapsedMilliseconds;
+            return client.Send(filter, path);
         }
     }
 }
