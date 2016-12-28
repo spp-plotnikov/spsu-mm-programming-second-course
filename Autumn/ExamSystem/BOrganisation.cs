@@ -87,7 +87,9 @@ namespace ExamSystem
             {
                 int len = 0;
                 ListItem preNode = buckets[hash].Next;
-                ListItem node = preNode.Next;
+                ListItem node = null;
+                if (preNode != null)
+                   node = preNode.Next;
                 while (node != null && node.BinFormat.CompareTo(curSt.BinFormat) < 0) 
                 {
                     len++;
