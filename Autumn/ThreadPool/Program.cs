@@ -11,9 +11,9 @@ namespace ThreadPool
     {
         static void Main(string[] args)
         {
-            ThreadPool pool = new ThreadPool(10);
+            ThreadPool pool = new ThreadPool(20);
             Random rng = new Random();
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 150; i++)
             {
                 string num = i.ToString();
                 pool.Enqueue(() => {

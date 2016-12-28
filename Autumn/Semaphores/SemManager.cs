@@ -7,110 +7,81 @@ using System.Threading.Tasks;
 
 namespace Semaphores
 {
-    public static class SemManager
+    public  class SemManager : IDisposable
     {
-        private static int _pause = 1000;
-        private static bool _flag = true;
+        private  bool[] _flagP;
+        private bool[]  _flagC;
 
-        static List<int> _buf = new List<int>();
+        List<int> buf = new List<int>();
 
-        private static int _qProd = 1;
-        private static int _qCons = 3;
+        private  int _qProd = 1;
+        private  int _qCons = 3;
 
-        public static List<Thread> PList = new List<Thread>(); // storage
-        public static List<Thread> CList = new List<Thread>();
+        private   List<Thread> _pList = new List<Thread>(); // storage
+        private  List<Thread> _cList = new List<Thread>();
 
-        public static Semaphore Lock = new Semaphore(1, 1);
+        public  Semaphore Lock = new Semaphore(1, 1);
 
-        static public  void Emulation (int numProd, int numCons)
+        public  void Dispose ()
         {
-            _qCons = numCons;
-            _qProd = numProd;
+            StopC();
+            StopP();
 
-            Console.WriteLine("Press 'Enter' to stop...");
-            //Thread.Sleep(wait * 2);
+            Thread.Sleep(2000);
+            
+            /*Clearing */
+            for (int i = 0; i < _qCons; i++)           
+              _cList[0].Join();
+           
             for (int i = 0; i < _qProd; i++)
+                _pList[0].Join();
+        }
+
+        public void StartP(int numProd)
+        {
+            _qProd = numProd;
+            Array.Resize<bool>(ref _flagP, _qProd);
+
+            for (int j = 0; j < _qProd; j++)
             {
-                Producer tmp = new Producer(i);
-                Thread prod = new Thread(() => tmp.Run());
-                PList.Add(prod);
+                int index = j;
+                Producer tmp = new Producer(j);
+                Thread prod = new Thread(() => tmp.Run(ref _flagP[index], ref Lock, ref buf));
+                _flagP[j] = true;
+                _pList.Add(prod);
                 prod.Start();
             }
 
+        }
+
+        public void StopP()
+        {
+            for (int i = 0; i < _qProd; i++)
+                _flagP[i] = false;
+        }
+
+
+        public void StartC(int numCons)
+        {
+            _qCons = numCons;
+            Array.Resize<bool>(ref _flagC, _qCons);
             for (int i = 0; i < _qCons; i++)
             {
+                int index = i;
                 Consumer consumerObj = new Consumer(i);
-                Thread cons = new Thread(() => consumerObj.Run());
-                CList.Add(cons);
+                Thread cons = new Thread(() => consumerObj.Run(ref _flagC[index], ref Lock, ref buf));
+                _flagC[i] = true;
+                _cList.Add(cons);
                 cons.Start();
             }
-            Console.ReadLine();
-            Console.WriteLine("=======");
-            _flag = false;
-            
-            /*Clearing */
+
+        }
+
+        public void StopC()
+        {
             for (int i = 0; i < _qCons; i++)
-            {
-                CList[0].Join();
-                CList.RemoveAt(0);
-            }
-            for (int i = 0; i < _qProd; i++)
-            {
-                PList[0].Join();
-                PList.RemoveAt(0);
-            }
-            Console.WriteLine("Press 'Enter' to continue...");
-            Console.ReadLine();
+                _flagC[i] = false;
         }
 
-        public class Producer
-        {
-            private  int _id;
-
-            public Producer(int Id)
-            {
-                _id = Id;
-
-            }
-
-            public void Run()
-            {
-                while (_flag)
-                {
-                    Lock.WaitOne();
-                    _buf.Add(_id);
-                    Console.WriteLine("Producer №{0} add {1}", _id, _id);
-                    Lock.Release();
-                    Thread.Sleep(_pause);
-                }
-            }
-        }
-
-        public class Consumer
-        {
-            private int _id;
-
-            public Consumer(int Id)
-            {
-                _id = Id;
-
-            }
-
-            public void Run()
-            {
-                while (_flag)
-                {
-                    Lock.WaitOne();
-                    if (_buf.Count() > 0)
-                    {
-                        int item = _buf.First();
-                        if(_buf.Remove(item))
-                          Console.WriteLine("Consumer №{0} get  {1}", _id, item);
-                    }
-                    Lock.Release();
-                    Thread.Sleep(_pause);
-                }
-            }
-        }
     }
 }
