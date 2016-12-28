@@ -11,7 +11,7 @@ namespace ExamSystem
     {
         IExamSystem _strategy;
         int[] _iter;
-        Random _rand = new Random(0);
+        Random _rand = new Random(0);bool _flag = true; 
         List<Thread> _pool = new List<Thread>();
 
         public Bots(int num, IExamSystem organisation)
@@ -32,7 +32,7 @@ namespace ExamSystem
         {
             int id = Int32.Parse(Thread.CurrentThread.Name);
 
-            while (true)
+            while (_flag)
             {
                 _iter[id]++;
                 int randRes = _rand.Next(0, 100);
@@ -54,6 +54,7 @@ namespace ExamSystem
 
         public void StatInfo()
         {
+            _flag = false;
             foreach (Thread th in _pool)
                 th.Abort();
 

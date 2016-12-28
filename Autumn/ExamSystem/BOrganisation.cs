@@ -14,6 +14,7 @@ namespace ExamSystem
         Bucket[] buckets;
         int _tSize = 8;
         int _lSize = 4;
+        bool _flag = true;
 
         public BOrganisation()
         {
@@ -159,13 +160,15 @@ namespace ExamSystem
                 if (node == null || preNode.IsBucket && node.IsBucket)
                 {
                     return false;
-                }  
+                }
+                if (_flag)
+                {
                     preNode.BucketMutex.WaitOne();
                     node.BucketMutex.WaitOne();
+                }
+
                 try
                 {
-                    
-
                     if (!Validate(preNode, node, hash)) continue;
                     return node.BinFormat.Equals(curSt.BinFormat);
                 }
