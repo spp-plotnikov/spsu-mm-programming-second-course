@@ -38,8 +38,13 @@ namespace Server
             _client.GetProgress(_filterWorking.Progress);
             Task<Bitmap> newImage = Task.Run(() => _filterWorking.MakeChanging(image, filter));
 
-            while (_filterWorking.Progress != 75)
+            while (_filterWorking.Progress != 75 && !_cancelProcess)
             {
+                if (_cancelProcess)
+                {
+                    newImage.Dispose();
+                    break;
+                }
                 Thread.Sleep(100);
                 _client.GetProgress(_filterWorking.Progress);
             }
