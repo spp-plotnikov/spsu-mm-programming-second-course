@@ -8,6 +8,7 @@ namespace FibersProgram
 {
     public static class ProcessManagerFramework
     {
+        public static List<Fiber> listDifferentFibers = new List<Fiber>();
         public static List<Fiber> listFibers = new List<Fiber>();
         private static int curFiberAssist = 0;
         private static int curFiber = 0;
@@ -45,14 +46,7 @@ namespace FibersProgram
 
                 if (listFibers.Count == 0)
                 {
-                    try
-                    {
-                        Fiber.Switch(Fiber.PrimaryId);
-                    }
-                    catch
-                    {
-                    }
-                    return;
+                    Fiber.Switch(Fiber.PrimaryId);
                 }
                 else
                 {
@@ -86,6 +80,21 @@ namespace FibersProgram
 
                 //Console.WriteLine(curFiber);
                 Fiber.Switch(listFibers[curFiber].Id);
+            }
+        }
+
+        public static void DeleteAllFibers()
+        {
+            try
+            {
+                foreach (Fiber fiber in listDifferentFibers)
+                    fiber.Delete();
+                Console.WriteLine("All fibers were removed");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("List empty. All fibers were removed");
+
             }
         }
     }

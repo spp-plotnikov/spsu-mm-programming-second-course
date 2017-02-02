@@ -32,30 +32,17 @@ namespace FibersProgram
                     }
             }
             //Console.ReadLine();
+            ProcessManagerFramework.listDifferentFibers = listDifferentFibers;
             ProcessManagerFramework.listFibers = listFibers;
             ProcessManagerFramework.priority = priority;
             ProcessManagerFramework.Switch(false);
             Console.WriteLine("Complited");
             //for(int i=0; i<fiberIdArr.Length;i++)
             //    Console.WriteLine(fiberIdArr[i]);
-            DeleteAllFibers(listDifferentFibers);
-
+            ProcessManagerFramework.DeleteAllFibers();
             Console.ReadLine();
         }
 
-        static void DeleteAllFibers(List<Fiber> listDifferentFibers)
-        {
-            try
-            {
-                foreach (Fiber fiber in listDifferentFibers)
-                    fiber.Delete();
-                Console.WriteLine("All fibers were removed");
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("List empty. All fibers were removed");
-
-            }
-        }
+        
     }
 }
