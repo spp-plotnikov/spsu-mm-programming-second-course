@@ -16,7 +16,7 @@ namespace MPIProgram
             {
                 var world = Communicator.world;
                 int proc = world.Size;             //процессора
-                int deg = considerDegreeTwo(proc);
+                int deg = ConsiderDegreeTwo(proc);
                 int numberOfElement;            //число элементов
                 int primaryNumberOnEachProc;    //изначальное число элементов на один процессор
                 int bearingElem = 0;                
@@ -44,17 +44,17 @@ namespace MPIProgram
                 #region           //Участок кода на случай, когда число процессоров не N-мерный гиперкуб
                 if (world.Rank == 0)
                 {
-                    if (!testDegreeTwo(proc))
+                    if (!TestDegreeTwo(proc))
                     {
                         Console.WriteLine("\nЧисло процессоров не степень двойки, запустится непараллельный алгоритм\n" +
                             "Результат:");
-                        qs(ref arr, 0, numberOfElement - 1);
+                        QuickSort(ref arr, 0, numberOfElement - 1);
                         for (int i = 0; i < numberOfElement; i++)
                             Console.Write("{0} ", arr[i]);
                         Thread.Sleep(500);
                     }
                 }
-                if (!testDegreeTwo(proc))
+                if (!TestDegreeTwo(proc))
                     return;
                 #endregion
 
@@ -70,14 +70,14 @@ namespace MPIProgram
                     int otherArrNewLenght = otherArrLenght;
                     for (int i = primaryNumberOnEachProc * (proc - 1); i < numberOfElement; i++)
                         otherArr[i - primaryNumberOnEachProc * (proc - 1)] = arr[i];
-                    qs(ref otherArr, 0, numberOfElement - primaryNumberOnEachProc * (proc - 1) - 1);
+                    QuickSort(ref otherArr, 0, numberOfElement - primaryNumberOnEachProc * (proc - 1) - 1);
                     bearingElem = otherArr[(numberOfElement - primaryNumberOnEachProc * (proc - 1)) / 2];
                     for (int i = 1; i <= proc - 1; i++)      //Рассылка опорного элемента и кол-ва пересылаемых элементов
                     {
                         world.Send<int>(bearingElem, i, 0);
                         world.Send<int>(primaryNumberOnEachProc, i, 1);
                     }
-                    solveByteNomber(ref ByteNumber, world.Rank);   //считаем двоичное представление номера процессора
+                    SolveByteNomber(ref ByteNumber, world.Rank);   //считаем двоичное представление номера процессора
 
                     //At this moment we have: 1.ByteNomber[], 2.b[] и bLenght, 3.n, p, N, 4.deg
                     int index;
@@ -88,7 +88,7 @@ namespace MPIProgram
 
                         if (i != 0)
                             bearingElem = world.Receive<int>(world.Rank + jumpToSecondProcessor, 0);
-                        index = findIndexBerEl(bearingElem, otherArr, otherArrLenght);
+                        index = FindIndexBerEl(bearingElem, otherArr, otherArrLenght);
                         world.Send<int>(otherArrLenght - index, world.Rank + jumpToSecondProcessor, 1);
                         for (int j = index; j < otherArrLenght; j++)
                             world.Send<int>(otherArr[j], world.Rank + jumpToSecondProcessor, j - index + 2);
@@ -97,7 +97,7 @@ namespace MPIProgram
                         for (int j = 0; j < otherArrNewLenght; j++)
                             otherArr[otherArrLenght + j] = world.Receive<int>(world.Rank + jumpToSecondProcessor, j + 2);
                         otherArrLenght += otherArrNewLenght;
-                        qs(ref otherArr, 0, otherArrLenght - 1);
+                        QuickSort(ref otherArr, 0, otherArrLenght - 1);
                     }
 
                     var outputFile = new StreamWriter(@outputFileName, false);
@@ -118,8 +118,8 @@ namespace MPIProgram
                     bearingElem = world.Receive<int>(0, 0);
                     for (int j = 0; j < otherArrLenght; j++)
                         otherArr[j] = world.Receive<int>(0, j + 2);
-                    qs(ref otherArr, 0, otherArrLenght - 1);
-                    solveByteNomber(ref ByteNumber, world.Rank);   //считаем двоичное представление номера процессора
+                    QuickSort(ref otherArr, 0, otherArrLenght - 1);
+                    SolveByteNomber(ref ByteNumber, world.Rank);   //считаем двоичное представление номера процессора
 
                     int index;
                     int jumpToSecondProcessor = proc;
@@ -133,7 +133,7 @@ namespace MPIProgram
                                 bearingElem = otherArr[otherArrLenght / 2];
                                 world.Send<int>(bearingElem, world.Rank - jumpToSecondProcessor, 0);
                             }
-                            index = findIndexBerEl(bearingElem, otherArr, otherArrLenght);
+                            index = FindIndexBerEl(bearingElem, otherArr, otherArrLenght);
                             world.Send<int>(index, world.Rank - jumpToSecondProcessor, 1);
                             for (int j = index; j > 0; j--)
                                 world.Send<int>(otherArr[index - j], world.Rank - jumpToSecondProcessor, index - j + 2);
@@ -144,13 +144,13 @@ namespace MPIProgram
                             for (int j = 0; j < otherArrNewLenght; j++)
                                 otherArr[otherArrLenght + j] = world.Receive<int>(world.Rank - jumpToSecondProcessor, j + 2);
                             otherArrLenght += otherArrNewLenght;
-                            qs(ref otherArr, 0, otherArrLenght - 1);
+                            QuickSort(ref otherArr, 0, otherArrLenght - 1);
                         }
                         else
                         {
                             if (i != 0)
                                 bearingElem = world.Receive<int>(world.Rank + jumpToSecondProcessor, 0);
-                            index = findIndexBerEl(bearingElem, otherArr, otherArrLenght);
+                            index = FindIndexBerEl(bearingElem, otherArr, otherArrLenght);
                             world.Send<int>(otherArrLenght - index, world.Rank + jumpToSecondProcessor, 1);
                             for (int j = index; j < otherArrLenght; j++)
                                 world.Send<int>(otherArr[j], world.Rank + jumpToSecondProcessor, j - index + 2);
@@ -159,7 +159,7 @@ namespace MPIProgram
                             for (int j = 0; j < otherArrNewLenght; j++)
                                 otherArr[otherArrLenght + j] = world.Receive<int>(world.Rank + jumpToSecondProcessor, j + 2);
                             otherArrLenght += otherArrNewLenght;
-                            qs(ref otherArr, 0, otherArrLenght - 1);
+                            QuickSort(ref otherArr, 0, otherArrLenght - 1);
                         }
                     }
                     world.Receive<int>(world.Rank - 1, 0);
@@ -182,7 +182,7 @@ namespace MPIProgram
         /// </summary>
         /// <param name="ByteNomber">byte view</param>
         /// <param name="value">int value</param>
-        static void solveByteNomber(ref int[] ByteNomber, int value)
+        static void SolveByteNomber(ref int[] ByteNomber, int value)
         {
             int i= 1;
             while(value>0)
@@ -199,7 +199,7 @@ namespace MPIProgram
         /// <param name="arr">sorted array</param>
         /// <param name="l">left element of array</param>
         /// <param name="r">right element of array</param>
-        static void qs(ref int[] arr, int l, int r)
+        static void QuickSort(ref int[] arr, int l, int r)
         {
             if (l < r)
             {
@@ -219,8 +219,8 @@ namespace MPIProgram
                     c = t;
                     e = -e;
                 }
-                qs(ref arr, l, m - 1);
-                qs(ref arr, m + 1, r);
+                QuickSort(ref arr, l, m - 1);
+                QuickSort(ref arr, m + 1, r);
             }
         }
         
@@ -229,7 +229,7 @@ namespace MPIProgram
         /// </summary>
         /// <param name="p"></param>
         /// <returns>Bool answer</returns>
-        static bool testDegreeTwo(int p)
+        static bool TestDegreeTwo(int p)
         {
             int _k = 1;
             int _p = p;
@@ -251,9 +251,9 @@ namespace MPIProgram
         /// </summary>
         /// <param name="p"></param>
         /// <returns>degree</returns>
-        static int considerDegreeTwo(int p)
+        static int ConsiderDegreeTwo(int p)
         {
-            if (testDegreeTwo(p))
+            if (TestDegreeTwo(p))
             {
                 int _k = 0;
                 while (p > 1)
@@ -278,7 +278,7 @@ namespace MPIProgram
         /// <param name="b"> array of value</param>
         /// <param name="bLength"> length array</param>
         /// <returns>index baerEl</returns>
-        static int findIndexBerEl(int bearEl, int[] b, int bLength)       //Ответ - кол-во меньших чем berEl
+        static int FindIndexBerEl(int bearEl, int[] b, int bLength)       //Ответ - кол-во меньших чем berEl
         {                                                               
             int ind=0;
             int first=0;
