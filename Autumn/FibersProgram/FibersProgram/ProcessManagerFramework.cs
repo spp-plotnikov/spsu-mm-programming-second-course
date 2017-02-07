@@ -8,16 +8,23 @@ namespace FibersProgram
 {
     public static class ProcessManagerFramework
     {
-        public static List<Fiber> listDifferentFibers = new List<Fiber>();
-        public static List<Fiber> listFibers = new List<Fiber>();
+        private static List<Fiber> listDifferentFibers = new List<Fiber>();
+        private static List<Fiber> listFibers = new List<Fiber>();
         private static int curFiberAssist = 0;
         private static int curFiber = 0;
 
         #region  This code for priority swich
-        public static bool priority;
+        private static bool priority;
         private static Random rand = new Random();
         private static Fiber someFiber;
         #endregion
+
+        public static void InitializeFunc(List<Fiber> listFibers, List<Fiber> listDifferentFibers, bool priority)
+        {
+            ProcessManagerFramework.listFibers = listFibers;
+            ProcessManagerFramework.listDifferentFibers = listDifferentFibers;
+            ProcessManagerFramework.priority = priority;
+        }
 
         public static void Switch(bool fiberFinished)
         {
@@ -42,7 +49,7 @@ namespace FibersProgram
                 }
                 else
                 #endregion  
-                    listFibers.Remove(listFibers[curFiber]);
+                listFibers.Remove(listFibers[curFiber]);
 
                 if (listFibers.Count == 0)
                 {
