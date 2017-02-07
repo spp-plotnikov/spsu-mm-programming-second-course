@@ -8,33 +8,39 @@ namespace ProducersConsumers
 {
     class Buyer
     {
-        private List<Request> takenRequest = new List<Request>();
-        DateTime p2;
-        public bool takeRequest(Request req, ref List<Request> listOffers, ref Mutex mutex)
+        private static bool stopTimeForRemove = false;
+        private bool buyerIsFinish = false;
+        private List<Request> _takenRequest = new List<Request>();
+        private DateTime _pause;
+        public bool TakeRequest(Request req, List<Request> listOffers, Mutex mutex)
         {
             //предполагаем, для Request значение поумолчанию - null.
 
             if (listOffers.Find(req.Equals) != null)
             {
-                p2 = Program.pauseSeller.AddMilliseconds(500);
+                _pause = Program.PauseSeller.AddMilliseconds(500);
                 mutex.WaitOne();
-                if (!Program.theEnd)
+                stopTimeForRemove = true;
+                if (buyerIsFinish)
                 {
                     mutex.ReleaseMutex();
+                    stopTimeForRemove = false;
                     return false;
                 }
-                while ((DateTime.Now - Program.pauseSeller).CompareTo(p2 - Program.pauseSeller) <= 0)
+                while ((DateTime.Now - Program.PauseSeller).CompareTo(_pause - Program.PauseSeller) <= 0)
                 {
+                    Thread.Sleep(_pause - DateTime.Now);
                 }
                 if (listOffers.Remove(listOffers.Find(req.Equals)))
                 {
                     Console.WriteLine("Offer accepted! " + NameBuyer + " takes a lot " + req.NumberRequest);
-                    takenRequest.Add(req);
+                    _takenRequest.Add(req);
                     NumberRequiredOffers--;
-                    Program.pauseBuyer = DateTime.Now;
+                    Program.SetPauseBuyerTime( DateTime.Now);
                     mutex.ReleaseMutex();
                     return true;
                 }
+                stopTimeForRemove = false; 
                 mutex.ReleaseMutex();
             }
             return false;
@@ -59,46 +65,57 @@ namespace ProducersConsumers
             NumberRequiredOffers = numberRequireOffers;
         }
 
-        public void findOffer(ref List<Request> listOffers, ref Mutex mutex)
+        public void FindOffer( List<Request> listOffers, Mutex mutex)
         {
-            while (Program.theEnd)
+            int _lastIndex=0;
+            while (!buyerIsFinish)
             {
                 bool _find = false;
                 Request interestReq = new Request(0,0,0,0);
                 while (!_find)
                 {
-                    for (int i = 0; i < listOffers.Count; i++)
+                    for (int i = _lastIndex; i < listOffers.Count; i++)
                     {
-                        if (!Program.theEnd)
-                            break;
-                        try
+                        while (stopTimeForRemove)
                         {
-                            if (listOffers[i].Offer <= InterestOffer)
+                            if ((DateTime.Now - Program.PauseSeller).CompareTo(
+                                            Program.PauseSeller.AddMilliseconds(500) - Program.PauseSeller) <= 0)
                             {
-                                if (interestReq.RatingCreatorCompany <= listOffers[i].RatingCreatorCompany)
-                                    interestReq = listOffers[i];
-
-                                _find = true;
-                                break;
+                                Thread.Sleep(Program.PauseSeller.AddMilliseconds(500) - DateTime.Now);
                             }
                         }
-                        catch
+                        if (buyerIsFinish)
+                            break;
+                        if (listOffers[i].Offer <= InterestOffer
+                            && interestReq.RatingCreatorCompany <= listOffers[i].RatingCreatorCompany)
                         {
+                            interestReq = listOffers[i];
+                            _lastIndex = i;
+                            _find = true;
                         }
-                        
                     }
-                    if (!Program.theEnd)
+                    if (buyerIsFinish)
                         break;
                     if (_find)
-                        if (!takeRequest(interestReq,ref listOffers,ref mutex))
+                        if (!TakeRequest(interestReq, listOffers, mutex))
                             _find = false;
                 }
                 if (NumberRequiredOffers == 0)
                 {
                     Console.WriteLine(NameBuyer + " living the market");
-                    Thread.CurrentThread.Abort();
                 }
             }
+        }
+
+        public void ThreadInitializeAndStart(List<Request> listOffers, Mutex mutex)
+        {
+            Thread thread = new Thread(() => FindOffer(listOffers, mutex));
+            thread.Start();
+        }
+
+        public void FinishBuyer()
+        {
+            buyerIsFinish = true;
         }
     }
 }

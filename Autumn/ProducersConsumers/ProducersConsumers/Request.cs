@@ -27,10 +27,12 @@ namespace ProducersConsumers
 
         public bool Equals (Request req)
         {
-            if (req.NumberRequest == NumberRequest)
-                return true;
-            else
-                return false;
+            if (req != null)
+            {
+                if (req.NumberRequest == NumberRequest)
+                    return true;
+            }
+            return false;
         }
     }
 }
