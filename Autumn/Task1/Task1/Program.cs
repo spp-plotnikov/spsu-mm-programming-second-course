@@ -42,7 +42,7 @@ namespace Task1
                         }
                         outp.WriteLine();
                         outp.Close();
-                        Console.WriteLine("Success.");
+                        Console.WriteLine("Success!");
                     }
                     return;
                 }
