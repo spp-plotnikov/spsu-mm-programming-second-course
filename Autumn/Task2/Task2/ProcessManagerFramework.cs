@@ -128,9 +128,9 @@ namespace Task2
             }
             else
             {
-                Tuple<Fiber, int> temp = fibers.Last();
-                fibers[fibers.Count - 1] = fibers[0];
-                fibers[0] = temp;
+                Tuple<Fiber, int> temp = fibers[0];
+                fibers.RemoveAt(0);
+                fibers.Add(temp);
                 onGoingFiber = 0;
                 Fiber.Switch(fibers[onGoingFiber].Item1.Id);
             }

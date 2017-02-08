@@ -62,7 +62,7 @@ namespace Task7
                 {
                     foreach (var elem in list)
                     {
-                        map[elem.GetHashCode() % map.Length].Add(elem);
+                        map[Math.Abs(elem.GetHashCode()) % map.Length].Add(elem);
                     }
                 }
             }

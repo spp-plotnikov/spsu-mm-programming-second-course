@@ -66,17 +66,23 @@ namespace Task4
         {
             lock(tasks)
             {
-                isWorking = false;
                 try
                 {
+                    isWorking = false;
                     Action task = tasks.Dequeue();
                     TaskCounter--;
                     isWorking = true;
+                    Run();
                     Monitor.PulseAll(tasks);
                     return task;
                 }
                 catch
                 {
+                    if(!isWorking)
+                    {
+                        isWorking = true;
+                        Run();
+                    }
                     return null;
                 }
             }
@@ -87,15 +93,12 @@ namespace Task4
             thread.Start();
             isWorking = true;
         }
-        public void Stop()
-        {
-            isWorking = false;
-        }
+
         public void Dispose()
         {
             lock(tasks)
             {
-                Stop();
+                isWorking = false;
                 tasks.Clear();
                 TaskCounter = 0;
                 Monitor.PulseAll(tasks);

@@ -15,12 +15,11 @@ namespace Task1
                 if (args.Length != 2)
                 {
                     Console.WriteLine("You should write down input and output filenames.");
-                    Console.ReadKey();
                     return;
                 }
                 StreamReader inp = new StreamReader(@args[0]);
                 string arrayToParse = inp.ReadLine();
-                int[] arrayResult;
+                int[][] arrayResult;
                 inp.Close();
                 int[] array = arrayToParse?.Split(' ').Select(int.Parse).ToArray();
                 if(array == null)
@@ -31,243 +30,115 @@ namespace Task1
 
                 Communicator communicator = Communicator.world;
 
-                if(communicator.Size == 1)
+                if(communicator.Size == 1 || array.Length < communicator.Size * communicator.Size)
                 {
-                    Array.Sort(array);
-                    StreamWriter outp = new StreamWriter(@args[1]);
-                    foreach(int element in array)
+                    if(communicator.Rank == 0)
                     {
-                        outp.Write(element + " ");
+                        Array.Sort(array);
+                        StreamWriter outp = new StreamWriter(@args[1]);
+                        foreach (int element in array)
+                        {
+                            outp.Write(element + " ");
+                        }
+                        outp.WriteLine();
+                        outp.Close();
+                        Console.WriteLine("Success.");
                     }
-                    outp.WriteLine();
-                    outp.Close();
-                    Console.WriteLine("Success.");
                     return;
                 }
+                arrayResult = Root(array);
                 if(communicator.Rank == 0)
                 {
-                    arrayResult = Root(array);
                     StreamWriter outp = new StreamWriter(@args[1]);
-                    foreach (int element in arrayResult)
+                    foreach (var list in arrayResult)
                     {
-                        outp.Write(element + " ");
+                        foreach(var elem in list)
+                        {
+                            outp.Write(elem + " ");
+                        }
                     }
                     outp.WriteLine();
                     outp.Close();
                     Console.WriteLine("Success.");
                     return;
                 }
-                else
-                {
-                    ThirdParty();
-                }
+                return;
             }
         }
-        private static int[] Root(int[] array)
+
+        private static void ThirdParty(int n)
         {
-            Communicator communicator = Communicator.world;
-            int length = array.Length;
-            int p = communicator.Size;
-            for(var i = 1; i < p; i++)
+            
+        }
+
+        private static int[][] Root(int[] array)
+        {
+            var comm = Communicator.world;
+            int n = array.Length;
+            int p = comm.Size;
+            int k = n / p;
+            int t = p / 2;
+            int number = comm.Rank;
+            var temp = new List<int>();
+            for(int i = 0; i < k; i++)
             {
-                int start = length / p;
-                start += ((length % p > i) ? 1 : 0);
-                communicator.Send(start, i, 0);
+                temp.Add(array[number * k + i]);
             }
-
-            List<int> current = new List<int>();
-
-            for(int i = 0; i < length; i += p)
+            if(number == p - 1 && n % p != 0)
             {
-                current.Add(array[i]);
-                for(int j = 1; j + i < length && j < p; j++)
+                for(int i = k * p; i < n; i++)
                 {
-                    communicator.Send(array[i + j], j, 1);
+                    temp.Add(array[i]);
                 }
             }
-            current.Sort();
-            List<int> samples = Enumerable.Range(0, current.Count / p).Select(x => current[x * p]).ToList();
-
-            for(int i = 1; i < p; i++)
-            {
-                int elem;
-                communicator.Receive(i, 2, out elem);
-                for (int j = 0; j <= elem; j++)
-                {
-                    int temp;
-                    communicator.Receive(i, 3, out temp);
-                    samples.Add(temp);
-                }
-            }
-
-            List<int> data = new List<int>();
-            List<int> pivots = new List<int>();
-            for(int i = 0; i < p - 1; i++)
-            {
-                int number = samples.Count / p;
-                number += ((samples.Count % p > i) ? 1 : 0);
-                data.Add(samples[number]);
-            }
-
-            data.Sort();
-
-            for(int i = 0; i < p - 1; i++)
-            {
-                pivots.Add(data[i * (data.Count / p)]);
-            }
-
-            for(int i = 1; i < p; i++)
-            {
-                communicator.Send(pivots, i, 2);
-            }
-
-            int k = 0;
-            List<List<int>> gathered = new List<List<int>>();
-            List<int> gatheringArray = new List<int>();
-
-            for(int i = 0; i < pivots.Count; i++)
-            {
-                gatheringArray = new List<int>();
-                while(k < current.Count && current[k] <= pivots[i])
-                {
-                    gatheringArray.Add(current[k]);
-                    k++;
-                }
-                if(i != communicator.Rank)
-                {
-                    communicator.Send(gatheringArray, i, 4);
-                }
-                else if(gatheringArray.Count != 0)
-                {
-                    gathered.Add(gatheringArray);
-                }
-            }
-
-            while(k < current.Count)
-            {
-                gatheringArray.Add(current[k]);
-                k++;
-            }
-
-            if(communicator.Size - 1 != communicator.Rank)
-            {
-                communicator.Send(gatheringArray, communicator.Size - 1, 4);
-            }
-            else if(gatheringArray.Count != 0)
-            {
-                gathered.Add(gatheringArray);
-            }
-
+            temp.Sort();
+            var patterns = new List<int>();
+            int w = n / (p * p);
             for(int i = 0; i < p; i++)
             {
-                if(i != communicator.Rank)
-                {
-                    gatheringArray = new List<int>();
-                    communicator.Receive(i, 4, out gatheringArray);
-                    if (gatheringArray.Count != 0)
-                    {
-                        gathered.Add(gatheringArray);
-                    }
-                }
+                patterns.Add(temp[i * w + 1]);
             }
-            List<int> merged = new List<int>();
-            Merge(gathered, ref merged);
-            List<int> result = new List<int>();
-            foreach(int i in merged)
-            {
-                result.Add(i);
-            }
-            for(int i = 1; i < p; i++)
-            {
-                List<int> temp = new List<int>();
-                communicator.Receive(i, 5, out temp);
-                foreach(int elem in temp)
-                {
-                    result.Add(elem);
-                }
-            }
-            Console.WriteLine("Success.");
-            return result.ToArray();
-        }
-
-        private static void ThirdParty()
-        {
-            Communicator communicator = Communicator.world;
-            int length;
-            communicator.Receive(0, 0, out length);
-
-            List<int> localList = new List<int>();
-            for(int i = 0; i < length; i++)
-            {
-                int elem;
-                communicator.Receive(0, 1, out elem);
-                localList.Add(elem);
-            }
-
-            localList.Sort();
-
-            int p = communicator.Size;
-            int samples = (localList.Count - 1) / p;
-
-            communicator.Send(samples, 0, 2);
-
-            for(var i = 0; i <= samples; i++)
-            {
-                communicator.Send(localList[i * p], 0, 3);
-            }
-
+            var samples = comm.Gather(patterns, 0);
             var pivots = new List<int>();
-            communicator.Receive(0, 2, out pivots);
-
-            int j = 0;
-            var gatheredList = new List<List<int>>();
-            List<int> temp = new List<int>();
-            for(var i = 0; i < pivots.Count; i++)
+            if (number == 0)
             {
-                temp = new List<int>();
-                while (j < localList.Count && localList[j] <= pivots[i])
+                List<int> merged = new List<int>();
+                Merge(samples.ToList(), ref merged);
+                for(int i = 1; i < p; i++)
                 {
-                    temp.Add(localList[j]);
-                    j++;
-                }
-                if (i != communicator.Rank)
-                {
-                    communicator.Send(temp, i, 4);
-                }
-                else if (temp.Count != 0)
-                {
-                    gatheredList.Add(temp);
+                    pivots.Add(merged[i * p + t]);
                 }
             }
-            while(j < localList.Count)
+            comm.Broadcast(ref pivots, 0);
+            var partitions = new List<int>[p];
+            partitions[0] = temp.Where(x => x < pivots[0]).ToList();
+            for(int i = 1; i < p - 1; i++)
             {
-                temp.Add(localList[j]);
-                j++;
+                partitions[i] = temp.Where(x => x >= pivots[i - 1] && x < pivots[i]).ToList();
             }
-            if(communicator.Size - 1 != communicator.Rank)
+            partitions[p - 1] = temp.Where(x => x >= pivots[p - 2]).ToList();
+            for(int i = 0; i < p; i++)
             {
-                communicator.Send(temp, communicator.Size - 1, 4);
-            }
-            else if(temp.Count != 0)
-            {
-                gatheredList.Add(temp);
-            }
-            for(var i = 0; i < p; i++)
-            {
-                if(i != communicator.Rank)
+                if(i == number)
                 {
-                    List<int> giveAway = new List<int>();
-                    communicator.Receive(i, 4, out giveAway);
-                    if (giveAway.Count != 0)
-                    {
-                        gatheredList.Add(giveAway);
-                    }
+                    continue;
                 }
+                comm.Send(partitions[i], i, 1);
             }
-
-            List<int> merged = new List<int>();
-            Merge(gatheredList, ref merged);
-            communicator.Send(merged, 0, 5);
+            var parts = new List<int>[p];
+            for (int i = 0; i < p; i++)
+            {
+                if (i == number)
+                {
+                    parts[i] = partitions[i];
+                    continue;
+                }
+                parts[i] = comm.Receive<List<int>>(i, 1);
+            }
+            List<int> localResult = new List<int>();
+            Merge(parts.ToList(), ref localResult);
+            var result = comm.Gather(localResult.ToArray(), 0);
+            return result;
         }
 
         static void Merge(List<List<int>> gathered, ref List<int> merged)
