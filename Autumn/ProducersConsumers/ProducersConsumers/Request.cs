@@ -25,6 +25,9 @@ namespace ProducersConsumers
             Offer = offer;
         }
 
+        /// <summary>
+        /// Compare request.
+        /// </summary>
         public bool Equals (Request req)
         {
             if (req != null)
