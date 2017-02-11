@@ -7,6 +7,7 @@ namespace ThreadPool
 {
     public class ThreadPool: IDisposable
     {
+        private bool _finish = false;
         private const int NumThread = 3;
         private Queue<Action> taskQueue = new Queue<Action>();
         private object threadLock = new object();
@@ -23,6 +24,7 @@ namespace ThreadPool
         public void Dispose()
         {
             taskQueue.Clear();
+            _finish = true;
             Console.WriteLine("Dispose finished");
         }
 
@@ -41,6 +43,11 @@ namespace ThreadPool
                             act = taskQueue.Dequeue();
                         }
                         act();
+                    }
+                    else
+                    {
+                        if (!_finish)
+                            Thread.Sleep(100);
                     }
                 });
                 threadArr[j % 3].Start();
