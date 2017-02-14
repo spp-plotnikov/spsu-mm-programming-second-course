@@ -14,14 +14,19 @@ namespace Future
             if (arr.Length == 1)
                 return arr[0];
             int[] otherArr = new int[arr.Length / 2];
+            Task<int>[] tasks = new Task<int>[arr.Length / 2];
             for (int i = 0; i < arr.Length / 2; i++)
             {
-                otherArr[i] = Task<int>.Run(() => arr[2 * i] + arr[2 * i + 1]).Result;
+                tasks[i] = Task<int>.Run(() => arr[2 * i] + arr[2 * i + 1]);
+            }
+            for (int i = 0; i<arr.Length / 2; i++)
+            {
+                otherArr[i]= tasks[i].Result;
             }
             if (arr.Length % 2 == 0)
                 return Sum(otherArr);
             else
-                return Sum(otherArr) + arr[arr.Length-1];
+                return Sum(otherArr) + arr[arr.Length - 1];
         }
     }
 }
