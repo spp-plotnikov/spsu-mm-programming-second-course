@@ -14,12 +14,6 @@ namespace ProducersConsumers
     class Program
     {
         private static Mutex _mutex = new Mutex();
-        public static DateTime PauseBuyer { get; private set; }
-
-        public static void SetPauseBuyerTime(DateTime time)
-        {
-            PauseBuyer = time;
-        }
 
         static void Main(string[] args)
         {

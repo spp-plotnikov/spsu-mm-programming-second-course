@@ -18,18 +18,12 @@ namespace ProducersConsumers
             {
                 if (buyerIsFinish)
                     return false;
-                while ((DateTime.Now - Program.PauseBuyer).CompareTo(
-                    Program.PauseBuyer.AddMilliseconds(500) - Program.PauseBuyer) <= 0)
-                {
-                    Thread.Sleep(Program.PauseBuyer.AddMilliseconds(500) - DateTime.Now);
-                }
                 if (listOffers.Remove(listOffers.Find(req.Equals)))
                 {
                     Console.WriteLine("Offer accepted! " + NameBuyer + " takes a lot " + req.NumberRequest);
                     Console.WriteLine(DateTime.Now);
                     _takenRequest.Add(req);
                     NumberRequiredOffers--;
-                    Program.SetPauseBuyerTime( DateTime.Now);
                     return true;
                 }
             }
@@ -67,8 +61,11 @@ namespace ProducersConsumers
                     {
                         mutex.WaitOne();
                         if (buyerIsFinish)
+                        {
+                            mutex.ReleaseMutex();
                             break;
-                        if (listOffers[i].Offer <= InterestOffer && listOffers.Count != 0
+                        }
+                            if (listOffers[i].Offer <= InterestOffer && listOffers.Count != 0
                             && interestReq.RatingCreatorCompany <= listOffers[i].RatingCreatorCompany)
                         {
                             interestReq = listOffers[i];
@@ -78,11 +75,16 @@ namespace ProducersConsumers
                     }
                     mutex.WaitOne();
                     if (buyerIsFinish)
+                    {
+                        mutex.ReleaseMutex();
                         break;
+                    }
                     if (_find)
-                        if (!TakeRequest(interestReq, listOffers, mutex))
+                        if (!TakeRequest(interestReq, listOffers, mutex)) 
                             _find = false;
                     mutex.ReleaseMutex();
+                    if (_find)
+                        Thread.Sleep(1000);
                 }
                 if (NumberRequiredOffers == 0)
                 {

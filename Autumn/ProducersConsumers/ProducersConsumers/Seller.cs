@@ -47,8 +47,8 @@ namespace ProducersConsumers
                 Console.WriteLine("New request! " + request.NumberRequest + " From " + NameCompany
                     + "     EUROtoRUB in exchange rate {0} ", _officialExchangeRate[1] + _offer);
                 Console.WriteLine(DateTime.Now);
-                Thread.Sleep(2000);
                 mutex.ReleaseMutex();
+                Thread.Sleep(5000);
             }
             _threadCount++;
             Console.WriteLine("Thread{0} finish work", _threadCount);
