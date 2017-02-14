@@ -17,7 +17,8 @@ namespace Future
             Task<int>[] tasks = new Task<int>[arr.Length / 2];
             for (int i = 0; i < arr.Length / 2; i++)
             {
-                tasks[i] = Task<int>.Run(() => arr[2 * i] + arr[2 * i + 1]);
+                int j = i;
+                tasks[i] = Task<int>.Run(() => arr[2 * j] + arr[2 * j + 1]);
             }
             for (int i = 0; i<arr.Length / 2; i++)
             {
