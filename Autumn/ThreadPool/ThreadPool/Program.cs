@@ -18,7 +18,7 @@ namespace ThreadPool
                 pool.Enqueue(() =>
                 {
                     Console.WriteLine("Action" + numAction + ": Work emulation");
-                    Thread.Sleep(500);
+                    Thread.Sleep(5000);
                     Console.WriteLine("Action" + numAction + ": finish");
                 });
             }
