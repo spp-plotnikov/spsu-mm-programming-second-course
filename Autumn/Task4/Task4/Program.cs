@@ -11,12 +11,11 @@ namespace Task4
     {
         static void Main(string[] args)
         {
-            Queue<Action> list = new Queue<Action>();
-            for(int i = 0; i < 11; i++)
+            ThreadPool pool = new ThreadPool(10);
+            for (int i = 0; i < 100; i++)
             {
-                list.Enqueue(() => Thread.Sleep(1000));
+                pool.Enqueue(() => Thread.Sleep(1000));
             }
-            ThreadPool pool = new ThreadPool(list, 5);
         }
     }
 }

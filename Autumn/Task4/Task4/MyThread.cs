@@ -12,7 +12,8 @@ namespace Task4
         private Queue<Action> tasks;
         private bool isWorking;
         private Thread thread;
-        private String name;
+        private string name;
+        private object obj;
         public int TaskCounter
         {
             get;
@@ -27,12 +28,18 @@ namespace Task4
             thread = new Thread(Run);
             this.name = name;
             TaskCounter = 0;
+            obj = new object();
         }
 
         public void Enqueue(Action task)
         {
             tasks.Enqueue(task);
             TaskCounter++;
+            if(!isWorking)
+            {
+                isWorking = true;
+                Start();
+            }
         }
 
         public void Run()
@@ -40,7 +47,7 @@ namespace Task4
             while(isWorking)
             {
                 Action onGoing = new Action(() => { });
-                lock(tasks)
+                lock(obj)
                 {
                     if(tasks.Count() != 0)
                     {
@@ -49,9 +56,10 @@ namespace Task4
                     }
                     else
                     {
-                        Console.WriteLine(name + " is not busy. Trying to steal.");
                         IsReady();
+                        isWorking = false;
                     }
+                    Monitor.PulseAll(obj);
                 }
                 if(!isWorking)
                 {
@@ -64,25 +72,17 @@ namespace Task4
 
         public Action Give()
         {
-            lock(tasks)
+            lock(obj)
             {
-                try
+                if(TaskCounter > 0)
                 {
-                    isWorking = false;
                     Action task = tasks.Dequeue();
                     TaskCounter--;
-                    isWorking = true;
-                    Run();
-                    Monitor.PulseAll(tasks);
+                    Monitor.PulseAll(obj);
                     return task;
                 }
-                catch
+                else
                 {
-                    if(!isWorking)
-                    {
-                        isWorking = true;
-                        Run();
-                    }
                     return null;
                 }
             }
@@ -90,18 +90,18 @@ namespace Task4
 
         public void Start()
         {
-            thread.Start();
             isWorking = true;
+            thread.Start();
         }
 
         public void Dispose()
         {
-            lock(tasks)
+            lock(obj)
             {
                 isWorking = false;
                 tasks.Clear();
                 TaskCounter = 0;
-                Monitor.PulseAll(tasks);
+                Monitor.PulseAll(obj);
             }
             return;
         }

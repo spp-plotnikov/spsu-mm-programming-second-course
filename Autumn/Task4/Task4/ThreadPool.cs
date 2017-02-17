@@ -9,53 +9,26 @@ namespace Task4
 {
     public class ThreadPool : IDisposable
     {
-        private Queue<Action> tasks;
         private int threadNumber;
         private List<MyThread> threads;
-        public ThreadPool(Queue<Action> list, int number)
+        private Random rand;
+        public ThreadPool(int number)
         {
             threadNumber = number;
-            tasks = list;
             threads = new List<MyThread>();
             for(int i = 0; i < threadNumber; i++)
             {
                 MyThread thread = new MyThread(i.ToString());
-                threads.Add(thread);
                 thread.IsReady += StealTask;
+                threads.Add(thread);
             }
-            while(tasks.Count != 0)
-            {
-                for (int i = 0; i < threadNumber; i++)
-                {
-                    try
-                    {
-                        threads[i].Enqueue(tasks.Dequeue());
-                    }
-                    catch
-                    {
-                        break;
-                    }
-                }
-            }
-            for (int i = 0; i < threadNumber; i++)
-            {
-                threads[i].Start();
-            }
+            rand = new Random();
         }
 
         private void StealTask()
         {
-            int max = threads[0].TaskCounter;
-            int maxIndex = 0;
-            for (int i = 0; i < threads.Count; i++)
-            {
-                if (threads[i].TaskCounter > max)
-                {
-                    max = threads[i].TaskCounter;
-                    maxIndex = i;
-                }
-            }
-            Enqueue(threads[maxIndex].Give());
+            int number = rand.Next(threadNumber);
+            Enqueue(threads[number].Give());
         }
 
         public void Enqueue(Action task)
@@ -64,22 +37,12 @@ namespace Task4
             {
                 return;
             }
-            int min = threads[0].TaskCounter;
-            int minIndex = 0;
-            for(int i = 0; i < threads.Count; i++)
-            {
-                if(threads[i].TaskCounter < min)
-                {
-                    min = threads[i].TaskCounter;
-                    minIndex = i;
-                }
-            }
-            threads[minIndex].Enqueue(task);
+            int number = rand.Next(threadNumber);
+            threads[number].Enqueue(task);
         }
 
         public void Dispose()
         {
-            tasks = new Queue<Action>();
             for(int i = 0; i < threads.Count; i++)
             {
                 threads[i].Dispose();
