@@ -1,36 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+
 namespace ThreadPool
 {
     public class ThreadPool: IDisposable
     {
+        const int NumThread = 3;
+
+        private Queue<Action> _taskQueue = new Queue<Action>();
+        private Thread[] _threadArr = new Thread[3];
+        private int _numPortion = 0;
+        private bool _portion = false;
         private bool _finish = false;
-        private const int NumThread = 3;
-        private Queue<Action> taskQueue = new Queue<Action>();
-        private object threadLock = new object();
-        private Thread[] threadArr = new Thread[3];
-        private int numPortion = 0;
-        private bool portion = false;
-        public struct newPortion
+        private object _threadLock = new object();
+
+        private struct NewPortion
         {
             public bool portion;
             public int numPortion;
             
-            public newPortion(bool portion, int numPortion)
+            public NewPortion(bool portion, int numPortion)
             {
                 this.portion = portion;
                 this.numPortion = numPortion;
             }
         }
-        newPortion threadPoolPortion = new newPortion(false, 0);
+
+        NewPortion threadPoolPortion = new NewPortion(false, 0);
+
         public void Enqueue(Action task)
         {
-            lock (threadLock)
+            lock (_threadLock)
             {
-                taskQueue.Enqueue(task);
+                _taskQueue.Enqueue(task);
                 threadPoolPortion.portion = true;
                 threadPoolPortion.numPortion += 1;
             }
@@ -38,46 +42,48 @@ namespace ThreadPool
 
         public void Dispose()
         {
-            taskQueue.Clear();
+            _taskQueue.Clear();
             _finish = true;
             Console.WriteLine("Dispose finished");
         }
 
         public void Start()
         {
-            int j=0;
+            int j = 0;
             while(!_finish)
             {
-                if (taskQueue.Count != 0)
+                if (_taskQueue.Count != 0)
                 {
-                    threadArr[j % 3] = new Thread(() =>
+                    _threadArr[j % 3] = new Thread(() =>
                     {
-                        numPortion = threadPoolPortion.numPortion;
-                        portion = threadPoolPortion.portion;
-                        Action act;
-                        lock (threadLock)
+                        _numPortion = threadPoolPortion.numPortion;
+                        _portion = threadPoolPortion.portion;
+                        Action act = () => { };
+                        lock (_threadLock)
                         {
-                            act = taskQueue.Dequeue();
+                            if (_taskQueue.Count > 0)
+                                act = _taskQueue.Dequeue();
                         }
-                        act();
+                        if (_taskQueue.Count > 0)
+                            act();
                     });
 
                     if (_finish)
                         break;
 
-                    threadArr[j % 3].Start();
+                    _threadArr[j % 3].Start();
                     j++;
                 }
                 else
                 {
-                    lock (threadLock)
+                    lock (_threadLock)
                     {
-                        if (numPortion == threadPoolPortion.numPortion)
-                            portion = false;
+                        if (_numPortion == threadPoolPortion.numPortion)
+                            _portion = false;
                     }
 
-                    if (threadArr[1] == Thread.CurrentThread)
-                        while (!portion)
+                    if (_threadArr[1] == Thread.CurrentThread)
+                        while (!_portion)
                             Thread.Sleep(1);
                     else
                         break;
@@ -87,9 +93,5 @@ namespace ThreadPool
                 }
             }
         }
-
-
-
-
     }
 }

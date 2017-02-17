@@ -9,6 +9,5 @@ namespace Future
     interface IArraySum
     {
         int Sum(int[] arr);
-
     }
 }

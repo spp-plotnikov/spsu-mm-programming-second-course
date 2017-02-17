@@ -8,26 +8,27 @@ namespace ProducersConsumers
 {
     class Seller
     {
-        private bool _sellerIsFinish = false;
-        private int _threadCount = 0;
-        List<string> listOfNames = new List<string>() { "Lucky Corp.", "First Company", "Liberty Inc.", "Area Ltd." };
+        private double[] _officialExchangeRate = new double[3] { 59.3137, 63.8156, 74.3438 };
+        private List<string> _listOfNames = new List<string>() { "Lucky Corp.", "First Company", "Liberty Inc.", "Area Ltd." };
+
         public string NameCompany { get; private set; }
         public int RatingCompany { get; private set; }
         public int ItemNumberInBidding { get; private set; }
+
+        private bool _sellerIsFinish = false;
         private int _amountRequest = 0;
-        private double[] _officialExchangeRate = new double[3] { 59.3137, 63.8156, 74.3438 };
+        private int _threadCount = 0;
 
         internal Seller(int numberNameInList, int ratingCompany, int itemNumberInBidding)
         {
-            NameCompany = listOfNames[numberNameInList - 1];
+            NameCompany = _listOfNames[numberNameInList - 1];
             RatingCompany = ratingCompany;
             ItemNumberInBidding = itemNumberInBidding;
         }
-
-        DateTime _pause;
+        
         /// <param name="offer">Offer which can make the company. The difference with the official exchange rate.</param>
         /// <param name="exchangeRate">Currencies exchange in this offer</param>
-        public void makeRequest(TypesOfExchangeRate exchangeRate, List<Request> listOffers, Mutex mutex)
+        public void MakeRequest(TypesOfExchangeRate exchangeRate, List<Request> listOffers, Mutex mutex)
         {
             while (!_sellerIsFinish)
             {
@@ -68,7 +69,7 @@ namespace ProducersConsumers
         public void ThreadInitializeAndStart(TypesOfExchangeRate exchangeRate,
                                                     List<Request> listOffers, Mutex mutex)
         {
-            Thread thread = new Thread(() => makeRequest(TypesOfExchangeRate.EUROtoRUB, listOffers, mutex));
+            Thread thread = new Thread(() => MakeRequest(TypesOfExchangeRate.EUROtoRUB, listOffers, mutex));
             thread.Start();
         }
 

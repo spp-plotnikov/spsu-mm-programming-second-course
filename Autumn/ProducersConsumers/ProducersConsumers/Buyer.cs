@@ -8,34 +8,16 @@ namespace ProducersConsumers
 {
     class Buyer
     {
-        private bool buyerIsFinish = false;
         private List<Request> _takenRequest = new List<Request>();
-        public bool TakeRequest(Request req, List<Request> listOffers, Mutex mutex)
-        {
-            //предполагаем, для Request значение поумолчанию - null.
+        private List<string> listOfNames = new List<string>() { "Nick Valentine", "John Wick", "Bob Seger", "Rick Grimes" };
 
-            if (listOffers.Find(req.Equals) != null)
-            {
-                if (buyerIsFinish)
-                    return false;
-                if (listOffers.Remove(listOffers.Find(req.Equals)))
-                {
-                    Console.WriteLine("Offer accepted! " + NameBuyer + " takes a lot " + req.NumberRequest);
-                    Console.WriteLine(DateTime.Now);
-                    _takenRequest.Add(req);
-                    NumberRequiredOffers--;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        List<string> listOfNames = new List<string>() { "Nick Valentine", "John Wick", "Bob Seger", "Rick Grimes" };
+        public TypesOfExchangeRate PairOfInterestRates { get; private set; }
         public string NameBuyer { get; private set; }
         public double InterestOffer { get; private set; }
         public int ItemNumberInBidding { get; private set; }
-        public TypesOfExchangeRate PairOfInterestRates { get; private set; }
         public int NumberRequiredOffers { get; private set; }
+
+        private bool _buyerIsFinish = false;
 
 
         /// <param name="interestOffer">The most expensive offer inetesting from Buyer.</param>
@@ -51,7 +33,7 @@ namespace ProducersConsumers
 
         public void FindOffer( List<Request> listOffers, Mutex mutex)
         {
-            while (!buyerIsFinish)
+            while (!_buyerIsFinish)
             {
                 bool _find = false;
                 Request interestReq = new Request(0,0,0,0);
@@ -60,21 +42,26 @@ namespace ProducersConsumers
                     for (int i = 0; i < listOffers.Count; i++)
                     {
                         mutex.WaitOne();
-                        if (buyerIsFinish)
+                        if (_buyerIsFinish)
                         {
                             mutex.ReleaseMutex();
                             break;
                         }
-                            if (listOffers[i].Offer <= InterestOffer && listOffers.Count != 0
-                            && interestReq.RatingCreatorCompany <= listOffers[i].RatingCreatorCompany)
+                        if (i < listOffers.Count && listOffers.Count != 0)
                         {
-                            interestReq = listOffers[i];
-                            _find = true;
+                            if (listOffers[i].Offer <= InterestOffer)
+                            {
+                                if (interestReq.RatingCreatorCompany <= listOffers[i].RatingCreatorCompany)
+                                {
+                                    interestReq = listOffers[i];
+                                    _find = true;
+                                }
+                            }
                         }
                         mutex.ReleaseMutex();
                     }
                     mutex.WaitOne();
-                    if (buyerIsFinish)
+                    if (_buyerIsFinish)
                     {
                         mutex.ReleaseMutex();
                         break;
@@ -94,6 +81,25 @@ namespace ProducersConsumers
             }
         }
 
+        public bool TakeRequest(Request req, List<Request> listOffers, Mutex mutex)
+        {
+            if (listOffers.Find(req.Equals) != null)            //Спросить нормально ли так делать с точки зрения CodeStyle
+            {
+                if (!_buyerIsFinish)
+                {
+                    if (listOffers.Remove(listOffers.Find(req.Equals)))
+                    {
+                        Console.WriteLine("Offer accepted! " + NameBuyer + " takes a lot " + req.NumberRequest);
+                        Console.WriteLine(DateTime.Now);
+                        _takenRequest.Add(req);
+                        NumberRequiredOffers--;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public void ThreadInitializeAndStart(List<Request> listOffers, Mutex mutex)
         {
             Thread thread = new Thread(() => FindOffer(listOffers, mutex));
@@ -102,7 +108,7 @@ namespace ProducersConsumers
 
         public void FinishBuyer()
         {
-            buyerIsFinish = true;
+            _buyerIsFinish = true;
         }
     }
 }

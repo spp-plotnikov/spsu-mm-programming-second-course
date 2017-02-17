@@ -11,9 +11,9 @@ namespace ProducersConsumers
     /// </summary>
     class Request
     {
+        public TypesOfExchangeRate ExchangeRateRequest { get; private set; }
         public int NumberRequest { get; private set; }
         public int RatingCreatorCompany { get; private set; }
-        public TypesOfExchangeRate ExchangeRateRequest { get; private set; }
         public double Offer { get; private set; }
 
         
