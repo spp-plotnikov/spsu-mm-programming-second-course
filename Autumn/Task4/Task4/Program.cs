@@ -12,10 +12,17 @@ namespace Task4
         static void Main(string[] args)
         {
             ThreadPool pool = new ThreadPool(10);
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10; i++)
             {
                 pool.Enqueue(() => Thread.Sleep(1000));
             }
+            Thread.Sleep(5000);
+
+            for (int i = 0; i < 10; i++)
+            {
+                pool.Enqueue(() => Thread.Sleep(1000));
+            }
+            Console.ReadKey();
         }
     }
 }

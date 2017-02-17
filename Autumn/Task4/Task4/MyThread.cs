@@ -14,11 +14,6 @@ namespace Task4
         private Thread thread;
         private string name;
         private object obj;
-        public int TaskCounter
-        {
-            get;
-            private set;
-        }
         public delegate void MyDelegate();
         public event MyDelegate IsReady;
 
@@ -27,14 +22,12 @@ namespace Task4
             tasks = new Queue<Action>();
             thread = new Thread(Run);
             this.name = name;
-            TaskCounter = 0;
             obj = new object();
         }
 
         public void Enqueue(Action task)
         {
             tasks.Enqueue(task);
-            TaskCounter++;
             if(!isWorking)
             {
                 isWorking = true;
@@ -66,7 +59,6 @@ namespace Task4
                     return;
                 }
                 onGoing();
-                TaskCounter--;
             }
         }
 
@@ -74,10 +66,9 @@ namespace Task4
         {
             lock(obj)
             {
-                if(TaskCounter > 0)
+                if(tasks.Count != 0)
                 {
                     Action task = tasks.Dequeue();
-                    TaskCounter--;
                     Monitor.PulseAll(obj);
                     return task;
                 }
@@ -91,7 +82,15 @@ namespace Task4
         public void Start()
         {
             isWorking = true;
-            thread.Start();
+            try
+            {
+                thread.Start();
+            }
+            catch
+            {
+                thread = new Thread(Run);
+                thread.Start();
+            }
         }
 
         public void Dispose()
@@ -100,7 +99,6 @@ namespace Task4
             {
                 isWorking = false;
                 tasks.Clear();
-                TaskCounter = 0;
                 Monitor.PulseAll(obj);
             }
             return;
