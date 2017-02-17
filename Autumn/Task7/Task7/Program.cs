@@ -12,11 +12,28 @@ namespace Task7
         {
             SlowSystem slowSystem = new SlowSystem();
             FastSystem fastSystem = new FastSystem();
+            int numberOfTests = 35;
             Emulation emul = new Emulation(slowSystem, 5);
-            Console.WriteLine(emul.Result);
+            Test(emul, numberOfTests);
             emul = new Emulation(fastSystem, 5);
-            Console.WriteLine(emul.Result);
+            Test(emul, numberOfTests);
             Console.ReadKey();
+        }
+
+        public static void Test(Emulation emul, int numberOfTests)
+        {
+            double average = 0.0;
+            emul.Init();
+            for(int i = 0; i < 10; i++)
+            {
+                emul.Start();
+            }
+            for (int i = 0; i < numberOfTests; i++)
+            {
+                emul.Start();
+                average += emul.Result;
+            }
+            Console.WriteLine(average / numberOfTests);
         }
     }
 }

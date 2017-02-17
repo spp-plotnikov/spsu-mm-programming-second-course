@@ -23,7 +23,7 @@ namespace Task4
 
         public MyThread(String name)
         {
-            //this.tasks = tasks;
+            tasks = new Queue<Action>();
             thread = new Thread(Run);
             this.name = name;
             TaskCounter = 0;
@@ -45,11 +45,11 @@ namespace Task4
                     if(tasks.Count() != 0)
                     {
                         onGoing = tasks.Dequeue();
-                        Console.WriteLine(name + "is running.");
+                        Console.WriteLine(name + " is running.");
                     }
                     else
                     {
-                        Console.WriteLine(name + "is not busy. Trying to steal.");
+                        Console.WriteLine(name + " is not busy. Trying to steal.");
                         IsReady();
                     }
                 }

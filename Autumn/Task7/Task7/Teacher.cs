@@ -20,21 +20,22 @@ namespace Task7
 
         public void Work(IExamSystem system)
         {
+            Random rand = new Random();
             for(int i = 0; i < 900; i++)
             {
-                int random = new Random().Next(SomeInfo.Count);
+                int random = rand.Next(SomeInfo.Count);
                 var temp = SomeInfo[random];
                 system.Contains(temp.Key, temp.Value);
             }
             for (int i = 0; i < 90; i++)
             {
-                int random = new Random().Next(SomeInfo.Count);
+                int random = rand.Next(SomeInfo.Count);
                 var temp = SomeInfo[random];
                 system.Add(temp.Key, temp.Value);
             }
             for(int i = 0; i < 10; i++)
             {
-                int random = new Random().Next(SomeInfo.Count);
+                int random = rand.Next(SomeInfo.Count);
                 var temp = SomeInfo[random];
                 system.Remove(temp.Key, temp.Value);
             }

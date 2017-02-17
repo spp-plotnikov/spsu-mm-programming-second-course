@@ -27,7 +27,14 @@ namespace Task4
             {
                 for (int i = 0; i < threadNumber; i++)
                 {
-                    threads[i].Enqueue(tasks.Dequeue());
+                    try
+                    {
+                        threads[i].Enqueue(tasks.Dequeue());
+                    }
+                    catch
+                    {
+                        break;
+                    }
                 }
             }
             for (int i = 0; i < threadNumber; i++)
@@ -72,10 +79,12 @@ namespace Task4
 
         public void Dispose()
         {
+            tasks = new Queue<Action>();
             for(int i = 0; i < threads.Count; i++)
             {
                 threads[i].Dispose();
             }
+            threads = new List<MyThread>();
         }
     }
 }

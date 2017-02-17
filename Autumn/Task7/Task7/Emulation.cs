@@ -24,21 +24,24 @@ namespace Task7
             this.system = system;
             this.teacherNumber = teacherNumber > 0 ? teacherNumber : 5;
             teachers = new List<Teacher>();
+            Result = -1;
+        }
 
-            for(int i = 0; i < teacherNumber; i++)
+        public void Init()
+        {
+            for (int i = 0; i < teacherNumber; i++)
             {
                 var info = new List<KeyValuePair<long, long>>();
-                for(int j = 0; j < 1000; j++)
+                for (int j = 0; j < 1000; j++)
                 {
                     info.Add(new KeyValuePair<long, long>((i + 1) * teacherNumber + j, new Random().Next((j + i + 1) * 5 % 100 + 1)));
                 }
                 Teacher teacher = new Teacher(info);
                 teachers.Add(teacher);
             }
-            Start();
         }
 
-        private void Start()
+        public void Start()
         {
             Stopwatch s = new Stopwatch();
             s.Reset();
