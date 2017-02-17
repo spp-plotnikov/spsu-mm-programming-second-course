@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Decanat
@@ -59,13 +60,10 @@ namespace Decanat
                     int j = i;
                     tasks.Add(new Task(() => ssl.Remove(3210001 + j, 1, job.Teacher)));
                 }
-                for (int t = 0; t < 10; t++)
+                for (int i = 0; i < 900; i++)
                 {
-                    for (int i = 0; i < 90; i++)
-                    {
-                        int j = i;
-                        tasks.Add(new Task(() => ssl.Contains(3210001 + j, 1)));
-                    }
+                    int j = i % 90;
+                    tasks.Add(new Task(() => ssl.Contains(3210001 + j, 1)));
                 }
                 foreach (Task task in tasks)
                     task.Start();

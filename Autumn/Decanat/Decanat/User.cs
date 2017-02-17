@@ -8,12 +8,12 @@ namespace Decanat
 {
     class User
     {
-        List<long> coursesID = new List<long>();
-        List<long> studentsID = new List<long>();
+        private List<long> _coursesID = new List<long>();
+        private List<long> _studentsID = new List<long>();
         readonly long courseID;
         readonly long studentID;
         readonly job job;
-        private IExamSystem system;
+        private IExamSystem _system;
         
         /// <param name="list">list students or courses depending on the job</param>
         public User(job job, long ID, List<long> list, IExamSystem system)
@@ -22,35 +22,35 @@ namespace Decanat
             if (job == job.Student)
             {
                 studentID = ID;
-                coursesID = list;
+                _coursesID = list;
             }
             else
             {
                 courseID = ID;
-                studentsID = list;
+                _studentsID = list;
             }
-            this.system = system;
+            _system = system;
         }
 
         public void AddExam(int numInList)
         {
             if (job == job.Student)
-                Task.Run(() => system.Add(studentID, coursesID[numInList], job));
+                Task.Run(() => _system.Add(studentID, _coursesID[numInList], job));
             else
-                Task.Run(() => system.Add(studentsID[numInList], courseID, job));
+                Task.Run(() => _system.Add(_studentsID[numInList], courseID, job));
         }
         
         public void RemoveExam(int numInList)
         {
             if (job == job.Student)
-                Task.Run(() => system.Remove(studentID, coursesID[numInList], job));
+                Task.Run(() => _system.Remove(studentID, _coursesID[numInList], job));
             else
-                Task.Run(() => system.Remove(studentsID[numInList], courseID, job));
+                Task.Run(() => _system.Remove(_studentsID[numInList], courseID, job));
         }
 
         public bool ContainsExam(long courseID, long studentID)
         {
-            var task = Task.Run(() => system.Contains(studentID, courseID));
+            var task = Task.Run(() => _system.Contains(studentID, courseID));
             return task.Result;
         }
     }
